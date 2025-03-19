@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+.test-bg {
+    @apply bg-red-500;
+  }
+  .test-height {
+    @apply h-20;
+  }
