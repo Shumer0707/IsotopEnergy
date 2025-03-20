@@ -5,6 +5,7 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\LanguageController;
+use App\Http\Controllers\ContactController;
 use Illuminate\Support\Facades\Route;
 
 // 🔹 Общедоступные маршруты
@@ -30,3 +31,5 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->midd
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
+
+Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:5,1');
