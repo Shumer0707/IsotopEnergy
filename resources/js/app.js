@@ -10,7 +10,7 @@ import Layout from './Layouts/Layout.vue';
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 // 🔹 Определяем страницы, которые должны использовать Layout.vue
-const publicPages = ['Home', 'About']; // Названия компонентов страниц
+const publicPages = ['Home', 'About', 'Cart', 'Contacts', 'Product']; // Названия компонентов страниц
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,

@@ -2,12 +2,21 @@
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\LanguageController;
 use Illuminate\Support\Facades\Route;
 
 // 🔹 Общедоступные маршруты
 Route::get('/', [PageController::class, 'home'])->name('home');
 Route::get('/about', [PageController::class, 'about'])->name('about');
+Route::get('/contacts', [PageController::class, 'contacts'])->name('contacts');
+Route::get('/cart', [PageController::class, 'cart'])->name('cart');
+
+// 🔹 Категории товаров
+Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.show');
+
+Route::get('/set-locale/{locale}', [LanguageController::class, 'switch'])->name('set-locale');
 
 // 🔹 Аутентификация (Breeze)
 Route::middleware('guest')->group(function () {
