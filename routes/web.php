@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\ContactController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\AdminProductController;
 
 // 🔹 Общедоступные маршруты
 Route::get('/', [PageController::class, 'home'])->name('home');
@@ -30,6 +31,7 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->midd
 // 🔹 Админская панель (только для администраторов)
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/products/create', [AdminProductController::class, 'create'])->name('products.create');
 });
 
 Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:5,1');

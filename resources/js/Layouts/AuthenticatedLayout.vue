@@ -39,6 +39,12 @@ const showingNavigationDropdown = ref(false);
                                 >
                                     Dashboard
                                 </NavLink>
+                                <Link
+                                    href="/admin/products/create"
+                                    class="flex items-center justify-center px-4 my-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                                >
+                                    Добавить товар
+                                </Link>
                             </div>
                         </div>
 
@@ -85,6 +91,7 @@ const showingNavigationDropdown = ref(false);
                                         </DropdownLink>
                                     </template>
                                 </Dropdown>
+
                             </div>
                         </div>
 
