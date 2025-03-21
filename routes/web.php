@@ -8,6 +8,8 @@ use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\ContactController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminProductController;
+use App\Http\Controllers\Admin\AdminCategoryController;
+use App\Http\Controllers\Admin\AdminAttributeController;
 
 // 🔹 Общедоступные маршруты
 Route::get('/', [PageController::class, 'home'])->name('home');
@@ -32,6 +34,16 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->midd
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/products/create', [AdminProductController::class, 'create'])->name('products.create');
+
+    Route::get('/categories', [AdminCategoryController::class, 'index'])->name('categories.index');
+    Route::post('/categories/store', [AdminCategoryController::class, 'store'])->name('categories.store');
+    Route::post('/categories/update/{category}', [AdminCategoryController::class, 'update'])->name('categories.update');
+    Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy'])->name('categories.destroy');
+
+    Route::get('/attributes', [AdminAttributeController::class, 'index'])->name('attributes.index');
+    Route::post('/attributes/store', [AdminAttributeController::class, 'store'])->name('attributes.store');
+    Route::post('/attributes/update/{attribute}', [AdminAttributeController::class, 'update'])->name('attributes.update');
+    Route::delete('/attributes/{attribute}', [AdminAttributeController::class, 'destroy'])->name('attributes.destroy');
 });
 
 Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:5,1');

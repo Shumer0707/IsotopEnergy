@@ -45,6 +45,19 @@ const showingNavigationDropdown = ref(false);
                                 >
                                     Добавить товар
                                 </Link>
+
+                                <Link
+                                    href="/admin/categories"
+                                    class="flex items-center justify-center px-4 my-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                                >
+                                    Категории
+                                </Link>
+                                <Link
+                                    href="/admin/attributes"
+                                    class="flex items-center justify-center px-4 my-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                                >
+                                    Атрибуты
+                                </Link>
                             </div>
                         </div>
 

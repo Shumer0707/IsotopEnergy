@@ -37,6 +37,7 @@
                 <Link href="/about" class="px-2">О нас</Link>
                 <Link href="/contacts" class="px-2">Контакты</Link>
                 <Link href="/cart" class="px-2">Корзина</Link>
+                <Link href="/admin/dashboard" class="px-2">Кабинет</Link>
             </nav>
             &copy; 2025 My Website
         </footer>
