@@ -1,11 +1,11 @@
 <script setup>
-import { ref } from 'vue';
-import ApplicationLogo from '@/Components/ApplicationLogo.vue';
-import Dropdown from '@/Components/Dropdown.vue';
-import DropdownLink from '@/Components/DropdownLink.vue';
-import NavLink from '@/Components/NavLink.vue';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
-import { Link } from '@inertiajs/vue3';
+import { ref } from "vue";
+import ApplicationLogo from "@/Components/ApplicationLogo.vue";
+import Dropdown from "@/Components/Dropdown.vue";
+import DropdownLink from "@/Components/DropdownLink.vue";
+import NavLink from "@/Components/NavLink.vue";
+import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
+import { Link } from "@inertiajs/vue3";
 
 const showingNavigationDropdown = ref(false);
 </script>
@@ -13,9 +13,7 @@ const showingNavigationDropdown = ref(false);
 <template>
     <div>
         <div class="min-h-screen bg-gray-100">
-            <nav
-                class="border-b border-gray-100 bg-white"
-            >
+            <nav class="border-b border-gray-100 bg-white">
                 <!-- Primary Navigation Menu -->
                 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div class="flex h-16 justify-between">
@@ -40,10 +38,10 @@ const showingNavigationDropdown = ref(false);
                                     Dashboard
                                 </NavLink>
                                 <Link
-                                    href="/admin/products/create"
+                                    href="/admin/products"
                                     class="flex items-center justify-center px-4 my-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                                 >
-                                    Добавить товар
+                                    Товары
                                 </Link>
 
                                 <Link
@@ -57,6 +55,12 @@ const showingNavigationDropdown = ref(false);
                                     class="flex items-center justify-center px-4 my-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
                                 >
                                     Атрибуты
+                                </Link>
+                                <Link
+                                    href="/admin/attribute-values"
+                                    class="flex items-center justify-center px-4 my-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                                >
+                                    Значения атрибутов
                                 </Link>
                             </div>
                         </div>
@@ -104,7 +108,6 @@ const showingNavigationDropdown = ref(false);
                                         </DropdownLink>
                                     </template>
                                 </Dropdown>
-
                             </div>
                         </div>
 
@@ -169,13 +172,9 @@ const showingNavigationDropdown = ref(false);
                     </div>
 
                     <!-- Responsive Settings Options -->
-                    <div
-                        class="border-t border-gray-200 pb-1 pt-4"
-                    >
+                    <div class="border-t border-gray-200 pb-1 pt-4">
                         <div class="px-4">
-                            <div
-                                class="text-base font-medium text-gray-800"
-                            >
+                            <div class="text-base font-medium text-gray-800">
                                 {{ $page.props.auth.user.name }}
                             </div>
                             <div class="text-sm font-medium text-gray-500">
@@ -200,10 +199,7 @@ const showingNavigationDropdown = ref(false);
             </nav>
 
             <!-- Page Heading -->
-            <header
-                class="bg-white shadow"
-                v-if="$slots.header"
-            >
+            <header class="bg-white shadow" v-if="$slots.header">
                 <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                     <slot name="header" />
                 </div>

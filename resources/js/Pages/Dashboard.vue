@@ -12,12 +12,6 @@ import { Head, Link } from '@inertiajs/vue3';
                 <h2 class="text-xl font-semibold leading-tight text-gray-800">
                     Dashboard
                 </h2>
-                <Link
-                    href="/admin/products/create"
-                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                >
-                    Добавить товар
-                </Link>
             </div>
         </template>
 

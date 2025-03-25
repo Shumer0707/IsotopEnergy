@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminProductController;
 use App\Http\Controllers\Admin\AdminCategoryController;
 use App\Http\Controllers\Admin\AdminAttributeController;
+use App\Http\Controllers\Admin\AdminAttributeValueController;
 
 // 🔹 Общедоступные маршруты
 Route::get('/', [PageController::class, 'home'])->name('home');
@@ -33,7 +34,11 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->midd
 // 🔹 Админская панель (только для администраторов)
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/products/create', [AdminProductController::class, 'create'])->name('products.create');
+
+    Route::get('/products', [AdminProductController::class, 'index'])->name('products.index');
+    Route::post('/products/store', [AdminProductController::class, 'store'])->name('products.store');
+    Route::post('/products/update/{product}', [AdminProductController::class, 'update'])->name('products.update');
+    Route::delete('/products/{product}', [AdminProductController::class, 'destroy'])->name('products.destroy');
 
     Route::get('/categories', [AdminCategoryController::class, 'index'])->name('categories.index');
     Route::post('/categories/store', [AdminCategoryController::class, 'store'])->name('categories.store');
@@ -44,6 +49,15 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/attributes/store', [AdminAttributeController::class, 'store'])->name('attributes.store');
     Route::post('/attributes/update/{attribute}', [AdminAttributeController::class, 'update'])->name('attributes.update');
     Route::delete('/attributes/{attribute}', [AdminAttributeController::class, 'destroy'])->name('attributes.destroy');
+
+    Route::get('/attribute-values', [AdminAttributeValueController::class, 'index'])->name('attribute-values.index');
+    Route::post('/attribute-values/store', [AdminAttributeValueController::class, 'store'])->name('attribute-values.store');
+    Route::post('/attribute-values/update/{attributeValue}', [AdminAttributeValueController::class, 'update'])->name('attribute-values.update');
+    Route::delete('/attribute-values/{attributeValue}', [AdminAttributeValueController::class, 'destroy'])->name('attribute-values.destroy');
+
+    Route::post('/products/{product}/images', [AdminProductController::class, 'uploadImages'])->name('products.images.upload');
+    Route::delete('/products/images/{image}', [AdminProductController::class, 'deleteImage'])->name('products.images.delete');
+    Route::get('/products/{product}/images/list', [AdminProductController::class, 'imagesList']);
 });
 
 Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:5,1');

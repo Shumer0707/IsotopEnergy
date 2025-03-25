@@ -9,7 +9,7 @@ class Description extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['product_id', 'language', 'text'];
+    protected $fillable = ['product_id', 'language', 'title', 'short_description', 'full_description'];
 
     public function product()
     {
