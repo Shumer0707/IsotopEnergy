@@ -70,6 +70,34 @@ const deleteImage = async (imageId) => {
         console.error("Ошибка при удалении изображения:", error);
     }
 };
+
+const makeMain = async (image) => {
+    try {
+        await axios.put(`/admin/products/${props.product.id}/main-image`, {
+            image_id: image.id,
+        });
+
+        props.product.main_image = image.path;
+        images.value = images.value.map((img) => ({
+            ...img,
+            is_main: img.id === image.id,
+        }));
+    } catch (e) {
+        console.error("Ошибка при установке главного изображения:", e);
+    }
+};
+const selectedImage = ref(null);
+const showModal = ref(false);
+
+const openImageModal = (image) => {
+    selectedImage.value = image;
+    showModal.value = true;
+};
+
+const closeModal = () => {
+    showModal.value = false;
+    selectedImage.value = null;
+};
 </script>
 
 <template>
@@ -88,7 +116,8 @@ const deleteImage = async (imageId) => {
                 <img
                     :src="`/storage/${image.path}`"
                     alt=""
-                    class="w-full h-full object-cover"
+                    class="w-full h-full object-cover cursor-pointer"
+                    @click="openImageModal(image)"
                 />
                 <button
                     @click="deleteImage(image.id)"
@@ -96,6 +125,22 @@ const deleteImage = async (imageId) => {
                 >
                     ✖
                 </button>
+                <div
+                    class="absolute bottom-1 left-1 text-xs bg-white rounded px-1"
+                >
+                    <span
+                        v-if="product.main_image === image.path"
+                        class="text-green-600 font-bold"
+                        >Главное</span
+                    >
+                    <button
+                        v-else
+                        @click="makeMain(image)"
+                        class="text-blue-600 hover:underline"
+                    >
+                        Сделать главным
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -132,5 +177,26 @@ const deleteImage = async (imageId) => {
         >
             Назад
         </button>
+    </div>
+    <div
+        v-if="showModal"
+        class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+        @click.self="closeModal"
+    >
+        <div class="bg-white p-4 rounded max-w-3xl w-full">
+            <img
+                :src="`/storage/${selectedImage.path}`"
+                alt="Изображение"
+                class="w-full max-h-[80vh] object-contain"
+            />
+            <div class="text-right mt-2">
+                <button
+                    @click="closeModal"
+                    class="text-sm text-gray-600 hover:underline"
+                >
+                    Закрыть
+                </button>
+            </div>
+        </div>
     </div>
 </template>

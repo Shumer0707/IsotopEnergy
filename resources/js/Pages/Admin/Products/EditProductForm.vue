@@ -6,6 +6,7 @@ const props = defineProps({
     product: Object,
     categories: Array,
     attributes: Array,
+    brands: Array,
     values: Array
 });
 
@@ -14,7 +15,7 @@ const emit = defineEmits(['productUpdated', 'cancel']);
 const form = useForm({
     id: props.product.id,
     category_id: props.product.category_id ?? '',
-    manufacturer: props.product.manufacturer ?? '',
+    brand_id: props.product.brand_id ?? '',
     price: props.product.price ?? '',
     discount_price: props.product.discount_price ?? '',
     currency: props.product.currency ?? 'MDL',
@@ -78,7 +79,12 @@ console.log('product.attributeValues', props.product.attributeValues);
 
         <!-- Производитель -->
         <label class="block">Производитель</label>
-        <input v-model="form.manufacturer" class="w-full p-2 border rounded mb-4" />
+        <select v-model="form.brand_id" required class="w-full p-2 border rounded mb-4">
+            <option disabled value="">Выберите категорию</option>
+            <option v-for="brand in brands" :key="brand.id" :value="brand.id">
+                {{ brand.name }}
+            </option>
+        </select>
 
         <!-- Цена и скидка -->
         <div class="flex space-x-4 mb-4">
@@ -86,10 +92,10 @@ console.log('product.attributeValues', props.product.attributeValues);
                 <label class="block">Цена</label>
                 <input type="number" v-model="form.price" class="w-full p-2 border rounded" />
             </div>
-            <div class="w-1/2">
+            <!-- <div class="w-1/2">
                 <label class="block">Цена со скидкой</label>
                 <input type="number" v-model="form.discount_price" class="w-full p-2 border rounded" />
-            </div>
+            </div> -->
         </div>
 
         <!-- Описания -->
@@ -100,8 +106,8 @@ console.log('product.attributeValues', props.product.attributeValues);
                 <input v-model="form.descriptions[lang].title" class="w-full p-2 border rounded mb-2" />
                 <label class="block">Краткое описание</label>
                 <textarea v-model="form.descriptions[lang].short_description" class="w-full p-2 border rounded mb-2" />
-                <label class="block">Полное описание</label>
-                <textarea v-model="form.descriptions[lang].full_description" class="w-full p-2 border rounded" />
+                <!-- <label class="block">Полное описание</label>
+                <textarea v-model="form.descriptions[lang].full_description" class="w-full p-2 border rounded" /> -->
             </div>
         </div>
 

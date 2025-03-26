@@ -10,6 +10,7 @@ const props = defineProps({
     products: Array,
     categories: Array,
     attributes: Array,
+    brands: Array,
     values: Array,
 });
 
@@ -135,6 +136,7 @@ const manageImages = (product) => {
                     :categories="categories"
                     :attributes="attributes"
                     :values="values"
+                    :brands="brands"
                     @productAdded="refreshList"
                     @cancel="viewMode = 'list'"
                 />
@@ -144,6 +146,7 @@ const manageImages = (product) => {
                     :categories="categories"
                     :attributes="attributes"
                     :values="values"
+                    :brands="brands"
                     @productUpdated="refreshList"
                     @cancel="viewMode = 'list'"
                 />

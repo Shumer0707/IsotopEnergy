@@ -7,31 +7,20 @@ const props = defineProps({
     categories: Array,
     attributes: Array,
     values: Array,
+    brands: Array,
 });
-console.log();
 
 const form = useForm({
     category_id: "",
-    manufacturer: "",
+    brand_id: "",
     price: "",
     discount_price: "",
     currency: "MDL",
+    main_image: "", // строка пути (в будущем может быть upload)
     descriptions: {
-        ru: {
-            title: "",
-            short_description: "",
-            full_description: "",
-        },
-        ro: {
-            title: "",
-            short_description: "",
-            full_description: "",
-        },
-        en: {
-            title: "",
-            short_description: "",
-            full_description: "",
-        },
+        ru: { title: "", short_description: "", full_description: "" },
+        ro: { title: "", short_description: "", full_description: "" },
+        en: { title: "", short_description: "", full_description: "" },
     },
     attributes: [],
 });
@@ -77,11 +66,20 @@ const filteredValues = (attrId) => {
                     {{ category.name_ru }}
                 </option>
             </select>
-            <label class="block">Производитель</label>
-            <input
-                v-model="form.manufacturer"
+            <label class="block">Бренд</label>
+            <select
+                v-model="form.brand_id"
                 class="w-full p-2 border rounded mb-4"
-            />
+            >
+                <option disabled value="">Выберите бренд</option>
+                <option
+                    v-for="brand in brands"
+                    :key="brand.id"
+                    :value="brand.id"
+                >
+                    {{ brand.name }}
+                </option>
+            </select>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div
                     v-for="lang in ['ru', 'ro', 'en']"
@@ -103,12 +101,12 @@ const filteredValues = (attrId) => {
                         v-model="form.descriptions[lang].short_description"
                         class="w-full p-2 border rounded mb-2"
                     />
-
+<!--
                     <label class="block">Полное описание</label>
                     <textarea
                         v-model="form.descriptions[lang].full_description"
                         class="w-full p-2 border rounded"
-                    />
+                    /> -->
                 </div>
             </div>
 

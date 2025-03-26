@@ -20,12 +20,13 @@ class AdminProductController extends Controller
     public function index()
     {
         return Inertia::render('Admin/Products/IndexProducts', [
-            'products' => Product::with(['category', 'descriptions'])->get()->map(function ($product) {
+            'products' => Product::with(['category', 'descriptions', 'brand'])->get()->map(function ($product) {
                 $product->attributeValues = $product->attributeValues()->get();
-                $product->images = $product->images()->get(); // 👈 вот это
+                $product->images = $product->images()->get();
                 return $product;
             }),
             'categories' => Category::all(),
+            'brands' => \App\Models\Brand::all(),
             'attributes' => ProductAttribute::all(),
             'values' => AttributeValue::all(),
         ]);
@@ -34,7 +35,7 @@ class AdminProductController extends Controller
     {
         $validated = $request->validate([
             'category_id' => 'required|exists:categories,id',
-            'manufacturer' => 'required|string|max:255',
+            'brand_id' => 'nullable|exists:brands,id',
             'price' => 'required|numeric',
             'discount_price' => 'nullable|numeric',
             'currency' => 'required|string|size:3',
@@ -51,16 +52,15 @@ class AdminProductController extends Controller
         ]);
 
         DB::transaction(function () use ($validated) {
-            // 1. Создаём товар
             $product = Product::create([
                 'category_id' => $validated['category_id'],
-                'manufacturer' => trim($validated['manufacturer']),
+                'brand_id' => $validated['brand_id'] ?? null,
                 'price' => $validated['price'],
                 'discount_price' => $validated['discount_price'] ?? null,
                 'currency' => $validated['currency'],
+                'main_image' => null, // Добавим позже через выбор из загруженных фото
             ]);
 
-            // 2. Создаём описания (ru, ro, en)
             foreach (['ru', 'ro', 'en'] as $lang) {
                 Description::create([
                     'product_id' => $product->id,
@@ -71,7 +71,6 @@ class AdminProductController extends Controller
                 ]);
             }
 
-            // 3. Сохраняем атрибуты
             foreach ($validated['attributes'] ?? [] as $attr) {
                 ProductAttributeValue::create([
                     'product_id' => $product->id,
@@ -83,11 +82,12 @@ class AdminProductController extends Controller
 
         return redirect()->route('admin.products.index')->with('success', 'Товар успешно добавлен!');
     }
+
     public function update(Request $request, Product $product)
     {
         $validated = $request->validate([
             'category_id' => 'required|exists:categories,id',
-            'manufacturer' => 'required|string|max:255',
+            'brand_id' => 'nullable|exists:brands,id',
             'price' => 'required|numeric',
             'discount_price' => 'nullable|numeric',
             'currency' => 'required|string|size:3',
@@ -104,16 +104,14 @@ class AdminProductController extends Controller
         ]);
 
         DB::transaction(function () use ($validated, $product) {
-            // 1. Обновляем сам товар
             $product->update([
                 'category_id' => $validated['category_id'],
-                'manufacturer' => trim($validated['manufacturer']),
+                'brand_id' => $validated['brand_id'] ?? null,
                 'price' => $validated['price'],
                 'discount_price' => $validated['discount_price'] ?? null,
                 'currency' => $validated['currency'],
             ]);
 
-            // 2. Обновляем описания
             foreach (['ru', 'ro', 'en'] as $lang) {
                 $product->descriptions()->updateOrCreate(
                     ['language' => $lang],
@@ -125,8 +123,7 @@ class AdminProductController extends Controller
                 );
             }
 
-            // 3. Обновляем атрибуты
-            $product->attributeValues()->delete(); // удаляем старые
+            $product->attributeValues()->delete();
             foreach ($validated['attributes'] ?? [] as $attr) {
                 ProductAttributeValue::create([
                     'product_id' => $product->id,
@@ -177,4 +174,22 @@ class AdminProductController extends Controller
             'images' => $product->images()->get()
         ]);
     }
+    public function setMainImage(Request $request, Product $product)
+{
+    $validated = $request->validate([
+        'image_id' => 'required|exists:images,id',
+    ]);
+
+    $image = Image::find($validated['image_id']);
+
+    if ($image->product_id !== $product->id) {
+        abort(403, 'Это изображение не принадлежит данному товару.');
+    }
+
+    $product->update([
+        'main_image' => $image->path
+    ]);
+
+    return response()->json(['success' => true]);
+}
 }

@@ -9,9 +9,10 @@ return new class extends Migration {
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
-            $table->string('name_ru'); // Название категории на русском
-            $table->string('name_ro'); // Название категории на румынском
-            $table->string('name_en'); // Название категории на английском
+            $table->foreignId('parent_id')->nullable()->constrained('categories')->nullOnDelete(); // Родительская категория
+            $table->string('name_ru');
+            $table->string('name_ro');
+            $table->string('name_en');
             $table->timestamps();
         });
     }
@@ -21,3 +22,4 @@ return new class extends Migration {
         Schema::dropIfExists('categories');
     }
 };
+

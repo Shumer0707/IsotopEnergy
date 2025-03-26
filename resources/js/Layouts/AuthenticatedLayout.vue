@@ -62,6 +62,12 @@ const showingNavigationDropdown = ref(false);
                                 >
                                     Значения атрибутов
                                 </Link>
+                                <Link
+                                    href="/admin/brands"
+                                    class="flex items-center justify-center px-4 my-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                                >
+                                    Бренды
+                                </Link>
                             </div>
                         </div>
 
