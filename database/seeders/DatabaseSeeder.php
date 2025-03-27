@@ -3,14 +3,20 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Database\Seeders\AdminUserSeeder;  // Добавляем импорт седера
+use Database\Seeders\AdminUserSeeder;
 
 class DatabaseSeeder extends Seeder
 {
     public function run()
     {
         $this->call([
-            AdminUserSeeder::class,  // Запускаем сэдер для создания администратора
+            AdminUserSeeder::class,
+            CategorySeeder::class,
+            BrandSeeder::class,
+            ProductAttributeSeeder::class,
+            ProductSeeder::class,
+            ProductAttributeValueSeeder::class,
+            DescriptionSeeder::class,
         ]);
     }
 }

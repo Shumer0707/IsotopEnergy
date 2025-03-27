@@ -1,6 +1,6 @@
 <script setup>
 import { useForm } from "@inertiajs/vue3";
-
+import { computed} from "vue";
 const emit = defineEmits(["productAdded", "cancel"]);
 
 const props = defineProps({
@@ -24,6 +24,10 @@ const form = useForm({
     },
     attributes: [],
 });
+
+const childCategories = computed(() =>
+    props.categories.filter((cat) => cat.parent_id !== null)
+);
 
 const submit = () => {
     form.post("/admin/products/store", {
@@ -57,9 +61,9 @@ const filteredValues = (attrId) => {
                 required
                 class="w-full p-2 border rounded mb-4"
             >
-                <option disabled value="">Выберите категорию</option>
+                <option disabled value="">Выберите подкатегорию</option>
                 <option
-                    v-for="category in categories"
+                    v-for="category in childCategories"
                     :key="category.id"
                     :value="category.id"
                 >
@@ -101,7 +105,7 @@ const filteredValues = (attrId) => {
                         v-model="form.descriptions[lang].short_description"
                         class="w-full p-2 border rounded mb-2"
                     />
-<!--
+                    <!--
                     <label class="block">Полное описание</label>
                     <textarea
                         v-model="form.descriptions[lang].full_description"

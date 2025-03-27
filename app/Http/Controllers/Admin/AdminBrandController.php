@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
-use Illuminate\Http\Request;
+use App\Services\BrandService;
+use App\Http\Requests\Admin\StoreBrandRequest;
+use App\Http\Requests\Admin\UpdateBrandRequest;
 use Inertia\Inertia;
 
 class AdminBrandController extends Controller
@@ -16,28 +18,16 @@ class AdminBrandController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreBrandRequest $request, BrandService $service)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255'
-        ]);
-
-        Brand::create([
-            'name' => trim($validated['name'])
-        ]);
+        $service->store($request->validated());
 
         return redirect()->route('admin.brands.index')->with('success', 'Бренд добавлен!');
     }
 
-    public function update(Request $request, Brand $brand)
+    public function update(UpdateBrandRequest $request, Brand $brand, BrandService $service)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255'
-        ]);
-
-        $brand->update([
-            'name' => trim($validated['name'])
-        ]);
+        $service->update($brand, $request->validated());
 
         return redirect()->route('admin.brands.index')->with('success', 'Бренд обновлён!');
     }
@@ -49,4 +39,5 @@ class AdminBrandController extends Controller
         return redirect()->route('admin.brands.index')->with('success', 'Бренд удалён!');
     }
 }
+
 

@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Inertia\Inertia;
 use App\Models\ProductAttribute;
-use Illuminate\Http\Request;
+use App\Http\Requests\Admin\StoreAttributeRequest;
+use App\Http\Requests\Admin\UpdateAttributeRequest;
+use App\Services\AttributeService;
 
 class AdminAttributeController extends Controller
 {
@@ -15,38 +17,21 @@ class AdminAttributeController extends Controller
             'attributes' => ProductAttribute::all()
         ]);
     }
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'name_ru' => 'required|string|max:255',
-            'name_ro' => 'required|string|max:255',
-            'name_en' => 'required|string|max:255'
-        ]);
 
-        ProductAttribute::create([
-            'name_ru' => mb_convert_case(trim($validated['name_ru']), MB_CASE_TITLE, 'UTF-8'),
-            'name_ro' => mb_convert_case(trim($validated['name_ro']), MB_CASE_TITLE, 'UTF-8'),
-            'name_en' => mb_convert_case(trim($validated['name_en']), MB_CASE_TITLE, 'UTF-8'),
-        ]);
+    public function store(StoreAttributeRequest $request, AttributeService $service)
+    {
+        $service->store($request->validated());
 
         return redirect()->route('admin.attributes.index')->with('success', 'Атрибут успешно добавлен!');
     }
-    public function update(Request $request, ProductAttribute $attribute)
-    {
-        $validated = $request->validate([
-            'name_ru' => 'required|string|max:255',
-            'name_ro' => 'required|string|max:255',
-            'name_en' => 'required|string|max:255'
-        ]);
 
-        $attribute->update([
-            'name_ru' => mb_convert_case(trim($validated['name_ru']), MB_CASE_TITLE, 'UTF-8'),
-            'name_ro' => mb_convert_case(trim($validated['name_ro']), MB_CASE_TITLE, 'UTF-8'),
-            'name_en' => mb_convert_case(trim($validated['name_en']), MB_CASE_TITLE, 'UTF-8'),
-        ]);
+    public function update(UpdateAttributeRequest $request, ProductAttribute $attribute, AttributeService $service)
+    {
+        $service->update($attribute, $request->validated());
 
         return redirect()->route('admin.attributes.index')->with('success', 'Атрибут обновлён!');
     }
+
     public function destroy(ProductAttribute $attribute)
     {
         $attribute->delete();

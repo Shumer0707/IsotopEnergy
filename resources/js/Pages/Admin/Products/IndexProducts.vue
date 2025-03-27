@@ -17,6 +17,19 @@ const props = defineProps({
 const viewMode = ref("list");
 const productToEdit = ref(null);
 const flashMessage = ref(null);
+const selectedCategory = ref("");
+
+watch(selectedCategory, (newVal) => {
+    router.get(
+        "/admin/products",
+        { category: newVal },
+        {
+            preserveScroll: true,
+            preserveState: true,
+            only: ["products"],
+        }
+    );
+});
 
 watch(
     () => usePage().props.flash?.success,
@@ -71,6 +84,34 @@ const manageImages = (product) => {
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <div v-if="viewMode === 'list'">
+                    <div class="mb-4 flex items-center gap-4">
+                        <div>
+                            <label class="block text-sm mb-1"
+                                >Фильтр по категории</label
+                            >
+                            <select
+                                v-model="selectedCategory"
+                                class="p-2 border rounded w-64"
+                            >
+                                <option value="">— Все категории —</option>
+                                <option
+                                    v-for="cat in categories"
+                                    :key="cat.id"
+                                    :value="cat.id"
+                                >
+                                    {{ cat.name_ru }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <button
+                            v-if="selectedCategory"
+                            @click="selectedCategory = ''"
+                            class="mt-6 px-3 py-2 bg-gray-300 hover:bg-gray-400 rounded text-sm"
+                        >
+                            ❌ Сбросить фильтр
+                        </button>
+                    </div>
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-lg font-semibold">Список товаров</h3>
                         <button

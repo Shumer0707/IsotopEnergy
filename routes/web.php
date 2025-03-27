@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\AdminCategoryController;
 use App\Http\Controllers\Admin\AdminAttributeController;
 use App\Http\Controllers\Admin\AdminAttributeValueController;
 use App\Http\Controllers\Admin\AdminBrandController;
+use App\Http\Controllers\Admin\AdminImageController;
 
 // 🔹 Общедоступные маршруты
 Route::get('/', [PageController::class, 'home'])->name('home');
@@ -56,10 +57,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/attribute-values/update/{attributeValue}', [AdminAttributeValueController::class, 'update'])->name('attribute-values.update');
     Route::delete('/attribute-values/{attributeValue}', [AdminAttributeValueController::class, 'destroy'])->name('attribute-values.destroy');
 
-    Route::post('/products/{product}/images', [AdminProductController::class, 'uploadImages'])->name('products.images.upload');
-    Route::delete('/products/images/{image}', [AdminProductController::class, 'deleteImage'])->name('products.images.delete');
-    Route::get('/products/{product}/images/list', [AdminProductController::class, 'imagesList']);
-    Route::put('/products/{product}/main-image', [AdminProductController::class, 'setMainImage']);
+    Route::post('/products/{product}/images', [AdminImageController::class, 'uploadImages'])->name('products.images.upload');
+    Route::delete('/products/images/{image}', [AdminImageController::class, 'deleteImage'])->name('products.images.delete');
+    Route::get('/products/{product}/images/list', [AdminImageController::class, 'imagesList']);
+    Route::put('/products/{product}/main-image', [AdminImageController::class, 'setMainImage']);
 
     Route::get('/brands', [AdminBrandController::class, 'index'])->name('brands.index');
     Route::post('/brands/store', [AdminBrandController::class, 'store']);
