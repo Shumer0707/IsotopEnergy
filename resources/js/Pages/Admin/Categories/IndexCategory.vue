@@ -56,19 +56,19 @@ const refreshList = () => {
 };
 
 const filters = ref({
-    filter: usePage().props.filters?.filter || '',
-    parent_id: usePage().props.filters?.parent_id || null
+    filter: usePage().props.filters?.filter || "",
+    parent_id: usePage().props.filters?.parent_id || null,
 });
 
 const applyFilter = () => {
-    router.get('/admin/categories', filters.value, {
+    router.get("/admin/categories", filters.value, {
         preserveState: true,
-        preserveScroll: true
+        preserveScroll: true,
     });
 };
 
 const resetFilters = () => {
-    filters.value = { filter: '', parent_id: null };
+    filters.value = { filter: "", parent_id: null };
     applyFilter();
 };
 </script>
@@ -134,7 +134,7 @@ const resetFilters = () => {
                                             :key="cat.id"
                                             :value="cat.id"
                                         >
-                                            {{ cat.name_ru }}
+                                            {{ cat.translation?.name ?? "—" }}
                                         </option>
                                     </select>
                                 </div>
@@ -198,17 +198,29 @@ const resetFilters = () => {
                                     <td
                                         class="border border-gray-300 px-4 py-2"
                                     >
-                                        {{ category.name_ru }}
+                                        {{
+                                            category.translations.find(
+                                                (t) => t.language === "ru"
+                                            )?.name ?? "—"
+                                        }}
                                     </td>
                                     <td
                                         class="border border-gray-300 px-4 py-2"
                                     >
-                                        {{ category.name_ro }}
+                                        {{
+                                            category.translations.find(
+                                                (t) => t.language === "ro"
+                                            )?.name ?? "—"
+                                        }}
                                     </td>
                                     <td
                                         class="border border-gray-300 px-4 py-2"
                                     >
-                                        {{ category.name_en }}
+                                        {{
+                                            category.translations.find(
+                                                (t) => t.language === "en"
+                                            )?.name ?? "—"
+                                        }}
                                     </td>
                                     <td
                                         class="border border-gray-300 px-4 py-2 flex space-x-2"

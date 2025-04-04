@@ -10,9 +10,6 @@ return new class extends Migration {
         Schema::create('attribute_values', function (Blueprint $table) {
             $table->id();
             $table->foreignId('attribute_id')->constrained('product_attributes')->onDelete('cascade'); // Связь с атрибутом
-            $table->string('value_ru'); // Значение на русском
-            $table->string('value_ro'); // Значение на румынском
-            $table->string('value_en'); // Значение на английском
             $table->timestamps();
         });
     }

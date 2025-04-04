@@ -8,7 +8,15 @@ const props = defineProps({
 
 const emit = defineEmits(['valueUpdated', 'cancel']);
 
-const form = useForm({ ...props.valueItem });
+const form = useForm({
+    id: props.valueItem.id,
+    attribute_id: props.valueItem.attribute_id,
+    translations: {
+        ru: props.valueItem.translations.find(t => t.language === 'ru')?.value ?? '',
+        ro: props.valueItem.translations.find(t => t.language === 'ro')?.value ?? '',
+        en: props.valueItem.translations.find(t => t.language === 'en')?.value ?? '',
+    }
+});
 
 const submit = () => {
     form.post(`/admin/attribute-values/update/${form.id}`, {
@@ -24,18 +32,18 @@ const submit = () => {
             <label class="block mb-1">Атрибут</label>
             <select v-model="form.attribute_id" required class="w-full p-2 border rounded mb-4">
                 <option v-for="attr in attributes" :key="attr.id" :value="attr.id">
-                    {{ attr.name_ru }}
+                    {{ attr.translation?.name ?? '—' }}
                 </option>
             </select>
 
             <label class="block">Значение (RU)</label>
-            <input v-model="form.value_ru" required class="w-full p-2 border rounded mb-2" />
+            <input v-model="form.translations.ru" required class="w-full p-2 border rounded mb-2" />
 
             <label class="block">Значение (RO)</label>
-            <input v-model="form.value_ro" required class="w-full p-2 border rounded mb-2" />
+            <input v-model="form.translations.ro" required class="w-full p-2 border rounded mb-2" />
 
             <label class="block">Значение (EN)</label>
-            <input v-model="form.value_en" required class="w-full p-2 border rounded mb-4" />
+            <input v-model="form.translations.en" required class="w-full p-2 border rounded mb-4" />
 
             <div class="flex space-x-2">
                 <button type="submit" class="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700">

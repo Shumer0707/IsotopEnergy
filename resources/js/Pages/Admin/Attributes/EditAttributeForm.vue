@@ -7,7 +7,14 @@ const props = defineProps({
 
 const emit = defineEmits(['attributeUpdated', 'cancel']);
 
-const form = useForm({ ...props.attribute });
+const form = useForm({
+    id: props.attribute.id,
+    translations: {
+        ru: props.attribute.translations.find(t => t.language === 'ru')?.name ?? '',
+        ro: props.attribute.translations.find(t => t.language === 'ro')?.name ?? '',
+        en: props.attribute.translations.find(t => t.language === 'en')?.name ?? '',
+    }
+});
 
 const submit = () => {
     form.post(`/admin/attributes/update/${form.id}`, {
@@ -21,13 +28,13 @@ const submit = () => {
         <h3 class="text-lg font-semibold mb-4">Редактировать атрибут</h3>
         <form @submit.prevent="submit">
             <label class="block">Название (RU)</label>
-            <input v-model="form.name_ru" class="w-full p-2 border rounded mb-2" />
+            <input v-model="form.translations.ru" class="w-full p-2 border rounded mb-2" />
 
             <label class="block">Название (RO)</label>
-            <input v-model="form.name_ro" class="w-full p-2 border rounded mb-2" />
+            <input v-model="form.translations.ro" class="w-full p-2 border rounded mb-2" />
 
             <label class="block">Название (EN)</label>
-            <input v-model="form.name_en" class="w-full p-2 border rounded mb-4" />
+            <input v-model="form.translations.en" class="w-full p-2 border rounded mb-4" />
 
             <div class="flex space-x-2">
                 <button type="submit" class="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700">

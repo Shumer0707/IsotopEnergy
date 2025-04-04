@@ -8,10 +8,12 @@ const props = defineProps({
 const emit = defineEmits(['categoryAdded', 'cancel']);
 
 const form = useForm({
-    name_ru: '',
-    name_ro: '',
-    name_en: '',
-    parent_id: null
+    translations: {
+        ru: '',
+        ro: '',
+        en: '',
+    },
+    parent_id: null,
 });
 
 const submitCategory = () => {
@@ -29,19 +31,19 @@ const submitCategory = () => {
         <h3 class="text-lg font-semibold mb-4">Добавить категорию</h3>
         <form @submit.prevent="submitCategory">
             <label class="block">Название (RU)</label>
-            <input v-model="form.name_ru" class="w-full p-2 border rounded mb-2" />
+            <input v-model="form.translations.ru" class="w-full p-2 border rounded mb-2" />
 
             <label class="block">Название (RO)</label>
-            <input v-model="form.name_ro" class="w-full p-2 border rounded mb-2" />
+            <input v-model="form.translations.ro" class="w-full p-2 border rounded mb-2" />
 
             <label class="block">Название (EN)</label>
-            <input v-model="form.name_en" class="w-full p-2 border rounded mb-2" />
+            <input v-model="form.translations.en" class="w-full p-2 border rounded mb-2" />
 
             <label class="block mt-2">Родительская категория (необязательно)</label>
             <select v-model="form.parent_id" class="w-full p-2 border rounded mb-2">
                 <option :value="null">Без родителя</option>
                 <option v-for="cat in parentCategories" :key="cat.id" :value="cat.id">
-                    {{ cat.name_ru }}
+                    {{ cat.translation?.name ?? '—' }}
                 </option>
             </select>
 

@@ -9,9 +9,6 @@ return new class extends Migration {
     {
         Schema::create('product_attributes', function (Blueprint $table) {
             $table->id();
-            $table->string('name_ru'); // Название атрибута на русском
-            $table->string('name_ro'); // Название атрибута на румынском
-            $table->string('name_en'); // Название атрибута на английском
             $table->timestamps();
         });
     }

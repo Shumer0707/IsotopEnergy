@@ -145,16 +145,16 @@ const deleteValue = (id) => {
                                         {{ value.id }}
                                     </td>
                                     <td class="border px-4 py-2">
-                                        {{ value.value_ru }}
+                                        {{ value.translations.find(t => t.language === 'ru')?.value ?? '—' }}
                                     </td>
                                     <td class="border px-4 py-2">
-                                        {{ value.value_ro }}
+                                        {{ value.translations.find(t => t.language === 'ro')?.value ?? '—' }}
                                     </td>
                                     <td class="border px-4 py-2">
-                                        {{ value.value_en }}
+                                        {{ value.translations.find(t => t.language === 'en')?.value ?? '—' }}
                                     </td>
                                     <td class="border px-4 py-2">
-                                        {{ value.attribute?.name_ru }}
+                                        {{ value.attribute?.translation?.name ?? '—' }}
                                     </td>
                                     <td class="border px-4 py-2 flex space-x-2">
                                         <button

@@ -11,11 +11,9 @@ use App\Services\AttributeService;
 
 class AdminAttributeController extends Controller
 {
-    public function index()
+    public function index(AttributeService $service)
     {
-        return Inertia::render('Admin/Attributes/IndexAttributes', [
-            'attributes' => ProductAttribute::all()
-        ]);
+        return Inertia::render('Admin/Attributes/IndexAttributes', $service->getIndexData());
     }
 
     public function store(StoreAttributeRequest $request, AttributeService $service)

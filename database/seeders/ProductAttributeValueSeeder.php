@@ -17,12 +17,16 @@ class ProductAttributeValueSeeder extends Seeder
 
         foreach ($products as $product) {
             foreach ($attributes as $attribute) {
-                $value = $attribute->values->random();
+                $values = $attribute->values;
+
+                if ($values->isEmpty()) {
+                    continue;
+                }
 
                 ProductAttributeValue::create([
                     'product_id' => $product->id,
                     'attribute_id' => $attribute->id,
-                    'attribute_value_id' => $value->id,
+                    'attribute_value_id' => $values->random()->id,
                 ]);
             }
         }

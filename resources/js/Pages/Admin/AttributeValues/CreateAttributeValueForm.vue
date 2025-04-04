@@ -9,9 +9,11 @@ const emit = defineEmits(['valueAdded', 'cancel']);
 
 const form = useForm({
     attribute_id: '',
-    value_ru: '',
-    value_ro: '',
-    value_en: ''
+    translations: {
+        ru: '',
+        ro: '',
+        en: ''
+    }
 });
 
 const submit = () => {
@@ -32,18 +34,18 @@ const submit = () => {
             <select v-model="form.attribute_id" required class="w-full p-2 border rounded mb-4">
                 <option disabled value="">Выберите атрибут</option>
                 <option v-for="attr in attributes" :key="attr.id" :value="attr.id">
-                    {{ attr.name_ru }}
+                    {{ attr.translation?.name ?? '—' }}
                 </option>
             </select>
 
             <label class="block">Значение (RU)</label>
-            <input v-model="form.value_ru" required class="w-full p-2 border rounded mb-2" />
+            <input v-model="form.translations.ru" required class="w-full p-2 border rounded mb-2" />
 
             <label class="block">Значение (RO)</label>
-            <input v-model="form.value_ro" required class="w-full p-2 border rounded mb-2" />
+            <input v-model="form.translations.ro" required class="w-full p-2 border rounded mb-2" />
 
             <label class="block">Значение (EN)</label>
-            <input v-model="form.value_en" required class="w-full p-2 border rounded mb-4" />
+            <input v-model="form.translations.en" required class="w-full p-2 border rounded mb-4" />
 
             <div class="flex space-x-2">
                 <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">

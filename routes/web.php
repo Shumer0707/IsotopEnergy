@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\AdminBrandController;
 use App\Http\Controllers\Admin\AdminImageController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\LayoutController;
+use App\Http\Controllers\TestController;
 
 // 🔹 Общедоступные маршруты
 Route::get('/', [PageController::class, 'home'])->name('home');
@@ -74,3 +75,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 });
 
 Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:5,1');
+
+
+// 🔹 Общедоступные маршруты
+Route::get('/test', [TestController::class, 'index'])->name('test');

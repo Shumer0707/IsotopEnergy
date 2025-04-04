@@ -17,8 +17,8 @@ class CategoryService
         }
 
         return [
-            'categories' => $query->get(),
-            'parentCategories' => Category::whereNull('parent_id')->get(),
+            'categories' => $query->with('translations')->get(),
+            'parentCategories' => Category::with('translation')->whereNull('parent_id')->get(),
             'filters' => [
                 'filter' => $filter,
                 'parent_id' => $parentId,
@@ -28,21 +28,32 @@ class CategoryService
 
     public function store(array $data): Category
     {
-        return Category::create([
-            'name_ru' => mb_convert_case(trim($data['name_ru']), MB_CASE_TITLE, 'UTF-8'),
-            'name_ro' => mb_convert_case(trim($data['name_ro']), MB_CASE_TITLE, 'UTF-8'),
-            'name_en' => mb_convert_case(trim($data['name_en']), MB_CASE_TITLE, 'UTF-8'),
+        $category = Category::create([
             'parent_id' => $data['parent_id'] ?? null,
         ]);
+
+        foreach ($data['translations'] as $lang => $name) {
+            $category->translations()->create([
+                'language' => $lang,
+                'name' => mb_convert_case(trim($name), MB_CASE_TITLE, 'UTF-8'),
+            ]);
+        }
+
+        return $category;
     }
 
     public function update(Category $category, array $data): Category
     {
         $category->update([
-            'name_ru' => mb_convert_case(trim($data['name_ru']), MB_CASE_TITLE, 'UTF-8'),
-            'name_ro' => mb_convert_case(trim($data['name_ro']), MB_CASE_TITLE, 'UTF-8'),
-            'name_en' => mb_convert_case(trim($data['name_en']), MB_CASE_TITLE, 'UTF-8'),
+            'parent_id' => $data['parent_id'] ?? null,
         ]);
+
+        foreach ($data['translations'] as $lang => $name) {
+            $category->translations()->updateOrCreate(
+                ['language' => $lang],
+                ['name' => mb_convert_case(trim($name), MB_CASE_TITLE, 'UTF-8')]
+            );
+        }
 
         return $category;
     }

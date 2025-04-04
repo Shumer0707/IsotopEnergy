@@ -6,22 +6,35 @@ use App\Models\ProductAttribute;
 
 class AttributeService
 {
+    public function getIndexData(): array
+    {
+        return [
+            'attributes' => ProductAttribute::with('translations')->get()
+        ];
+    }
+
     public function store(array $data): ProductAttribute
     {
-        return ProductAttribute::create([
-            'name_ru' => mb_convert_case(trim($data['name_ru']), MB_CASE_TITLE, 'UTF-8'),
-            'name_ro' => mb_convert_case(trim($data['name_ro']), MB_CASE_TITLE, 'UTF-8'),
-            'name_en' => mb_convert_case(trim($data['name_en']), MB_CASE_TITLE, 'UTF-8'),
-        ]);
+        $attribute = ProductAttribute::create();
+
+        foreach ($data['translations'] as $lang => $name) {
+            $attribute->translations()->create([
+                'language' => $lang,
+                'name' => mb_convert_case(trim($name), MB_CASE_TITLE, 'UTF-8'),
+            ]);
+        }
+
+        return $attribute;
     }
 
     public function update(ProductAttribute $attribute, array $data): ProductAttribute
     {
-        $attribute->update([
-            'name_ru' => mb_convert_case(trim($data['name_ru']), MB_CASE_TITLE, 'UTF-8'),
-            'name_ro' => mb_convert_case(trim($data['name_ro']), MB_CASE_TITLE, 'UTF-8'),
-            'name_en' => mb_convert_case(trim($data['name_en']), MB_CASE_TITLE, 'UTF-8'),
-        ]);
+        foreach ($data['translations'] as $lang => $name) {
+            $attribute->translations()->updateOrCreate(
+                ['language' => $lang],
+                ['name' => mb_convert_case(trim($name), MB_CASE_TITLE, 'UTF-8')]
+            );
+        }
 
         return $attribute;
     }

@@ -7,14 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreProductRequest;
 use App\Http\Requests\Admin\UpdateProductRequest;
 use App\Models\Product;
-use App\Models\Category;
-use App\Models\ProductAttribute;
-use App\Models\AttributeValue;
-use App\Models\Description;
-use App\Models\ProductAttributeValue;
 use App\Services\ProductService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class AdminProductController extends Controller
 {

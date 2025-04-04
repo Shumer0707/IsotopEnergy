@@ -4,9 +4,11 @@ import { useForm } from '@inertiajs/vue3';
 const emit = defineEmits(['attributeAdded', 'cancel']);
 
 const form = useForm({
-    name_ru: '',
-    name_ro: '',
-    name_en: ''
+    translations: {
+        ru: '',
+        ro: '',
+        en: ''
+    }
 });
 
 const submit = () => {
@@ -24,13 +26,13 @@ const submit = () => {
         <h3 class="text-lg font-semibold mb-4">Добавить атрибут</h3>
         <form @submit.prevent="submit">
             <label class="block">Название (RU)</label>
-            <input v-model="form.name_ru" class="w-full p-2 border rounded mb-2" />
+            <input v-model="form.translations.ru" class="w-full p-2 border rounded mb-2" />
 
             <label class="block">Название (RO)</label>
-            <input v-model="form.name_ro" class="w-full p-2 border rounded mb-2" />
+            <input v-model="form.translations.ro" class="w-full p-2 border rounded mb-2" />
 
             <label class="block">Название (EN)</label>
-            <input v-model="form.name_en" class="w-full p-2 border rounded mb-4" />
+            <input v-model="form.translations.en" class="w-full p-2 border rounded mb-4" />
 
             <div class="flex space-x-2">
                 <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">

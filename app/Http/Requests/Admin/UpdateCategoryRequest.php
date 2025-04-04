@@ -6,14 +6,18 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateCategoryRequest extends FormRequest
 {
-    public function authorize(): bool { return true; }
+    public function authorize(): bool
+    {
+        return true;
+    }
 
     public function rules(): array
     {
         return [
-            'name_ru' => 'required|string|max:255',
-            'name_ro' => 'required|string|max:255',
-            'name_en' => 'required|string|max:255',
+            'translations.ru' => 'required|string|max:255',
+            'translations.ro' => 'required|string|max:255',
+            'translations.en' => 'required|string|max:255',
+            'parent_id' => 'nullable|exists:categories,id',
         ];
     }
 }

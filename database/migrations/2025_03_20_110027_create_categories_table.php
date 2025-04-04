@@ -10,9 +10,6 @@ return new class extends Migration {
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
             $table->foreignId('parent_id')->nullable()->constrained('categories')->nullOnDelete(); // Родительская категория
-            $table->string('name_ru');
-            $table->string('name_ro');
-            $table->string('name_en');
             $table->timestamps();
         });
     }

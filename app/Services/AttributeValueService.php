@@ -3,15 +3,14 @@
 namespace App\Services;
 
 use App\Models\AttributeValue;
+use App\Models\ProductAttribute;
 use Illuminate\Http\Request;
 
 class AttributeValueService
 {
-
-
     public function getIndexData(?int $attributeId = null): array
     {
-        $query = AttributeValue::with('attribute');
+        $query = AttributeValue::with(['translations', 'attribute.translation']);
 
         if ($attributeId) {
             $query->where('attribute_id', $attributeId);
@@ -19,29 +18,39 @@ class AttributeValueService
 
         return [
             'values' => $query->get(),
-            'attributes' => \App\Models\ProductAttribute::all(),
+            'attributes' => ProductAttribute::with('translation')->get(),
             'activeAttribute' => $attributeId,
         ];
     }
 
     public function store(array $data): AttributeValue
     {
-        return AttributeValue::create([
+        $value = AttributeValue::create([
             'attribute_id' => $data['attribute_id'],
-            'value_ru' => mb_convert_case(trim($data['value_ru']), MB_CASE_TITLE, 'UTF-8'),
-            'value_ro' => mb_convert_case(trim($data['value_ro']), MB_CASE_TITLE, 'UTF-8'),
-            'value_en' => mb_convert_case(trim($data['value_en']), MB_CASE_TITLE, 'UTF-8'),
         ]);
+
+        foreach ($data['translations'] as $lang => $val) {
+            $value->translations()->create([
+                'language' => $lang,
+                'value' => mb_convert_case(trim($val), MB_CASE_TITLE, 'UTF-8'),
+            ]);
+        }
+
+        return $value;
     }
 
     public function update(AttributeValue $value, array $data): AttributeValue
     {
         $value->update([
             'attribute_id' => $data['attribute_id'],
-            'value_ru' => mb_convert_case(trim($data['value_ru']), MB_CASE_TITLE, 'UTF-8'),
-            'value_ro' => mb_convert_case(trim($data['value_ro']), MB_CASE_TITLE, 'UTF-8'),
-            'value_en' => mb_convert_case(trim($data['value_en']), MB_CASE_TITLE, 'UTF-8'),
         ]);
+
+        foreach ($data['translations'] as $lang => $val) {
+            $value->translations()->updateOrCreate(
+                ['language' => $lang],
+                ['value' => mb_convert_case(trim($val), MB_CASE_TITLE, 'UTF-8')]
+            );
+        }
 
         return $value;
     }

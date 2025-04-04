@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Category;
-use Illuminate\Support\Str;
+use App\Models\CategoryTranslation;
 
 class CategorySeeder extends Seeder
 {
@@ -15,24 +15,44 @@ class CategorySeeder extends Seeder
             'Сантехника', 'Окна и двери', 'Изоляция', 'Лаки и краски', 'Сад и огород'
         ];
 
-        foreach ($parentCategories as $parentNameRu) {
-            $parent = Category::create([
-                'name_ru' => $parentNameRu,
-                'name_ro' => $this->translateToRo($parentNameRu),
-                'name_en' => $this->translateToEn($parentNameRu),
-                'parent_id' => null,
-            ]);
+        foreach ($parentCategories as $ruName) {
+            $category = Category::create(['parent_id' => null]);
+
+            $this->createTranslations($category->id, $ruName);
 
             $subCount = rand(3, 5);
             for ($i = 1; $i <= $subCount; $i++) {
-                Category::create([
-                    'name_ru' => $parentNameRu . ' - Подкатегория ' . $i,
-                    'name_ro' => $this->translateToRo($parentNameRu) . ' - Subcategorie ' . $i,
-                    'name_en' => $this->translateToEn($parentNameRu) . ' - Subcategory ' . $i,
-                    'parent_id' => $parent->id,
-                ]);
+                $sub = Category::create(['parent_id' => $category->id]);
+
+                $this->createTranslations(
+                    $sub->id,
+                    $ruName . ' - Подкатегория ' . $i,
+                    'Subcategorie ' . $i,
+                    'Subcategory ' . $i
+                );
             }
         }
+    }
+
+    private function createTranslations($categoryId, $nameRu, $nameRo = null, $nameEn = null)
+    {
+        CategoryTranslation::insert([
+            [
+                'category_id' => $categoryId,
+                'language' => 'ru',
+                'name' => $nameRu,
+            ],
+            [
+                'category_id' => $categoryId,
+                'language' => 'ro',
+                'name' => $nameRo ?? $this->translateToRo($nameRu),
+            ],
+            [
+                'category_id' => $categoryId,
+                'language' => 'en',
+                'name' => $nameEn ?? $this->translateToEn($nameRu),
+            ],
+        ]);
     }
 
     private function translateToRo($ru)

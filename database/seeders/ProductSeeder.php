@@ -15,7 +15,7 @@ class ProductSeeder extends Seeder
         $categories = Category::all();
         $brands = Brand::all();
 
-        for ($i = 1; $i <= 1000; $i++) {
+        for ($i = 1; $i <= 200; $i++) {
             Product::create([
                 'category_id' => $categories->whereNotNull('parent_id')->random()->id,
                 'brand_id' => $brands->random()->id,

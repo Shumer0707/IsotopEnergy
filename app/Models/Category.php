@@ -9,7 +9,28 @@ class Category extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name_ru', 'name_ro', 'name_en', 'parent_id'];
+    protected $fillable = ['parent_id'];
+
+    public function translations()
+    {
+        return $this->hasMany(CategoryTranslation::class);
+    }
+
+    public function translation()
+    {
+        return $this->hasOne(CategoryTranslation::class)
+            ->where('language', app()->getLocale());
+    }
+
+    // 🔹 Fallback (если нужно)
+    public function translatedName()
+    {
+        return $this->translations
+            ->firstWhere('language', app()->getLocale())
+            ?->name
+            ?? $this->translations->firstWhere('language', config('app.fallback_locale'))?->name;
+    }
+
 
     public function parent()
     {
