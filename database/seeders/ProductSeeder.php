@@ -15,14 +15,14 @@ class ProductSeeder extends Seeder
         $categories = Category::all();
         $brands = Brand::all();
 
-        for ($i = 1; $i <= 50; $i++) {
+        for ($i = 1; $i <= 1000; $i++) {
             Product::create([
                 'category_id' => $categories->whereNotNull('parent_id')->random()->id,
                 'brand_id' => $brands->random()->id,
                 'price' => rand(500, 5000),
                 'discount_price' => rand(400, 4900),
                 'currency' => 'MDL',
-                'main_image' => 'products/product_' . $i . '.jpg',
+                'main_image' => NULL,
             ]);
         }
     }

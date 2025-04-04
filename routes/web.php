@@ -13,6 +13,8 @@ use App\Http\Controllers\Admin\AdminAttributeController;
 use App\Http\Controllers\Admin\AdminAttributeValueController;
 use App\Http\Controllers\Admin\AdminBrandController;
 use App\Http\Controllers\Admin\AdminImageController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\LayoutController;
 
 // 🔹 Общедоступные маршруты
 Route::get('/', [PageController::class, 'home'])->name('home');
@@ -21,6 +23,9 @@ Route::get('/contacts', [PageController::class, 'contacts'])->name('contacts');
 Route::get('/cart', [PageController::class, 'cart'])->name('cart');
 
 // 🔹 Категории товаров
+Route::get('/layout-data', [LayoutController::class, 'index'])->name('layout.data');
+Route::get('/category/{id}', [\App\Http\Controllers\CategoryController::class, 'show'])->name('category.show');
+
 Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.show');
 
 Route::get('/set-locale/{locale}', [LanguageController::class, 'switch'])->name('set-locale');
