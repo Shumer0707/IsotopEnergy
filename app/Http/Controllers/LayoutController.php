@@ -8,10 +8,12 @@ class LayoutController extends Controller
 {
     public function index()
     {
-        $categories = Category::with('children')
-            ->whereNull('parent_id')
-            ->get(['id', 'name_ru', 'name_ro', 'name_en', 'parent_id']);
+        $categories = Category::with([
+            'translation',
+            'children.translation',
+        ])->whereNull('parent_id')->get();
 
+        // Можем вернуть как есть, и на фронте использовать translatedName()
         return response()->json([
             'navCategories' => $categories
         ]);

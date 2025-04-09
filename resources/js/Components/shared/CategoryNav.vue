@@ -20,13 +20,14 @@ const toggleCategories = () => {
 };
 
 const categories = computed(() => {
-    return navCategories.value.map((category) => ({
-        name: category[`name_${locale.value}`],
-        children: (category.children || []).map((sub) => ({
-            id: sub.id,
-            name: sub[`name_${locale.value}`],
-        })),
-    }));
+  return navCategories.value.map((category) => ({
+    id: category.id,
+    name: category.translation?.name ?? 'Без названия',
+    children: (category.children || []).map((sub) => ({
+      id: sub.id,
+      name: sub.translation?.name ?? 'Без названия',
+    })),
+  }));
 });
 
 const handleClickOutside = (event) => {

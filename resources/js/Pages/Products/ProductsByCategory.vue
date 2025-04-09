@@ -1,45 +1,57 @@
 <script setup>
-import { usePage } from "@inertiajs/vue3";
+import { router } from '@inertiajs/vue3';
+import FilterPanel from '@/Components/shared/FilterPanel.vue';
 
 const props = defineProps({
     category: Object,
     products: Array,
+    brands: Array,
 });
 
-const locale = usePage().props.locale;
+const openProduct = (id) => {
+    router.visit(`/product/${id}`);
+};
 </script>
 
 <template>
-    <div>
-        <h1 class="text-2xl font-bold mb-4">
-            {{ category[`name_${locale}`] }}
-        </h1>
+    <div class="flex flex-col lg:flex-row gap-6">
+        <FilterPanel :brands="brands" :category-id="category.id" />
 
-        <div v-if="products.length === 0">
-            <p>Нет товаров в этой категории.</p>
-        </div>
+        <div class="flex-1">
+            <h1 class="text-2xl font-bold mb-4">
+                {{ category.translation.name }}
+            </h1>
 
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            <div
-                v-for="product in products"
-                :key="product.id"
-                class="border rounded p-4"
-            >
-                <img
-                    :src="
-                        product.main_image
-                            ? `/storage/${product.main_image}`
-                            : '/images/placeholder.jpg'
-                    "
-                    alt=""
-                    class="w-full h-32 object-cover mb-2"
-                />
-                <h3 class="text-lg font-semibold">
-                    {{ product.descriptions?.[0]?.title || "Без названия" }}
-                </h3>
-                <p class="text-sm">
-                    {{ product.price }} {{ product.currency }}
-                </p>
+            <div v-if="products.length === 0">
+                <p>Нет товаров в этой категории.</p>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                <div
+                    v-for="product in products"
+                    :key="product.id"
+                    class="border rounded p-4 flex flex-col"
+                >
+                    <img
+                        :src="product.main_image ? `/storage/${product.main_image}` : '/images/placeholder.jpg'"
+                        alt=""
+                        class="w-full h-32 object-cover mb-2 cursor-pointer"
+                        @click="openProduct(product.id)"
+                    />
+                    <h3 class="text-lg font-semibold">
+                        {{ product.description?.title ?? "Без названия" }}
+                    </h3>
+                    <p class="text-sm">{{ product.price }} {{ product.currency }}</p>
+                    <p class="text-sm mb-2">{{ product.brand.name }}</p>
+
+                    <!-- Кнопка корзины -->
+                    <button
+                        class="mt-auto bg-pink-500 hover:bg-pink-600 text-white py-1 px-3 rounded text-sm transition"
+                        @click="() => {}"
+                    >
+                        В корзину
+                    </button>
+                </div>
             </div>
         </div>
     </div>
