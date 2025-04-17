@@ -2,21 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Product;
 use Inertia\Inertia;
 
 class ProductController extends Controller
 {
-    public function show($id)
+    public function show(Product $product)
     {
-        // Временно передаем фиктивные данные
-        $product = [
-            'id' => $id,
-            'name' => 'Пример товара',
-            'description' => 'Описание товара. Это тестовые данные.',
-            'price' => '1000',
-            'currency' => 'MDL',
-        ];
+        $product->load(['description', 'brand', 'category', 'images', 'attributeValues.value.translation']);
 
         return Inertia::render('Product', [
             'product' => $product,

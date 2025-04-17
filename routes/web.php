@@ -13,9 +13,11 @@ use App\Http\Controllers\Admin\AdminAttributeController;
 use App\Http\Controllers\Admin\AdminAttributeValueController;
 use App\Http\Controllers\Admin\AdminBrandController;
 use App\Http\Controllers\Admin\AdminImageController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\LayoutController;
 use App\Http\Controllers\TestController;
+use Inertia\Inertia;
 
 // 🔹 Общедоступные маршруты
 Route::get('/', [PageController::class, 'home'])->name('home');
@@ -25,9 +27,15 @@ Route::get('/cart', [PageController::class, 'cart'])->name('cart');
 
 // 🔹 Категории товаров
 Route::get('/layout-data', [LayoutController::class, 'index'])->name('layout.data');
-Route::get('/category/{id}', [\App\Http\Controllers\CategoryController::class, 'show'])->name('category.show');
 
-Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.show');
+Route::get('/category/{id}', [CategoryController::class, 'show'])->name('category.show');
+
+Route::get('/product/{product}', [ProductController::class, 'show'])->name('product.show');
+
+Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
+Route::delete('/cart/remove/{productId}', [CartController::class, 'remove'])->name('cart.remove');
+Route::delete('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 
 Route::get('/set-locale/{locale}', [LanguageController::class, 'switch'])->name('set-locale');
 

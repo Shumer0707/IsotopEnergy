@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Session;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,6 +21,7 @@ class AppServiceProvider extends ServiceProvider
         Inertia::share([
             'locale' => fn () => App::getLocale(),
             'translations' => fn () => __('messages'), // ✅ Передаем все переводы
+            'cartFromServer' => fn () => Session::get('cart', []),
         ]);
     }
 }
