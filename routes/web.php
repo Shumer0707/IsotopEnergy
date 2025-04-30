@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\AdminImageController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\LayoutController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\TestController;
 use Inertia\Inertia;
 
@@ -36,6 +37,8 @@ Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
 Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
 Route::delete('/cart/remove/{productId}', [CartController::class, 'remove'])->name('cart.remove');
 Route::delete('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+
+Route::post('/order', [OrderController::class, 'submit']);
 
 Route::get('/set-locale/{locale}', [LanguageController::class, 'switch'])->name('set-locale');
 

@@ -1,9 +1,11 @@
 <script setup>
-import { useCartStore } from '@/Stores/cart';
+import { useCartStore } from "@/Stores/cart";
 import QuantityControl from "@/Components/common/QuantityControl.vue";
+import OrderModal from '@/Components/common/OrderModal.vue';
+import { ref } from 'vue';
 
+const isModalOpen = ref(false);
 const cart = useCartStore();
-
 </script>
 
 <template>
@@ -22,19 +24,29 @@ const cart = useCartStore();
             >
                 <div>
                     <p class="font-medium">Товар ID: {{ productId }}</p>
-                    <p class="text-sm text-gray-600">Количество: {{ quantity }}</p>
+                    <p class="text-sm text-gray-600">
+                        Количество: {{ quantity }}
+                    </p>
                 </div>
 
                 <QuantityControl :product-id="productId" />
             </div>
-
-            <button
-                @click="cart.clear"
-                class="mt-6 text-sm text-red-600 hover:underline"
-            >
-                Очистить корзину
-            </button>
+            <div class="flex justify-between">
+                <button
+                    @click="cart.clear"
+                    class="mt-6 text-sm text-red-600 hover:underline"
+                >
+                    Очистить корзину
+                </button>
+                <button
+                    @click="isModalOpen = true"
+                    class="mt-6 bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded"
+                >
+                    Оформить заказ
+                </button>
+            </div>
+            <!-- Модалка -->
+            <OrderModal v-if="isModalOpen" @close="isModalOpen = false" />
         </div>
     </div>
 </template>
-
