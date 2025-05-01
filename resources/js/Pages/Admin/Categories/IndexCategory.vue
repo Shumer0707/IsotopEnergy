@@ -5,7 +5,7 @@ import { ref, watch, nextTick } from "vue";
 import CreateCategoryForm from "./CreateCategoryForm.vue";
 import EditCategoryForm from "./EditCategoryForm.vue";
 
-console.log("Flash из usePage():", usePage().props.flash);
+// console.log("Flash из usePage():", usePage().props.flash);
 const props = defineProps({
     categories: Array,
     parentCategories: Array,

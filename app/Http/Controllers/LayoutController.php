@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Brand;
 
 class LayoutController extends Controller
 {
@@ -13,9 +14,11 @@ class LayoutController extends Controller
             'children.translation',
         ])->whereNull('parent_id')->get();
 
-        // Можем вернуть как есть, и на фронте использовать translatedName()
+        $brands = Brand::select('id', 'name', 'logo')->get();
+
         return response()->json([
-            'navCategories' => $categories
+            'navCategories' => $categories,
+            'brands' => $brands,
         ]);
     }
 }

@@ -13,6 +13,7 @@ const props = defineProps({
     brands: Array,
     values: Array,
 });
+console.log(props.products.map(p => p.descriptions));
 
 const viewMode = ref("list");
 const productToEdit = ref(null);
@@ -99,7 +100,7 @@ const manageImages = (product) => {
                                     :key="cat.id"
                                     :value="cat.id"
                                 >
-                                    {{ cat.name_ru }}
+                                    {{ cat.translation?.name ?? '—'  }}
                                 </option>
                             </select>
                         </div>
@@ -139,10 +140,14 @@ const manageImages = (product) => {
                                     {{ product.id }}
                                 </td>
                                 <td class="border px-4 py-2">
-                                    {{ product.name_ru }}
+                                    {{
+                                            product.descriptions.find(
+                                                (t) => t.language === "ru"
+                                            )?.title ?? "—"
+                                    }}
                                 </td>
                                 <td class="border px-4 py-2">
-                                    {{ product.category?.name_ru }}
+                                    {{ product.category?.translation?.name ?? '—' }}
                                 </td>
                                 <td class="border px-4 py-2">
                                     {{ product.price }}

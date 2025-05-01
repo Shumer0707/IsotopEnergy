@@ -55,7 +55,10 @@ onBeforeUnmount(() => {
 
 <template>
     <div ref="navRef" class="relative">
-        <button @click="toggleCategories" class="px-2">Товары</button>
+        <button @click="toggleCategories"
+            class="bg-pink-600 hover:bg-pink-500 text-white px-12 py-3 rounded-xl text-sm lg:text-base"
+            >Каталог
+        </button>
         <div
             v-if="showCategories"
             class="absolute left-0 mt-2 w-48 bg-white text-gray-800 shadow-md z-50"

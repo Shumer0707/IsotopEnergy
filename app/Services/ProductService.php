@@ -15,7 +15,7 @@ class ProductService
 {
     public function getIndexData(?int $categoryId = null): array
     {
-        $productsQuery = Product::with(['category', 'descriptions', 'brand']);
+        $productsQuery = Product::with(['category.translation', 'category', 'descriptions', 'brand']);
 
         if ($categoryId) {
             $productsQuery->where('category_id', $categoryId);
@@ -29,7 +29,7 @@ class ProductService
 
         return [
             'products' => $products,
-            'categories' => Category::all(),
+            'categories' => Category::with('translation')->get(),
             'brands' => Brand::all(),
             'attributes' => ProductAttribute::all(),
             'values' => AttributeValue::all(),
