@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
             AttributeValueSeeder::class,
             ProductAttributeValueSeeder::class,
             DescriptionSeeder::class,
+            DiscountGroupSeeder::class,
+            PromotionSeeder::class,
         ]);
     }
 }

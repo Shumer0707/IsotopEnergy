@@ -68,6 +68,12 @@ const showingNavigationDropdown = ref(false);
                                 >
                                     Бренды
                                 </Link>
+                                <Link
+                                    href="/admin/promotions"
+                                    class="flex items-center justify-center px-4 my-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700"
+                                >
+                                    Скидки
+                                </Link>
                             </div>
                         </div>
 

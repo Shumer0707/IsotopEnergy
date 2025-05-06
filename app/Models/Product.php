@@ -60,4 +60,15 @@ class Product extends Model
     {
         return $this->hasMany(ProductAttributeValue::class, 'product_id', 'id');
     }
+
+    public function promotion()
+    {
+        return $this->hasOne(Promotion::class);
+    }
+
+    public function discountedPrice()
+    {
+        $discount = $this->promotion?->discountGroup?->discount_percent ?? 0;
+        return $this->price * (1 - $discount / 100);
+    }
 }
