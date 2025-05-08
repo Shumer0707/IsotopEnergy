@@ -1,10 +1,18 @@
 <script setup>
   import { ref, onMounted } from 'vue'
+  import { Link, router } from '@inertiajs/vue3'
   import axios from 'axios'
+  import { useCartStore } from '@/Stores/cart'
 
   const promoProducts = ref([])
   const currentPage = ref(1)
   const lastPage = ref(1)
+
+  const cart = useCartStore()
+
+  const openProduct = (id) => {
+    router.visit(`/product/${id}`)
+  }
 
   const fetchProducts = async (page = 1) => {
     const res = await axios.get('/promo-products?page=' + page)
@@ -39,6 +47,7 @@
             :src="product.main_image ? `/storage/${product.main_image}` : '/images/placeholder.jpg'"
             alt="product image"
             class="max-h-full max-w-full object-contain"
+            @click="openProduct(product.id)"
           />
         </div>
 
@@ -48,7 +57,6 @@
         </h4>
         <p class="text-xs text-gray-600 mb-1">Артикул: {{ product.id }}</p>
 
-
         <div class="flex justify-between items-center mt-3">
           <div>
             <div v-if="product.promotion?.discount_group" class="text-xs text-gray-400 line-through">{{ product.price }} mdl</div>
@@ -56,10 +64,11 @@
           </div>
 
           <div class="flex gap-2">
-            <button class="bg-gray-600 text-white rounded-md p-2 hover:bg-gray-700" title="Добавить в корзину">🛒</button>
-            <button class="bg-gray-200 text-white rounded-md p-2 hover:text-pink-500" title="Добавить в избранное">
-              ❤️
-            </button>
+            <button @click="cart.add(product.id)" class="p-1 text-xl text-white rounded-md bg-gray-600 hover:bg-gray-700">🛒</button>
+
+            <Link href="/favorites" class="p-1 text-2xl hover:text-gray-300" title="Добавить в избранное">
+              <font-awesome-icon :icon="['far', 'heart']" class="text-gray-500 hover:text-pink-600" />
+            </Link>
           </div>
         </div>
       </div>

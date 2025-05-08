@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { Swiper, SwiperSlide } from 'swiper/vue';
-import { Autoplay } from 'swiper';
+import { Autoplay, FreeMode } from 'swiper';
 import 'swiper/css';
 
 const brands = ref([]);

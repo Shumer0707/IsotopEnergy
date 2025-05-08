@@ -42,8 +42,11 @@
 
       <!-- Справа: Избранное и Корзина -->
       <div class="flex items-center space-x-6">
-        <Link href="/favorites" class="text-3xl hover:text-gray-300"><font-awesome-icon :icon="['fat', 'heart']" /></Link>
-        <Link href="/cart" class="text-3xl hover:text-gray-300">🛒</Link>
+        <Link href="/favorites" class="p-1 text-3xl hover:text-gray-300">
+          <font-awesome-icon :icon="['far', 'heart']" class="text-gray-500 hover:text-pink-600" />
+        </Link>
+        <!-- <Link href="/cart" class="text-3xl hover:text-gray-300"><font-awesome-icon :icon="['fas', 'shopping-cart']" /></Link> -->
+        <Link href="/cart" class="p-1 text-3xl rounded-md hover:bg-gray-700">🛒</Link>
       </div>
     </div>
   </header>

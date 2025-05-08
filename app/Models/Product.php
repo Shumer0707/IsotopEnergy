@@ -47,11 +47,6 @@ class Product extends Model
             ->withPivot('attribute_value_id');
     }
 
-    // public function descriptions()
-    // {
-    //     return $this->hasMany(Description::class);
-    // }
-
     public function images()
     {
         return $this->hasMany(Image::class);

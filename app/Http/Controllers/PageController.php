@@ -22,4 +22,8 @@ class PageController extends Controller
     {
         return Inertia::render('About');
     }
+    public function favorites()
+    {
+        return Inertia::render('Favorites/IndexFavorites');
+    }
 }

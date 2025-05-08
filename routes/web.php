@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\AdminImageController;
 use App\Http\Controllers\Admin\AdminPromotionController;
 use App\Http\Controllers\Admin\AdminDiscountGroupController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\LayoutController;
 use App\Http\Controllers\OrderController;
@@ -26,8 +27,8 @@ Route::get('/', [PageController::class, 'home'])->name('home');
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/contacts', [PageController::class, 'contacts'])->name('contacts');
 Route::get('/cart', [PageController::class, 'cart'])->name('cart');
+Route::get('/favorites', [PageController::class, 'favorites'])->name('favorites');
 
-// 🔹 Категории товаров
 Route::get('/layout-data', [LayoutController::class, 'index'])->name('layout.data');
 Route::get('/promo-products', [LayoutController::class, 'promoProducts']);
 
@@ -35,10 +36,20 @@ Route::get('/category/{id}', [CategoryController::class, 'show'])->name('categor
 
 Route::get('/product/{product}', [ProductController::class, 'show'])->name('product.show');
 
-Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
-Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
-Route::delete('/cart/remove/{productId}', [CartController::class, 'remove'])->name('cart.remove');
-Route::delete('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+Route::prefix('cart')->as('cart.')->group(function () {
+  Route::post('/data', [CartController::class, 'data'])->name('data');
+  Route::post('/add', [CartController::class, 'add'])->name('add');
+  Route::post('/update', [CartController::class, 'update'])->name('update');
+  Route::delete('/remove/{productId}', [CartController::class, 'remove'])->name('remove');
+  Route::delete('/clear', [CartController::class, 'clear'])->name('clear');
+});
+
+Route::prefix('favorites')->as('favorites.')->group(function () {
+  Route::get('/data', [FavoriteController::class, 'index'])->name('data');
+  Route::post('/toggle', [FavoriteController::class, 'toggle'])->name('toggle');
+  Route::delete('/remove/{productId}', [FavoriteController::class, 'remove'])->name('remove');
+  Route::delete('/clear', [FavoriteController::class, 'clear'])->name('clear');
+});
 
 Route::post('/order', [OrderController::class, 'submit']);
 
