@@ -1,11 +1,66 @@
 <template>
-    <Head title="О нас" />
-    <h1 class="text-xl font-bold">О нас</h1>
-    <p><h2>{{ translations.welcome || 'Загрузка...' }}</h2></p>
-</template>
-<script setup>
-import { Head } from '@inertiajs/vue3';
-import { useTranslations } from '@/composables/useTranslations';
+  <Head title="О нас" />
 
-const translations = useTranslations();
+  <section class="max-w-7xl mx-auto px-4 py-12">
+    <h1 class="text-2xl font-bold text-center mb-8">О компании ISOTOP ENERGY</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+      <!-- Текст -->
+      <div class="space-y-4 leading-7 text-justify">
+        <div v-if="translations.About-text" v-html="translations.About-text" />
+        <template v-else>
+          <p>
+            <strong>Компания ISOTOP ENERGY</strong>
+            успешно работает на территории Республики Молдова с 1994 года, реализует оптом и в розницу хвойные и твёрдые породы
+            дерева, вагонку, брус, имитацию бруса, OSB, фанеру, арматуру, трубы, цемент, шперы и многие другие строительные
+            материалы. Изготавливаем на заказ лестницу из модулек, качели, детские площадки и декоративные элементы из 100%
+            натурального дерева.
+          </p>
+
+          <p>
+            SA «МИГ» сотрудничает с надёжными компаниями и фирмами. Вот почему продаваемая продукция отличается надёжностью и
+            безопасностью. Качество продукции отмечалось на выставках: «Стиль Бидэ-2000», «Стиль Бидэ-2002», «Домус-2006»,
+            «Домус-2007».
+          </p>
+          <p>
+            Разнообразие продуктов, гибкая ценовая политика и система скидок позволяют SA «МИГ» удовлетворять запросы самых разных
+            категорий покупателей. На весь ассортимент продукции действует гарантия, которая позволяет покупателю убедиться, что
+            он сделал правильный выбор.
+          </p>
+          <p>
+            <strong>Наша цель</strong>
+            — дать каждому клиенту особый опыт работы со строительными материалами.
+          </p>
+        </template>
+      </div>
+
+      <!-- Картинка -->
+      <div>
+        <img src="/images/placeholder.jpg" alt="О компании" class="rounded-xl shadow-md w-full object-cover h-[300px]" />
+      </div>
+    </div>
+  </section>
+  <!-- 🔹 Форма -->
+  <section class="bg-gray-50 py-12">
+    <div class="max-w-7xl mx-auto px-4">
+      <ContactForm />
+    </div>
+  </section>
+
+  <!-- 🔹 Партнёры -->
+  <section class="bg-gray-100 py-12">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+      <h3 class="text-xl font-semibold mb-6">Наши партнёры</h3>
+      <PartnersCarousel />
+    </div>
+  </section>
+</template>
+
+<script setup>
+  import { Head } from '@inertiajs/vue3'
+  import { useTranslations } from '@/composables/useTranslations'
+  import ContactForm from '@/Components/shared/ContactForm.vue'
+  import PartnersCarousel from '@/Components/shared/PartnersCarousel.vue'
+
+  const translations = useTranslations()
 </script>

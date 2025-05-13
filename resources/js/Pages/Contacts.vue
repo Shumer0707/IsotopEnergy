@@ -1,79 +1,75 @@
 <template>
-    <Head title="Контакты" />
-    <div class="max-w-lg mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">
-        <h1 class="text-xl font-bold mb-4">Контакты</h1>
-        <p class="mb-4">Свяжитесь с нами.</p>
+  <Head title="Контакты" />
 
-        <form @submit.prevent="submit">
-            <div class="mb-4">
-                <label class="block text-sm font-medium mb-1" for="name">Имя</label>
-                <input
-                    v-model="form.name"
-                    type="text"
-                    id="name"
-                    class="w-full p-2 border rounded"
-                    required
-                />
-            </div>
+  <!-- Хлебные крошки уже есть выше -->
 
-            <div class="mb-4">
-                <label class="block text-sm font-medium mb-1" for="email">Email</label>
-                <input
-                    v-model="form.email"
-                    type="email"
-                    id="email"
-                    class="w-full p-2 border rounded"
-                    required
-                />
-            </div>
+  <section class="max-w-7xl mx-auto px-4 py-12">
+    <h2 class="text-2xl font-bold mb-4">Наши контакты</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+      <div
+        class="bg-white shadow-md border border-gray-200 rounded-xl p-6 space-y-6 text-base text-gray-800 leading-6 min-h-[300px] h-full"
+      >
+        <p class="flex items-start gap-3">
+          <font-awesome-icon icon="fa-solid fa-location-dot" class="text-gray-600 mt-1 shrink-0" />
+          <span>
+            <span class="font-semibold">Адрес:</span>
+            <br />
+            г. Бельцы, ул. Алпишеня
+          </span>
+        </p>
 
-            <div class="mb-4">
-                <label class="block text-sm font-medium mb-1" for="message">Текст</label>
-                <textarea
-                    v-model="form.message"
-                    id="message"
-                    class="w-full p-2 border rounded"
-                    rows="4"
-                    required
-                ></textarea>
-            </div>
-            <p v-if="errorMessage" class="text-red-500 mt-2">{{ errorMessage }}</p>
-            <button
-                type="submit"
-                class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
-            >
-                Отправить
-            </button>
-        </form>
+        <p class="flex items-start gap-3">
+          <font-awesome-icon icon="fa-solid fa-clock" class="text-gray-600 mt-1 shrink-0" />
+          <span>
+            <span class="font-semibold">График работы:</span>
+            <br />
+            Пн–Пт: 9:00–20:00
+            <br />
+            Сб: 9:00–18:00
+            <br />
+            Вс: выходной
+          </span>
+        </p>
+
+        <p class="flex items-start gap-3">
+          <font-awesome-icon icon="fa-solid fa-phone" class="text-gray-600 mt-1 shrink-0" />
+          <span>
+            <span class="font-semibold">Телефон:</span>
+            <br />
+            +373 699 77 777
+          </span>
+        </p>
+
+        <p class="flex items-start gap-3">
+          <font-awesome-icon icon="fa-solid fa-envelope" class="text-gray-600 mt-1 shrink-0" />
+          <span>
+            <span class="font-semibold">Почта:</span>
+            <br />
+            isotopenergy@gmail.com
+          </span>
+        </p>
+      </div>
+
+      <div class="h-full">
+        <div class="rounded-xl overflow-hidden shadow-md w-full h-full">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2682.136172755125!2d27.9274437922014!3d47.75941300317316!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40cb672c9938c16b%3A0x80e2057e0c88a1!2zQWxpxZ9hciBOb3ZhaSAzLCBNRC0zMTAwLCBCxINsyJtpLCDQnNC-0LvQtNC-0LLQsA!5e0!3m2!1sru!2s!4v1747054732023!5m2!1sru!2s"
+            width="100%"
+            height="100%"
+            style="border: 0"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+          ></iframe>
+        </div>
+      </div>
     </div>
+
+    <ContactForm />
+  </section>
 </template>
 
 <script setup>
-import { Head, router } from '@inertiajs/vue3';
-import { reactive, ref } from 'vue';
-
-const form = reactive({
-    name: '',
-    email: '',
-    message: '',
-});
-
-const errorMessage = ref('');
-
-const submit = () => {
-    errorMessage.value = ''; // Очищаем ошибку перед отправкой
-
-    router.post('/contact', form, {
-        onSuccess: () => {
-            alert('Сообщение отправлено!');
-        },
-        onError: (errors) => {
-            if (errors.status === 429) {
-                errorMessage.value = 'Слишком много запросов. Попробуйте позже.';
-            } else {
-                console.error(errors);
-            }
-        }
-    });
-};
+  import ContactForm from '@/Components/shared/ContactForm.vue'
+  import { Head } from '@inertiajs/vue3'
 </script>

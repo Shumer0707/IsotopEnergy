@@ -3,7 +3,10 @@
   import { Link, router } from '@inertiajs/vue3'
   import axios from 'axios'
   import { useCartStore } from '@/Stores/cart'
+  import { useFavoritesStore } from '@/Stores/favorites'
+  import ProductCard from '@/Components/shared/ProductCard.vue'
 
+  const favorites = useFavoritesStore()
   const promoProducts = ref([])
   const currentPage = ref(1)
   const lastPage = ref(1)
@@ -22,56 +25,20 @@
   }
 
   onMounted(() => fetchProducts())
-
-  function discountedPrice(product) {
-    const discount = product.promotion?.discount_group?.discount_percent || 0
-    return (product.price * (1 - discount / 100)).toFixed(2)
-  }
 </script>
 
 <template>
   <div>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-      <div v-for="product in promoProducts" :key="product.id" class="bg-white rounded-2xl shadow p-4 relative">
-        <!-- 🔹 Скидка -->
-        <div
-          v-if="product.promotion?.discount_group"
-          class="absolute top-2 left-2 bg-gray-300 text-xs font-bold px-2 py-1 rounded"
-        >
-          СКИДКА -{{ product.promotion.discount_group.discount_percent }}%
-        </div>
-
-        <!-- 🔹 Изображение -->
-        <div class="h-40 bg-gray-100 rounded flex items-center justify-center mb-4 overflow-hidden">
-          <img
-            :src="product.main_image ? `/storage/${product.main_image}` : '/images/placeholder.jpg'"
-            alt="product image"
-            class="max-h-full max-w-full object-contain"
-            @click="openProduct(product.id)"
-          />
-        </div>
-
-        <!-- 🔹 Название -->
-        <h4 class="font-semibold text-sm mb-1 leading-tight">
-          {{ product.description?.title ?? 'Без названия' }}
-        </h4>
-        <p class="text-xs text-gray-600 mb-1">Артикул: {{ product.id }}</p>
-
-        <div class="flex justify-between items-center mt-3">
-          <div>
-            <div v-if="product.promotion?.discount_group" class="text-xs text-gray-400 line-through">{{ product.price }} mdl</div>
-            <div class="text-pink-600 font-bold text-xl">{{ discountedPrice(product) }} mdl</div>
-          </div>
-
-          <div class="flex gap-2">
-            <button @click="cart.add(product.id)" class="p-1 text-xl text-white rounded-md bg-gray-600 hover:bg-gray-700">🛒</button>
-
-            <Link href="/favorites" class="p-1 text-2xl hover:text-gray-300" title="Добавить в избранное">
-              <font-awesome-icon :icon="['far', 'heart']" class="text-gray-500 hover:text-pink-600" />
-            </Link>
-          </div>
-        </div>
-      </div>
+      <ProductCard
+        v-for="product in promoProducts"
+        :key="product.id"
+        :product="product"
+        :onClick="openProduct"
+        :onAddToCart="cart.add"
+        :onToggleFavorite="favorites.localToggle"
+        :isFavorite="favorites.isFavorite(product.id)"
+      />
     </div>
 
     <!-- 🔹 Пагинация -->

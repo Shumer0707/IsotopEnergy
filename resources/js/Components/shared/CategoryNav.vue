@@ -1,28 +1,29 @@
 <script setup>
   import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
   import { Link, usePage } from '@inertiajs/vue3'
-  import axios from 'axios'
-  import SubcategoryModal from '@/Components/shared/SubcategoryModal.vue'
+  import { useCategoryStore } from '@/Stores/category'
 
+  const categoryStore = useCategoryStore()
   const showCategories = ref(false)
-  const navCategories = ref([])
-  const locale = computed(() => usePage().props.locale)
   const navRef = ref(null)
   const navButtonRef = ref(null)
   const menuTop = ref(0)
 
+  // Следим за языком
+  const locale = computed(() => usePage().props.locale)
+
+  // Загружаем категории при открытии меню
   const toggleCategories = () => {
     showCategories.value = !showCategories.value
 
-    if (navCategories.value.length === 0 && showCategories.value) {
-      axios.get('/layout-data').then((res) => {
-        navCategories.value = res.data.navCategories
-      })
+    if (!categoryStore.isLoaded && showCategories.value) {
+      categoryStore.loadCategories()
     }
   }
 
+  // Категории для вывода
   const categories = computed(() => {
-    return navCategories.value.map((category) => ({
+    return categoryStore.navCategories.map((category) => ({
       id: category.id,
       name: category.translation?.name ?? 'Без названия',
       children: (category.children || []).map((sub) => ({
@@ -32,33 +33,30 @@
     }))
   })
 
+  // Обработка клика вне меню
   const handleClickOutside = (event) => {
     if (navRef.value && !navRef.value.contains(event.target)) {
       showCategories.value = false
     }
   }
 
-  const activeCategory = ref(null)
-
+  // Открытие модалки
   function openSubcategories(category) {
-    activeCategory.value = category
-    // Здесь дальше будет вызываться модалка
-    console.log('Открываем модалку для:', category.name)
+    categoryStore.openCategory(category.id)
   }
 
+  // Расчёт позиции меню
   onMounted(() => {
     document.addEventListener('click', handleClickOutside)
-  })
 
-  onBeforeUnmount(() => {
-    document.removeEventListener('click', handleClickOutside)
-  })
-
-  onMounted(() => {
     if (navButtonRef.value) {
       const rect = navButtonRef.value.getBoundingClientRect()
       menuTop.value = rect.bottom + 24
     }
+  })
+
+  onBeforeUnmount(() => {
+    document.removeEventListener('click', handleClickOutside)
   })
 </script>
 
@@ -71,12 +69,13 @@
     >
       Каталог
     </button>
+
     <div
       v-if="showCategories"
       :style="{ top: `${menuTop}px` }"
       class="fixed left-0 bg-white text-gray-800 shadow-xl z-50 transition-all duration-300 px-4 py-2"
     >
-      <div v-for="category in categories" :key="category.name" class="relative group">
+      <div v-for="category in categories" :key="category.id" class="relative group">
         <button class="block w-full px-4 py-2 text-left hover:bg-gray-200" @click.prevent="openSubcategories(category)">
           {{ category.name }}
         </button>
@@ -95,5 +94,4 @@
       </div>
     </div>
   </div>
-  <SubcategoryModal :category="activeCategory" @close="activeCategory = null" />
 </template>

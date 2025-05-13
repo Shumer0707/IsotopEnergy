@@ -1,41 +1,31 @@
 <script setup>
-  import { ref, onMounted } from 'vue'
-  import axios from 'axios'
-  import SubcategoryModal from './SubcategoryModal.vue'
+  import { onMounted } from 'vue'
+  import { useCategoryStore } from '@/Stores/category'
 
-  const categories = ref([])
-  const activeCategory = ref(null)
+  const categoryStore = useCategoryStore()
 
-  const fetchCategories = async () => {
-    const res = await axios.get('/layout-data')
-    categories.value = res.data.navCategories
-  }
+  onMounted(() => {
+    if (!categoryStore.isLoaded) {
+      categoryStore.loadCategories()
+    }
+  })
 
   const openModal = (category) => {
-    activeCategory.value = {
-      id: category.id,
-      name: category.translation?.name ?? 'Без названия',
-      children: (category.children || []).map((sub) => ({
-        id: sub.id,
-        name: sub.translation?.name ?? 'Без названия',
-      })),
-    }
+    categoryStore.openCategory(category.id)
   }
-
-  onMounted(fetchCategories)
 </script>
 
 <template>
   <div>
     <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-8 lg:grid-cols-10 gap-4">
       <div
-        v-for="category in categories"
+        v-for="category in categoryStore.navCategories"
         :key="category.id"
         class="flex flex-col items-center cursor-pointer"
         @click="openModal(category)"
       >
         <img
-          :src="category.logo ? `/storage/${category.logo}` : '/images/placeholder.jpg'"
+          :src="category.logo ? `/storage/${category.logo}` : `/images/placeholder.jpg`"
           alt="logo"
           class="w-20 h-20 object-contain rounded-md bg-white"
         />
@@ -44,7 +34,5 @@
         </span>
       </div>
     </div>
-
-    <SubcategoryModal :category="activeCategory" @close="activeCategory = null" />
   </div>
 </template>

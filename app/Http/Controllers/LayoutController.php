@@ -30,7 +30,7 @@ class LayoutController extends Controller
 
   public function promoProducts()
   {
-    $products = Product::with(['description', 'promotion.discountGroup'])
+    $products = Product::with(['description', 'brand', 'promotion.discountGroup'])
       ->whereHas('promotion', fn($q) => $q->where('active', true))
       ->paginate(8);
 

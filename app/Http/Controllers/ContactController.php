@@ -8,17 +8,19 @@ use App\Mail\ContactMail;
 
 class ContactController extends Controller
 {
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email',
-            'message' => 'required|string',
-        ]);
+  public function store(Request $request)
+  {
+    $validated = $request->validate([
+      'name' => 'required|string|max:255',
+      'phone' => 'required|string|max:50',
+      'email' => 'nullable|email',
+      'message' => 'required|string',
+      'agree' => 'accepted',
+    ]);
 
-        // Отправляем письмо
-        Mail::to('admin@example.com')->send(new ContactMail($validated));
+    // Отправляем письмо
+    Mail::to('admin@example.com')->send(new ContactMail($validated));
 
-        return back()->with('success', 'Ваше сообщение отправлено!');
-    }
+    return back()->with('success', true);
+  }
 }

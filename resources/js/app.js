@@ -7,13 +7,8 @@ import { createApp, h } from 'vue'
 import { ZiggyVue } from '../../vendor/tightenco/ziggy'
 import { createPinia } from 'pinia'
 import Layout from './Layouts/Layout.vue'
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faHeart as farHeart } from '@fortawesome/free-regular-svg-icons'
-import { faShoppingCart, faHeart as fasHeart } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-
-// Добавляем нужные иконки
-library.add(farHeart, fasHeart, faShoppingCart)
+import './Utils/icons'
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel'
 
