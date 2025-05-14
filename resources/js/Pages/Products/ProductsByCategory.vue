@@ -15,6 +15,7 @@
     brands: Array,
     sort: String,
     filters: Object,
+    max_price: Number
   })
 
   const cart = useCartStore()
@@ -36,7 +37,7 @@
 
 <template>
   <div class="flex flex-col lg:flex-row gap-6">
-    <FilterPanel :brands="brands" />
+    <FilterPanel :brands="brands" :maxPrice="max_price" />
 
     <div class="flex-1">
       <h1 class="text-2xl font-bold mb-4">

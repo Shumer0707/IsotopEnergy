@@ -26,6 +26,12 @@ class ProductFilterService
       $query->orderBy('price', 'desc');
     }
 
+    if (!empty($filters['price_from']) && !empty($filters['price_to'])) {
+      $query->whereBetween('price', [
+        $filters['price_from'],
+        $filters['price_to'],
+      ]);
+    }
     return $query;
   }
 }

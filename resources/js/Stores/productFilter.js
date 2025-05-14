@@ -7,12 +7,20 @@ export const useProductFilterStore = defineStore('productFilter', {
     filters: {
       brands: [],
       sort: '',
+      price_from: 0,
+      price_to: 10000,
+      max_price: 10000,
     },
   }),
 
   actions: {
-    setCategoryId(id) {
-      this.categoryId = id
+    init({ categoryId, sort, filters, max_price }) {
+      this.categoryId = categoryId
+      this.filters.sort = sort || ''
+      this.filters.brands = filters?.brands || []
+      this.filters.max_price = max_price
+      this.filters.price_from = filters?.price_from ?? 0
+      this.filters.price_to = filters?.price_to ?? max_price
     },
 
     setSort(value) {
@@ -34,7 +42,11 @@ export const useProductFilterStore = defineStore('productFilter', {
       router.get(
         `/category/${this.categoryId}`,
         {
-          filters: JSON.stringify({ brands: this.filters.brands }),
+          filters: JSON.stringify({
+            brands: this.filters.brands,
+            price_from: this.filters.price_from,
+            price_to: this.filters.price_to,
+          }),
           sort: this.filters.sort,
         },
         {
@@ -44,14 +56,14 @@ export const useProductFilterStore = defineStore('productFilter', {
       )
     },
 
-    init({ categoryId, sort, filters }) {
-      this.categoryId = categoryId
-      this.filters.sort = sort || ''
-      this.filters.brands = filters?.brands || []
-    },
     reset() {
-      this.filters.sort = ''
-      this.filters.brands = []
+      this.filters = {
+        brands: [],
+        sort: '',
+        price_from: 0,
+        price_to: this.filters.max_price,
+        max_price: this.filters.max_price,
+      }
       this.apply()
     },
   },
