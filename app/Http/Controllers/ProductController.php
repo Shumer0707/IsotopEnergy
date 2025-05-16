@@ -9,7 +9,7 @@ class ProductController extends Controller
 {
     public function show(Product $product)
     {
-        $product->load(['description', 'brand', 'category', 'images', 'attributeValues.value.translation']);
+        $product->load(['description', 'brand', 'category', 'images', 'attributeValues.attribute.translations', 'attributeValues.value.translations']);
 
         return Inertia::render('Product', [
             'product' => $product,

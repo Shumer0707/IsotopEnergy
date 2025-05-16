@@ -3,10 +3,10 @@
   import { Link, router } from '@inertiajs/vue3'
   import axios from 'axios'
   import { useCartStore } from '@/Stores/cart'
-  import { useFavoritesStore } from '@/Stores/favorites'
+  // import { useFavoritesStore } from '@/Stores/favorites'
   import ProductCard from '@/Components/shared/ProductCard.vue'
 
-  const favorites = useFavoritesStore()
+  // const favorites = useFavoritesStore()
   const promoProducts = ref([])
   const currentPage = ref(1)
   const lastPage = ref(1)
@@ -36,8 +36,6 @@
         :product="product"
         :onClick="openProduct"
         :onAddToCart="cart.add"
-        :onToggleFavorite="favorites.localToggle"
-        :isFavorite="favorites.isFavorite(product.id)"
       />
     </div>
 

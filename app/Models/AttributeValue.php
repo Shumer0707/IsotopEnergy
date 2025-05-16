@@ -7,32 +7,38 @@ use Illuminate\Database\Eloquent\Model;
 
 class AttributeValue extends Model
 {
-    use HasFactory;
+  use HasFactory;
 
-    protected $fillable = ['attribute_id'];
+  protected $fillable = ['attribute_id'];
 
+  protected $appends = ['translated_value'];
 
-    public function translations()
-    {
-        return $this->hasMany(AttributeValueTranslation::class);
-    }
+  public function translations()
+  {
+    return $this->hasMany(AttributeValueTranslation::class);
+  }
 
-    public function translation()
-    {
-        return $this->hasOne(AttributeValueTranslation::class)
-            ->where('language', app()->getLocale());
-    }
+  public function translation()
+  {
+    return $this->hasOne(AttributeValueTranslation::class)
+      ->where('language', app()->getLocale());
+  }
 
-    public function translatedValue()
-    {
-        return $this->translations
-            ->firstWhere('language', app()->getLocale())
-            ?->value
-            ?? $this->translations->firstWhere('language', config('app.fallback_locale'))?->value;
-    }
+  public function translatedValue()
+  {
+    return $this->translations
+      ->firstWhere('language', app()->getLocale())
+      ?->value
+      ?? $this->translations->firstWhere('language', config('app.fallback_locale'))?->value;
+  }
 
-    public function attribute()
-    {
-        return $this->belongsTo(ProductAttribute::class);
-    }
+  public function attribute()
+  {
+    return $this->belongsTo(ProductAttribute::class);
+  }
+
+  public function getTranslatedValueAttribute()
+  {
+    return $this->translatedValue();
+  }
 }

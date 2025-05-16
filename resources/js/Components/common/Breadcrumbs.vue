@@ -38,6 +38,7 @@
       about: translations.value.About,
       contacts: translations.value.Contacts,
       cart: translations.value.Cart,
+      favorites: translations.value.favorites,
     }
 
     const crumbs = [{ name: translations.value.Home || 'Главная', href: '/' }]

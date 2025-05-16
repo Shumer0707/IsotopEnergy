@@ -15,6 +15,7 @@ const { onQtyInput, onQtyBlur } = useCartInputHandlers();
 
 <template>
     <div v-if="cart.items[productId]" class="flex items-center gap-2">
+    <!-- <div class="flex items-center gap-2"> -->
         <!-- Кнопка - -->
         <button
             class="bg-gray-200 px-2 rounded"

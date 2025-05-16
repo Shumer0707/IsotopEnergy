@@ -7,30 +7,37 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProductAttribute extends Model
 {
-    use HasFactory;
+  use HasFactory;
 
-    public function translations()
-    {
-        return $this->hasMany(AttributeTranslation::class);
-    }
+  protected $appends = ['translated_name'];
 
-    public function translation()
-    {
-        return $this->hasOne(AttributeTranslation::class)
-            ->where('language', app()->getLocale());
-    }
+  public function translations()
+  {
+    return $this->hasMany(AttributeTranslation::class);
+  }
 
-    // Фоллбэк
-    public function translatedName()
-    {
-        return $this->translations
-            ->firstWhere('language', app()->getLocale())
-            ?->name
-            ?? $this->translations->firstWhere('language', config('app.fallback_locale'))?->name;
-    }
+  public function translation()
+  {
+    return $this->hasOne(AttributeTranslation::class)
+      ->where('language', app()->getLocale());
+  }
 
-    public function values()
-    {
-        return $this->hasMany(AttributeValue::class, 'attribute_id');
-    }
+  // Фоллбэк
+  public function translatedName()
+  {
+    return $this->translations
+      ->firstWhere('language', app()->getLocale())
+      ?->name
+      ?? $this->translations->firstWhere('language', config('app.fallback_locale'))?->name;
+  }
+
+  public function values()
+  {
+    return $this->hasMany(AttributeValue::class, 'attribute_id');
+  }
+
+  public function getTranslatedNameAttribute()
+  {
+    return $this->translatedName();
+  }
 }

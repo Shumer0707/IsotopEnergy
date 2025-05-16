@@ -3,7 +3,7 @@
   import { useFavoritesStore } from '@/Stores/favorites'
   import { useCartStore } from '@/Stores/cart'
   import { computed, onMounted } from 'vue'
-
+  import ProductCard from '@/Components/shared/ProductCard.vue'
   const favorites = useFavoritesStore()
   const cart = useCartStore()
 
@@ -19,43 +19,28 @@
 </script>
 
 <template>
-  <div class="p-6">
-    <div class="flex justify-between items-center mb-6">
+  <div class="px-4 sm:px-6 lg:px-8 py-6">
+    <!-- 🔹 Заголовок -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
       <h1 class="text-2xl font-bold">Избранное</h1>
-      <button @click="favorites.clear()" class="text-sm text-red-600 hover:underline">Очистить избранное</button>
+      <button @click="favorites.clear()" class="text-sm text-red-600 hover:underline whitespace-nowrap">
+        Очистить избранное
+      </button>
     </div>
 
+    <!-- 🔹 Пусто -->
     <div v-if="products.length === 0" class="text-gray-500">Нет избранных товаров.</div>
 
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4" v-else>
-      <div v-for="product in products" :key="product.id" class="border rounded p-4 flex flex-col">
-        <img
-          :src="product.main_image ? `/storage/${product.main_image}` : '/images/placeholder.jpg'"
-          alt=""
-          class="w-full h-32 object-cover mb-2 cursor-pointer"
-          @click="openProduct(product.id)"
-        />
-        <h3 class="text-lg font-semibold">{{ product.description?.title ?? 'Без названия' }}</h3>
-        <p class="text-sm">{{ product.price }} {{ product.currency }}</p>
-
-        <div class="flex justify-between mt-3">
-          <button
-            @click="favorites.localToggle(product)"
-            class="text-red-500 hover:text-red-700 text-lg"
-            title="Удалить из избранного"
-          >
-            ✖
-          </button>
-
-          <button
-            @click="cart.add(product.id)"
-            class="p-1 text-white bg-gray-600 hover:bg-gray-700 rounded"
-            title="Добавить в корзину"
-          >
-            🛒
-          </button>
-        </div>
-      </div>
+    <!-- 🔹 Сетка карточек -->
+    <div v-else class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-4">
+      <ProductCard
+        v-for="product in products"
+        :key="product.id"
+        :product="product"
+        :onClick="openProduct"
+        :onAddToCart="cart.add"
+        :inFavorites="true"
+      />
     </div>
   </div>
 </template>

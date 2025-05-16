@@ -4,7 +4,6 @@
   import FilterPanel from '@/Components/shared/FilterPanel.vue'
   import Pagination from '@/Components/common/Pagination.vue'
   import { useCartStore } from '@/Stores/cart'
-  import { useFavoritesStore } from '@/Stores/favorites'
   import { useProductFilterStore } from '@/Stores/productFilter'
   import ProductCard from '@/Components/shared/ProductCard.vue'
   import ProductSortAndCount from '@/Components/shared/ProductSortAndCount.vue'
@@ -19,7 +18,6 @@
   })
 
   const cart = useCartStore()
-  const favorites = useFavoritesStore()
   const filterStore = useProductFilterStore()
 
   filterStore.init({
@@ -30,9 +28,6 @@
 
   const openProduct = (id) => router.visit(`/product/${id}`)
 
-  onMounted(() => {
-    favorites.load()
-  })
 </script>
 
 <template>
@@ -63,8 +58,6 @@
           :product="product"
           :onClick="openProduct"
           :onAddToCart="cart.add"
-          :onToggleFavorite="favorites.localToggle"
-          :isFavorite="favorites.isFavorite(product.id)"
         />
       </div>
 
