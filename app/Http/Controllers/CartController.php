@@ -9,7 +9,7 @@ use App\Models\Product;
 
 class CartController extends Controller
 {
-  public function data(Request $request)
+  public function index(Request $request)
   {
     $productIds = $request->input('product_ids', []);
 
@@ -66,5 +66,12 @@ class CartController extends Controller
     session()->forget('cart');
 
     return response()->json(['message' => 'Корзина очищена']);
+  }
+
+  public function get()
+  {
+    return response()->json([
+      'items' => session('cart', []),
+    ]);
   }
 }

@@ -8,18 +8,24 @@ use Illuminate\Queue\SerializesModels;
 
 class OrderCreated extends Mailable
 {
-    use Queueable, SerializesModels;
+  use Queueable, SerializesModels;
 
-    public $data;
+  public $data;
+  public $isClient;
 
-    public function __construct($data)
-    {
-        $this->data = $data;
-    }
+  public function __construct(array $data, bool $isClient = false)
+  {
+    $this->data = $data;
+    $this->isClient = $isClient;
+  }
 
-    public function build()
-    {
-        return $this->subject('Новый заказ')
-            ->view('emails.order');
-    }
+  public function build()
+  {
+    $subject = $this->isClient
+      ? 'Ваш заказ принят'
+      : 'Новый заказ от клиента';
+
+    return $this->subject($subject)
+      ->view('emails.order');
+  }
 }

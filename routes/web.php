@@ -37,11 +37,12 @@ Route::get('/category/{id}', [CategoryController::class, 'show'])->name('categor
 Route::get('/product/{product}', [ProductController::class, 'show'])->name('product.show');
 
 Route::prefix('cart')->as('cart.')->group(function () {
-  Route::post('/data', [CartController::class, 'data'])->name('data');
+  Route::post('/data', [CartController::class, 'index'])->name('data');
   Route::post('/add', [CartController::class, 'add'])->name('add');
   Route::post('/update', [CartController::class, 'update'])->name('update');
   Route::delete('/remove/{productId}', [CartController::class, 'remove'])->name('remove');
   Route::delete('/clear', [CartController::class, 'clear'])->name('clear');
+  Route::get('/get', [CartController::class, 'get'])->name('get');
 });
 
 Route::prefix('favorites')->as('favorites.')->group(function () {

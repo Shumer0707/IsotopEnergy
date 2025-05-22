@@ -12,6 +12,12 @@ export const useCartStore = defineStore('cart', {
       this.items = cartFromServer
     },
 
+    async init() {
+      const res = await axios.get(route('cart.get'))
+      this.items = res.data.items
+      await this.loadProducts()
+    },
+
     async loadProducts() {
       const productIds = Object.keys(this.items)
 

@@ -7,3 +7,6 @@
   .test-height {
     @apply h-20;
   }
+body.modal-open {
+  overflow: hidden;
+}
