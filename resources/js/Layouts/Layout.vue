@@ -2,7 +2,7 @@
   <div class="min-h-screen flex flex-col">
     <Header />
 
-    <main class="flex-1 p-4 w-full">
+    <main class="bg-my_white flex-1 w-full py-4 max-w-screen-3xl mx-auto">
       <Breadcrumbs v-if="usePage().url !== '/'" :segments="usePage().url.split('/').filter(Boolean)" />
       <slot />
     </main>
@@ -32,6 +32,11 @@
 
   onMounted(() => {
     cart.set(cartFromServer)
+
+    if (Object.keys(cartFromServer).length > 0) {
+      cart.loadProducts()
+    }
+
     categoryStore.reset()
     categoryStore.loadCategories()
   })

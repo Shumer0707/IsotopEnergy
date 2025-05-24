@@ -59,7 +59,7 @@
               :src="product.main_image ? `/storage/${product.main_image}` : '/images/placeholder.jpg'"
               alt=""
               @click="openProduct(product.id)"
-              class="w-20 h-20 object-cover rounded shrink-0"
+              class="w-20 h-20 object-cover rounded shrink-0 cursor-pointer"
             />
             <div class="flex flex-col justify-center">
               <p class="font-medium text-sm sm:text-base">{{ product.description?.title ?? 'Без названия' }}</p>

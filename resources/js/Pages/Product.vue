@@ -42,7 +42,6 @@
     <div class="flex flex-col sm:flex-row gap-4 md:w-1/2">
       <div class="relative w-20">
         <!-- Кнопка вверх -->
-        <!-- Кнопка вверх -->
         <button
           @click="swiper.slidePrev()"
           class="absolute top-0 left-0 right-0 h-6 z-10 text-sm text-gray-400 hover:text-pink-600"

@@ -16,8 +16,8 @@
 </script>
 
 <template>
-  <div>
-    <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-8 lg:grid-cols-10 gap-4">
+  <div class="max-w-[1280px] mx-auto">
+    <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 xl:grid-cols-10 gap-8 sm:gap-4 text-sm sm:text-base">
       <div
         v-for="category in categoryStore.navCategories"
         :key="category.id"

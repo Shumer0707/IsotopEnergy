@@ -17,14 +17,13 @@ export default {
         sans: ['Figtree', ...defaultTheme.fontFamily.sans],
       },
       colors: {
-        my_white: '#f8f8f5', // для Фона
+        my_white: '#F2F2F2', // для Фона
         my_black: '#121211', // для Текст
-        my_gray: 'rgba(51, 65, 85)',
-        my_gray_op: 'rgba(51, 65, 85, 0.3)',
+        main: 'rgba(0, 50, 45)',
+        more: 'rgba(49, 75, 73)',
+        bg_sc: 'rgba(101, 177, 25)',
         my_pink: 'rgba(244, 63, 94)',
         my_pink_op: 'rgba(244, 63, 94, 0.3)',
-        my_crem: 'rgba(117, 110, 106)',
-        my_crem_op: 'rgba(117, 110, 106, 0.7)',
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out',
@@ -38,6 +37,9 @@ export default {
       gridTemplateColumns: {
         14: 'repeat(14, minmax(0, 1fr))',
       },
+      maxWidth: {
+      '3xl': '1920px',
+    },
     },
   },
 

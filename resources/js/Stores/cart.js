@@ -47,10 +47,14 @@ export const useCartStore = defineStore('cart', {
         [productId]: existing + quantity,
       }
 
-      axios.post(route('cart.add'), {
-        product_id: productId,
-        quantity,
-      })
+      axios
+        .post(route('cart.add'), {
+          product_id: productId,
+          quantity,
+        })
+        .then(() => {
+          this.loadProducts()
+        })
     },
 
     update(productId, quantity) {

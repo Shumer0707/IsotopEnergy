@@ -32,7 +32,7 @@
     </button>
 
     <input
-      type="number"
+      type="text"
       min="1"
       max="100"
       :value="cart.items[productId]"
