@@ -2,18 +2,18 @@
   <button
     @click="toggleFavorite"
     :title="inFavorites ? 'Удалить из избранного' : 'Избранное'"
-    :class="[
+    :class="['sm:p-2',
       inFavorites
-        ? 'bg-gray-300 text-gray-700 p-2 rounded hover:bg-red-300'
-        : sizeClass + ' text-gray-500 hover:text-pink-600 transition',
-      isFavorite && !inFavorites ? 'text-pink-500' : ''
+        ? ' rounded hover:bg-red-300'
+        : sizeClass + 'hover:text-pink-600 transition',
+      isFavorite && !inFavorites ? ' text-pink-500' : ''
     ]"
   >
     <template v-if="inFavorites">
       ✖
     </template>
     <template v-else>
-      <font-awesome-icon :icon="isFavorite ? ['fas', 'heart'] : ['far', 'heart']" />
+      <font-awesome-icon class="text-xl sm:text-2xl" :icon="isFavorite ? ['fas', 'heart'] : ['far', 'heart']" />
     </template>
   </button>
 </template>

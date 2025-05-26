@@ -5,7 +5,7 @@
       <!-- Левая колонка: Логотип и описание -->
       <div>
         <div class="flex justify-center p-4">
-          <img :src="`/storage/logo/logo-1.png`" alt="Logo" class="h-auto min-w-[100px] sm:min-w-[140px] lg:sm:min-w-[180px]" />
+          <img :src="`/storage/logo/logo.png`" alt="Logo" class="h-auto min-w-[100px] sm:min-w-[140px] lg:sm:min-w-[180px]" />
         </div>
         <p class="text-sm text-gray-400">
           ISOTOP ENERGY – это современный интернет-магазин, предоставляющий широкий выбор специализированных фасадных и кровельных
@@ -54,13 +54,14 @@
     >
       <div>2025. Все права защищены.</div>
       <div class="flex space-x-4 my-4 md:my-0">
-        <span>📘</span>
+        <!-- <span>📘</span>
         <span>💬</span>
-        <span>✈️</span>
+        <span>✈️</span> -->
       </div>
       <div class="flex space-x-4">
         <span>VISA</span>
-        <span>💳</span>
+        <span>Mastercard</span>
+        <!-- <span>💳</span> -->
       </div>
     </div>
   </footer>

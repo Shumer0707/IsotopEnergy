@@ -21,7 +21,9 @@ export default {
         my_black: '#121211', // для Текст
         main: 'rgba(0, 50, 45)',
         more: 'rgba(49, 75, 73)',
-        bg_sc: 'rgba(101, 177, 25)',
+        more_op: 'rgba(49, 75, 73, 0.5)',
+        bt_sc: 'rgba(101, 177, 25)',
+        bt_sc_op: 'rgba(101, 177, 25, 0.5)',
         my_pink: 'rgba(244, 63, 94)',
         my_pink_op: 'rgba(244, 63, 94, 0.3)',
       },
@@ -38,10 +40,10 @@ export default {
         14: 'repeat(14, minmax(0, 1fr))',
       },
       maxWidth: {
-      '3xl': '1920px',
-    },
+        '3xl': '1920px',
+      },
     },
   },
 
-  plugins: [forms],
+  plugins: [forms, require('tailwindcss-textshadow')],
 }

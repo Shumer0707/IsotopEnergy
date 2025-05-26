@@ -33,6 +33,14 @@ export const useCartStore = defineStore('cart', {
       this.products = res.data.products
     },
 
+    toggle(productId) {
+      if (this.items[productId]) {
+        this.remove(productId)
+      } else {
+        this.add(productId)
+      }
+    },
+
     clear() {
       this.items = {}
       this.products = []

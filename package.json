@@ -26,6 +26,7 @@
         "@vueform/slider": "^2.1.10",
         "imask": "^7.6.1",
         "pinia": "^3.0.1",
-        "swiper": "^8.4.7"
+        "swiper": "^8.4.7",
+        "tailwindcss-textshadow": "^2.1.3"
     }
 }

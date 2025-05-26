@@ -1,22 +1,29 @@
 <script setup>
   import FavoriteButton from '../common/FavoriteButton.vue'
-  defineProps({
+  import { useCartStore } from '@/Stores/cart'
+  import { computed } from 'vue'
+
+  const cart = useCartStore()
+
+  const props = defineProps({
     product: Object,
     onClick: Function,
-    onAddToCart: Function,
+    // onAddToCart: Function,
     inFavorites: Boolean,
   })
+
+  const inCart = computed(() => !!cart.items[props.product.id])
 </script>
 
 <template>
   <div class="bg-white rounded-2xl shadow p-4 relative flex flex-col h-full justify-between">
     <!-- 🔹 Скидка -->
-    <div v-if="product.promotion?.discount_group" class="absolute top-2 left-2 bg-gray-300 text-xs font-bold px-2 py-1 rounded">
+    <div v-if="product.promotion?.discount_group" class="absolute top-2 left-2 bg-gray-300 text-xs font-semibold px-2 sm:py-1 rounded">
       СКИДКА -{{ product.promotion.discount_group.discount_percent }}%
     </div>
 
     <!-- 🔹 Изображение -->
-    <div class="h-40 bg-gray-100 rounded flex items-center justify-center mb-4 overflow-hidden">
+    <div class="h-20 lg:h-40 bg-gray-100 rounded flex items-center justify-center mb-2 lg:mb-4 overflow-hidden">
       <img
         :src="product.main_image ? `/storage/${product.main_image}` : '/images/placeholder.jpg'"
         alt="product image"
@@ -26,8 +33,8 @@
     </div>
 
     <!-- 🔹 Название и инфо -->
-    <div class="mb-4">
-      <h3 class="text-base font-semibold leading-tight mb-1">
+    <div class="mb-2 lg:mb-4">
+      <h3 class="text-sm sm:text-base font-semibold leading-tight mb-1">
         {{ product.description?.title ?? 'Без названия' }}
       </h3>
       <p class="text-xs text-gray-500">Артикул: {{ product.id }}</p>
@@ -38,11 +45,16 @@
     <div class="flex justify-between items-center mt-auto">
       <div>
         <div v-if="product.promotion?.discount_group" class="text-xs text-gray-400 line-through">{{ product.price }} mdl</div>
-        <div class="text-pink-600 font-bold text-lg">{{ product.discounted_price }} mdl</div>
+        <div class="text-pink-600 font-bold text-sm sm:text-lg">{{ product.discounted_price }} mdl</div>
       </div>
 
       <div class="flex gap-2 items-center">
-        <button @click="onAddToCart(product.id)" class="p-2 text-white bg-gray-700 hover:bg-gray-800 rounded">🛒</button>
+        <button
+          @click="cart.toggle(product.id)"
+          :class="['p-1 sm:p-2 text-white rounded', inCart ? 'bg-bt_sc hover:bg-more_op' : 'bg-more_op hover:bg-bt_sc_op']"
+        >
+          <font-awesome-icon icon="shopping-cart" class="text-lg lg:text-2xl" />
+        </button>
         <FavoriteButton :product-id="product.id" :in-favorites="inFavorites" size-class="text-xl" />
       </div>
     </div>

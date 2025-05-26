@@ -23,7 +23,7 @@
   </section>
 
   <!-- 🔹 Преимущества -->
-  <section class="bg-gray-50 py-10">
+  <section>
     <AdvantagesBlock />
   </section>
 

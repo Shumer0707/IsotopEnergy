@@ -29,7 +29,7 @@
 
 <template>
   <div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
       <ProductCard
         v-for="product in promoProducts"
         :key="product.id"
@@ -51,7 +51,7 @@
       <button
         v-if="currentPage < lastPage"
         @click="fetchProducts(currentPage + 1)"
-        class="px-4 py-2 rounded bg-pink-600 text-white hover:bg-pink-700"
+        class="px-4 py-2 rounded bg-bt_sc text-white hover:bg-more"
       >
         Показать ещё
       </button>

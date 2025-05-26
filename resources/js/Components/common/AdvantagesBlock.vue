@@ -1,14 +1,37 @@
 <template>
-  <div class="bg-more mx-auto ">
-    <h3 class="text-xl font-semibold mb-6 text-center">Наши преимущества</h3>
+  <div class="bg-more mx-auto py-4 text-white">
+    <h3 class="text-2xl font-semibold mb-6 text-center">Наши преимущества</h3>
     <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center md:divide-x-2 lg:divide-x-4 divide-gray-300">
-      <div v-for="i in 4" :key="i">
-        <div class="w-20 md:w-28 lg:w-36 h-20 md:h-28 lg:h-36 bg-gray-300 rounded-full mx-auto"></div>
-        <p class="mt-2 text-sm sm:text-md">ДОСТУПНЫЕ ЦЕНЫ</p>
-        <p class="mt-2 text-xs sm:text-sm">Короткий слоган или описание преимушества</p>
+      <div v-for="(advantage, index) in advantages" :key="index" class="flex flex-col items-center text-center py-10 ">
+          <img :src="advantage.image" alt="" class="mb-2" />
+          <p class="text-lg font-semibold">{{ advantage.title }}</p>
+          <p class="text-sm ">{{ advantage.text }}</p>
       </div>
     </div>
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+const advantages = [
+    {
+      title: 'ДОСТУПНЫЕ ЦЕНЫ',
+      text: 'Качество, доступное для всех.',
+      image: '/storage/varia/group-15.webp',
+    },
+    {
+      title: 'ПРОВЕРЕННЫЕ БРЕНДЫ',
+      text: 'Проверено нами, проверено вами.',
+      image: '/storage/varia/group-16.webp',
+    },
+    {
+      title: 'ДОСТАВКА ПО МОЛДОВЕ',
+      text: 'По всем городам и сёлам.',
+      image: '/storage/varia/group-17.webp',
+    },
+    {
+      title: 'ШИРОКИЙ ВЫБОР',
+      text: 'Ваш идеальный выбор - здесь.',
+      image: '/storage/varia/group-18.webp',
+    },
+  ]
+</script>

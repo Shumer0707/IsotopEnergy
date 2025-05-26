@@ -65,7 +65,7 @@
     <button
       ref="navButtonRef"
       @click="toggleCategories"
-      class="flex items-center gap-4 whitespace-nowrap bg-bg_sc hover:bg-pink-500 text-white px-6 sm:px-8 py-2 sm:py-3 rounded-xl text-sm lg:text-base"
+      class="flex items-center gap-4 whitespace-nowrap bg-bt_sc hover:bg-bt_sc_op text-white px-6 sm:px-8 py-2 sm:py-3 rounded-xl text-sm lg:text-base"
     >
       <span>Все категории</span>
       <font-awesome-icon icon="chevron-down" class="text-xs" />

@@ -44,11 +44,11 @@
       class="rounded-xl overflow-hidden"
     >
       <SwiperSlide v-for="(slide, index) in slides" :key="index">
-        <div class="relative h-[560px] flex flex-col justify-center items-center text-center text-white">
+        <div class="relative h-[280px] lg:h-[560px] flex flex-col justify-center items-center text-center text-white">
           <img :src="slide.image" alt="slide" class="rounded-xl absolute inset-0 w-full h-full object-cover z-0" />
           <div class="relative z-10 p-6 rounded-xl">
-            <h2 class="text-4xl font-bold mb-2">{{ slide.title }}</h2>
-            <p class="text-2xl mb-4">{{ slide.text }}</p>
+            <h2 class="text-2xl lg:text-4xl text-shadow-xl font-bold mb-2">{{ slide.title }}</h2>
+            <p class="text-xl lg:text-2xl text-shadow-xl mb-4">{{ slide.text }}</p>
             <!-- <a :href="slide.link" class="bg-pink-600 text-white px-4 py-2 rounded-xl text-sm">
               {{ slide.button }}
             </a> -->
@@ -58,3 +58,19 @@
     </Swiper>
   </div>
 </template>
+
+<style>
+  .swiper-button-prev,
+  .swiper-button-next {
+    color: rgba(101, 177, 25) !important;
+  }
+
+  .swiper-pagination-bullet {
+    background-color: rgba(101, 177, 25, 0.3) !important;
+    opacity: 1 !important;
+  }
+
+  .swiper-pagination-bullet-active {
+    background-color: rgba(101, 177, 25) !important;
+  }
+</style>
