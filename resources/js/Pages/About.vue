@@ -36,7 +36,7 @@
 
       <!-- Картинка -->
       <div>
-        <img src="/images/placeholder.jpg" alt="О компании" class="rounded-xl shadow-md w-full object-cover h-[300px]" />
+        <img src='/storage/varia/about.webp' alt="О компании" class="rounded-xl w-full object-cover" />
       </div>
     </div>
   </section>

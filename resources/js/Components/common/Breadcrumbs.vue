@@ -71,26 +71,28 @@
 </script>
 
 <template>
-  <nav class="text-sm text-gray-500 mb-4">
-    <ol class="flex flex-wrap gap-1">
-      <li v-for="(item, i) in breadcrumbs" :key="i" class="flex items-center gap-1">
-        <template v-if="item.href">
-          <Link :href="item.href" class="hover:underline text-gray-500">{{ item.name }}</Link>
-        </template>
-        <template v-else>
-          <span
-            v-if="item.name === parent?.translation?.name"
-            class="cursor-pointer text-gray-800 hover:underline"
-            @click="openModal"
-          >
-            {{ item.name }}
-          </span>
-          <span v-else class="font-semibold text-gray-800">
-            {{ item.name }}
-          </span>
-        </template>
-        <span v-if="i < breadcrumbs.length - 1" class="mx-1 text-gray-400">/</span>
-      </li>
-    </ol>
-  </nav>
+  <div class="max-w-7xl mx-auto px-4">
+    <nav class="text-sm text-gray-500 mb-4">
+      <ol class="flex flex-wrap gap-1">
+        <li v-for="(item, i) in breadcrumbs" :key="i" class="flex items-center gap-1">
+          <template v-if="item.href">
+            <Link :href="item.href" class="hover:underline text-gray-500">{{ item.name }}</Link>
+          </template>
+          <template v-else>
+            <span
+              v-if="item.name === parent?.translation?.name"
+              class="cursor-pointer text-gray-800 hover:underline"
+              @click="openModal"
+            >
+              {{ item.name }}
+            </span>
+            <span v-else class="font-semibold text-gray-800">
+              {{ item.name }}
+            </span>
+          </template>
+          <span v-if="i < breadcrumbs.length - 1" class="mx-1 text-gray-400">/</span>
+        </li>
+      </ol>
+    </nav>
+  </div>
 </template>

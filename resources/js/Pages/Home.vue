@@ -16,7 +16,7 @@
 
   <!-- 🔹 Категории -->
   <section class="py-10">
-    <div class="mx-auto px-4">
+    <div class="max-w-7xl mx-auto px-4">
       <h3 class="text-2xl font-semibold mb-6 text-center">Каталог</h3>
       <CategoryGrid />
     </div>

@@ -1,5 +1,5 @@
 <script setup>
-  import { computed } from 'vue'
+  import { ref, onMounted, watch, nextTick, computed } from 'vue'
   import { useCartMiniUiStore } from '@/Stores/cartMiniUi'
   import { useCartStore } from '@/Stores/cart'
   import { router } from '@inertiajs/vue3'
@@ -8,6 +8,20 @@
   const layout = useLayoutStore()
   const cart = useCartStore()
   const cartMiniUi = useCartMiniUiStore()
+  const cartButtonRef = ref(null)
+
+  const updateOffset = () => {
+    if (cartButtonRef.value) {
+      const rect = cartButtonRef.value.getBoundingClientRect()
+      layout.setCartButtonRightOffset(window.innerWidth - rect.right)
+    }
+  }
+
+  onMounted(() => {
+    nextTick(updateOffset)
+  })
+
+  watch(() => layout.headerBottom, updateOffset) // на всякий случай
 
   const totalWithDiscount = computed(() =>
     cart.products.reduce((sum, p) => {
@@ -47,74 +61,82 @@
     </div>
 
     <!-- Модалка -->
-    <transition
-      enter-active-class="transition duration-300 ease-out"
-      enter-from-class="opacity-0 -translate-y-4"
-      enter-to-class="opacity-100 translate-y-0"
-      leave-active-class="transition duration-200 ease-in"
-      leave-from-class="opacity-100 translate-y-0"
-      leave-to-class="opacity-0 -translate-y-4"
+    <div
+      v-show="cartMiniUi.isMiniCartOpen"
+      class="fixed inset-0 z-20 bg-black/10 backdrop-blur-sm transition-opacity duration-300"
+      @click="cartMiniUi.closeMiniCart"
+    ></div>
+
+    <div
+      v-show="cartMiniUi.isMiniCartOpen"
+      class="fixed z-30 overflow-hidden"
+      :style="{
+        top: `${layout.headerBottom}px`,
+        right: `${layout.cartButtonRightOffset}px`,
+        width: '300px',
+      }"
     >
-      <div v-if="cartMiniUi.isMiniCartOpen" class="fixed inset-0 z-30 bg-black/50" @click.self="cartMiniUi.closeMiniCart">
-        <!-- Панель -->
+      <!-- Анимация ТОЛЬКО внутренней панели -->
+      <transition
+        enter-active-class="transition duration-300 ease-out"
+        enter-from-class="-translate-y-full opacity-0"
+        enter-to-class="translate-y-0 opacity-100"
+        leave-active-class="transition duration-200 ease-in"
+        leave-from-class="translate-y-0 opacity-100"
+        leave-to-class="-translate-y-full opacity-0"
+      >
         <div
-          class="absolute right-3 z-40 transform transition-all duration-300 ease-out"
-          :style="{ top: `${layout.headerBottom}px` }"
+          v-if="cartMiniUi.isMiniCartOpen"
+          ref="miniCartRef"
+          class="overflow-y-auto scrollbar-thin bg-more rounded-md shadow-xl border border-gray-700 p-3 overflow-y-auto text-white text-sm w-full h-auto max-h-[50vh]"
         >
-          <div
-            class="w-[300px] max-h-[50vh] h-auto bg-white rounded-md shadow-md border border-gray-200 p-3 overflow-y-auto text-sm"
-          >
-            <div class="flex justify-between items-center mb-2 relative">
-              <h2 class="font-semibold text-center w-full">Корзина</h2>
-              <button
-                @click="cartMiniUi.closeMiniCart"
-                class="text-lg absolute right-2 top-0 text-gray-500 hover:text-gray-700 leading-none"
-              >
-                &times;
-              </button>
+          <div class="flex justify-between items-center mb-2 relative">
+            <h2 class="font-semibold text-center w-full">Корзина</h2>
+            <button @click="cartMiniUi.closeMiniCart" class="text-lg absolute right-2 top-0 hover:text-gray-700 leading-none">
+              &times;
+            </button>
+          </div>
+
+          <div v-if="cart.products.length === 0" class="text-center">Пусто</div>
+
+          <div v-else class="space-y-3">
+            <div v-for="product in cart.products" :key="product.id" class="flex items-center gap-2 border-t pt-2">
+              <img
+                :src="product.main_image ? `/storage/${product.main_image}` : '/images/placeholder.jpg'"
+                alt=""
+                class="w-12 h-12 object-cover rounded bg-gray-100"
+              />
+              <div class="flex-1">
+                <p class="text-xs">
+                  {{ product.description?.title ?? '❌ нет title' }} x {{ cart.items[product.id] }} —
+                  {{ (product.discounted_price ?? product.price) * cart.items[product.id] }} mdl
+                </p>
+              </div>
             </div>
 
-            <div v-if="cart.products.length === 0" class="text-gray-500 text-center">Пусто</div>
+            <hr />
 
-            <div v-else class="space-y-3">
-              <div v-for="product in cart.products" :key="product.id" class="flex items-center gap-2 border-t pt-2">
-                <img
-                  :src="product.main_image ? `/storage/${product.main_image}` : '/images/placeholder.jpg'"
-                  alt=""
-                  class="w-12 h-12 object-cover rounded bg-gray-100"
-                />
-                <div class="flex-1">
-                  <p class="text-gray-500 text-xs">
-                    {{ product.description?.title ?? '❌ нет title' }} x {{ cart.items[product.id] }} —
-                    {{ (product.discounted_price ?? product.price) * cart.items[product.id] }} mdl
-                  </p>
-                </div>
-              </div>
-
-              <hr />
-
-              <div class="flex justify-between font-semibold">
-                <span>Итого:</span>
-                <span class="text-pink-600">{{ totalWithDiscount.toFixed(2) }} mdl</span>
-              </div>
-
-              <button
-                class="w-full bg-gray-700 text-white py-1.5 rounded text-sm font-semibold hover:bg-gray-800"
-                @click="goToCart"
-              >
-                Оформить
-              </button>
-
-              <button
-                @click="cartMiniUi.closeMiniCart"
-                class="w-full border border-gray-400 text-gray-700 py-1.5 rounded text-sm font-semibold hover:bg-gray-100"
-              >
-                Проверить
-              </button>
+            <div class="flex justify-between font-semibold">
+              <span>Итого:</span>
+              <span>{{ totalWithDiscount.toFixed(2) }} mdl</span>
             </div>
+
+            <button
+              class="w-full border border-gray-400 text-white py-1.5 rounded text-sm font-semibold hover:bg-gray-800"
+              @click="goToCart"
+            >
+              Оформить
+            </button>
+
+            <button
+              @click="cartMiniUi.closeMiniCart"
+              class="w-full border border-gray-400 py-1.5 rounded text-sm font-semibold hover:bg-gray-800"
+            >
+              Проверить
+            </button>
           </div>
         </div>
-      </div>
-    </transition>
+      </transition>
+    </div>
   </div>
 </template>

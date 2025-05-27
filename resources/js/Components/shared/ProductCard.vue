@@ -53,9 +53,9 @@
           @click="cart.toggle(product.id)"
           :class="['p-1 sm:p-2 text-white rounded', inCart ? 'bg-bt_sc hover:bg-more_op' : 'bg-more_op hover:bg-bt_sc_op']"
         >
-          <font-awesome-icon icon="shopping-cart" class="text-lg lg:text-2xl" />
+          <font-awesome-icon icon="shopping-cart" class="text-lg" />
         </button>
-        <FavoriteButton :product-id="product.id" :in-favorites="inFavorites" size-class="text-xl" />
+        <FavoriteButton :product-id="product.id" :product="product" :in-favorites="inFavorites" size-class="text-xl" />
       </div>
     </div>
   </div>

@@ -27,6 +27,7 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  product: Object,
   sizeClass: {
     type: String,
     default: 'text-base',
@@ -42,6 +43,6 @@ favorites.load()
 const isFavorite = computed(() => favorites.isFavorite(props.productId))
 
 const toggleFavorite = () => {
-  favorites.localToggle({ id: props.productId })
+  favorites.localToggle(props.product)
 }
 </script>

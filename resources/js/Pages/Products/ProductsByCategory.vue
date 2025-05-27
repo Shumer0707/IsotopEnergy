@@ -14,7 +14,7 @@
     brands: Array,
     sort: String,
     filters: Object,
-    max_price: Number
+    max_price: Number,
   })
 
   const cart = useCartStore()
@@ -27,41 +27,42 @@
   })
 
   const openProduct = (id) => router.visit(`/product/${id}`)
-
 </script>
 
 <template>
-  <div class="flex flex-col lg:flex-row gap-6">
-    <FilterPanel :brands="brands" :maxPrice="max_price" />
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="flex flex-col lg:flex-row gap-6">
+      <FilterPanel :brands="brands" :maxPrice="max_price" />
 
-    <div class="flex-1">
-      <h1 class="text-2xl font-bold mb-4">
-        {{ category.translation.name }}
-      </h1>
+      <div class="flex-1">
+        <h1 class="text-2xl font-bold mb-4">
+          {{ category.translation.name }}
+        </h1>
 
-      <ProductSortAndCount
-        :sort="filterStore.filters.sort"
-        :from="products.from"
-        :to="products.to"
-        :total="products.total"
-        :onSortChange="filterStore.setSort"
-      />
-
-      <div v-if="products.data.length === 0">
-        <p>Нет товаров в этой категории.</p>
-      </div>
-
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-        <ProductCard
-          v-for="product in products.data"
-          :key="product.id"
-          :product="product"
-          :onClick="openProduct"
-          :onAddToCart="cart.add"
+        <ProductSortAndCount
+          :sort="filterStore.filters.sort"
+          :from="products.from"
+          :to="products.to"
+          :total="products.total"
+          :onSortChange="filterStore.setSort"
         />
-      </div>
 
-      <Pagination :links="products.links" />
+        <div v-if="products.data.length === 0">
+          <p>Нет товаров в этой категории.</p>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          <ProductCard
+            v-for="product in products.data"
+            :key="product.id"
+            :product="product"
+            :onClick="openProduct"
+            :onAddToCart="cart.add"
+          />
+        </div>
+
+        <Pagination :links="products.links" />
+      </div>
     </div>
   </div>
 </template>

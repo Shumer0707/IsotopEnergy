@@ -2,13 +2,30 @@
   import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
   import { Link, usePage } from '@inertiajs/vue3'
   import { useCategoryStore } from '@/Stores/category'
+  import { useLayoutStore } from '@/Stores/layout'
 
+  const layout = useLayoutStore()
   const categoryStore = useCategoryStore()
   const showCategories = ref(false)
   const navRef = ref(null)
-  const navButtonRef = ref(null)
   const menuTop = ref(0)
+  const categoryButtonRef = ref(null)
 
+  const updateCategoryOffset = () => {
+    if (categoryButtonRef.value) {
+      const rect = categoryButtonRef.value.getBoundingClientRect()
+      layout.setCategoryButtonLeftOffset(rect.left)
+    }
+  }
+
+  onMounted(() => {
+    updateCategoryOffset()
+    window.addEventListener('resize', updateCategoryOffset)
+  })
+
+  onBeforeUnmount(() => {
+    window.removeEventListener('resize', updateCategoryOffset)
+  })
   // Следим за языком
   const locale = computed(() => usePage().props.locale)
 
@@ -48,11 +65,6 @@
   // Расчёт позиции меню
   onMounted(() => {
     document.addEventListener('click', handleClickOutside)
-
-    if (navButtonRef.value) {
-      const rect = navButtonRef.value.getBoundingClientRect()
-      menuTop.value = rect.bottom + 24
-    }
   })
 
   onBeforeUnmount(() => {
@@ -63,18 +75,18 @@
 <template>
   <div ref="navRef" class="relative">
     <button
-      ref="navButtonRef"
+      ref="categoryButtonRef"
       @click="toggleCategories"
-      class="flex items-center gap-4 whitespace-nowrap bg-bt_sc hover:bg-bt_sc_op text-white px-6 sm:px-8 py-2 sm:py-3 rounded-xl text-sm lg:text-base"
+      class="flex items-center gap-2 whitespace-nowrap bg-bt_sc hover:bg-bt_sc_op text-white px-4 sm:px-6 py-2 sm:py-3 rounded-xl text-sm lg:text-base"
     >
-      <span>Все категории</span>
       <font-awesome-icon icon="chevron-down" class="text-xs" />
+      <span>Все категории</span>
     </button>
 
     <div
       v-if="showCategories"
-      :style="{ top: `${menuTop}px` }"
-      class="fixed left-0 bg-white text-gray-800 shadow-xl z-50 transition-all duration-300 px-4 py-2"
+      :style="{ top: `${layout.headerBottom}px`, left: `${layout.categoryButtonLeftOffset}px` }"
+      class="fixed bg-white text-gray-800 shadow-xl z-50 transition-all duration-300 px-4 py-2"
     >
       <div v-for="category in categories" :key="category.id" class="relative group">
         <button class="block w-full px-4 py-2 text-left hover:bg-gray-200" @click.prevent="openSubcategories(category)">
