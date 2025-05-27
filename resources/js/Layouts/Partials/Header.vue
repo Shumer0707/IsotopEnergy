@@ -35,17 +35,7 @@
 
       <!-- Центр -->
       <div class="flex flex-col sm:flex-row items-center justify-center gap-3 w-full">
-        <div class="relative w-full max-w-sm sm:max-w-md md:max-w-lg">
-          <input
-            type="text"
-            placeholder="Поиск по товарам..."
-            class="w-full pl-4 pr-10 py-1.5 sm:py-3 rounded-xl text-black placeholder-gray-500 focus:outline-none"
-          />
-          <button class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 pr-2">
-            <font-awesome-icon icon="magnifying-glass" class="lg:text-xl text-lg" />
-            <!-- 🔍 -->
-          </button>
-        </div>
+        <ProductSearch />
       </div>
 
       <!-- Правая часть -->
@@ -81,6 +71,7 @@
   import { ref, onMounted } from 'vue'
   import { useLayoutStore } from '@/Stores/layout'
   import { useTranslations } from '@/composables/useTranslations'
+  import ProductSearch from '@/Components/common/ProductSearch.vue'
 
   const t = useTranslations()
   const layout = useLayoutStore()

@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\AdminBrandController;
 use App\Http\Controllers\Admin\AdminImageController;
 use App\Http\Controllers\Admin\AdminPromotionController;
 use App\Http\Controllers\Admin\AdminDiscountGroupController;
+use App\Http\Controllers\Api\ProductSearchController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\CategoryController;
@@ -35,6 +36,8 @@ Route::get('/promo-products', [LayoutController::class, 'promoProducts']);
 Route::get('/category/{id}', [CategoryController::class, 'show'])->name('category.show');
 
 Route::get('/product/{product}', [ProductController::class, 'show'])->name('product.show');
+
+Route::get('/search-products', ProductSearchController::class);
 
 Route::prefix('cart')->as('cart.')->group(function () {
   Route::post('/data', [CartController::class, 'index'])->name('data');
