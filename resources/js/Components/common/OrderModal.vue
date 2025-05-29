@@ -295,7 +295,7 @@
               <span>Сумма без скидки:</span>
               <span>{{ totalWithoutDiscount.toFixed(2) }} mdl</span>
             </div>
-            <div class="flex justify-between text-green-600">
+            <div class="flex justify-between text-my_red">
               <span>Скидка:</span>
               <span>-{{ totalDiscount.toFixed(2) }} mdl</span>
             </div>
@@ -308,7 +308,7 @@
           <button
             @click="submitOrder"
             :disabled="loading"
-            class="w-full bg-pink-500 hover:bg-pink-600 text-white py-2 rounded mt-4 transition-colors"
+            class="w-full bg-my_green hover:bg-my_green_op text-white py-2 rounded mt-4 transition-colors"
           >
             {{ loading ? 'Отправка...' : 'Подтвердить заказ' }}
           </button>

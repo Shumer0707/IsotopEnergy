@@ -46,7 +46,7 @@
   <div class="relative">
     <!-- Кнопка -->
     <div ref="cartButtonRef">
-      <button @click="toggleMiniCart" class="gap-1 flex flex-raw items-center sm:p-1 text-3xl rounded-md hover:bg-gray-700">
+      <button @click="toggleMiniCart" class="gap-1 flex flex-raw items-center sm:p-1 text-3xl rounded-md hover:bg-my_green_op">
         <font-awesome-icon icon="shopping-cart" class="lg:text-3xl text-2xl" />
         <font-awesome-icon icon="chevron-down" class="text-xs" />
       </button>
@@ -54,7 +54,7 @@
       <font-awesome-icon icon="chevron-down" class="text-xs" /> -->
       <span
         v-if="totalQuantity > 0"
-        class="absolute -top-1 -left-1 bg-pink-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center"
+        class="absolute -top-1 -left-1 bg-my_red text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center"
       >
         {{ totalQuantity }}
       </span>
@@ -63,7 +63,7 @@
     <!-- Модалка -->
     <div
       v-show="cartMiniUi.isMiniCartOpen"
-      class="fixed inset-0 z-20 bg-black/10 backdrop-blur-sm transition-opacity duration-300"
+      class="fixed inset-0 z-20 "
       @click="cartMiniUi.closeMiniCart"
     ></div>
 
@@ -88,7 +88,7 @@
         <div
           v-if="cartMiniUi.isMiniCartOpen"
           ref="miniCartRef"
-          class="overflow-y-auto scrollbar-thin bg-more rounded-md shadow-xl border border-gray-700 p-3 overflow-y-auto text-white text-sm w-full h-auto max-h-[50vh]"
+          class="overflow-y-auto scrollbar-thin bg-my_white rounded-b-md shadow-xl border-t-0 border border-gray-700 p-3 overflow-y-auto text-black text-sm w-full h-auto max-h-[50vh]"
         >
           <div class="flex justify-between items-center mb-2 relative">
             <h2 class="font-semibold text-center w-full">Корзина</h2>
@@ -122,18 +122,18 @@
             </div>
 
             <button
-              class="w-full border border-gray-400 text-white py-1.5 rounded text-sm font-semibold hover:bg-gray-800"
+              class="w-full bg-my_green border border-main text-black py-1.5 rounded text-sm font-semibold hover:bg-my_green_op"
               @click="goToCart"
             >
-              Оформить
+              Перейти в корзину
             </button>
 
-            <button
+            <!-- <button
               @click="cartMiniUi.closeMiniCart"
               class="w-full border border-gray-400 py-1.5 rounded text-sm font-semibold hover:bg-gray-800"
             >
               Проверить
-            </button>
+            </button> -->
           </div>
         </div>
       </transition>

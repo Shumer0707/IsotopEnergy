@@ -77,7 +77,7 @@
     <button
       ref="categoryButtonRef"
       @click="toggleCategories"
-      class="flex items-center gap-2 whitespace-nowrap bg-bt_sc hover:bg-bt_sc_op text-white px-4 sm:px-6 py-2 sm:py-3 rounded-xl text-sm lg:text-base"
+      class="flex items-center gap-2 whitespace-nowrap bg-my_green hover:bg-my_green_op text-white px-4 sm:px-6 py-2 sm:py-3 rounded-xl text-sm lg:text-base"
     >
       <font-awesome-icon icon="chevron-down" class="text-xs" />
       <span>Все категории</span>
@@ -86,20 +86,20 @@
     <div
       v-if="showCategories"
       :style="{ top: `${layout.headerBottom}px`, left: `${layout.categoryButtonLeftOffset}px` }"
-      class="fixed bg-white text-gray-800 shadow-xl z-50 transition-all duration-300 px-4 py-2"
+      class="fixed bg-white text-gray-800 shadow-xl z-50 transition-all duration-300 px-4 py-2 rounded-xl"
     >
       <div v-for="category in categories" :key="category.id" class="relative group">
-        <button class="block w-full px-4 py-2 text-left hover:bg-gray-200" @click.prevent="openSubcategories(category)">
+        <button class="block  w-full px-4 py-2 text-left hover:bg-gray-200" @click.prevent="openSubcategories(category)">
           {{ category.name }}
         </button>
         <div
-          class="absolute left-full top-0 mt-0 max-h-0 w-0 bg-white shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 overflow-hidden group-hover:max-h-[400px] group-hover:w-64"
+          class="absolute rounded-xl left-full top-0 bg-white shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 overflow-hidden max-h-0 group-hover:max-h-[400px] w-0 group-hover:min-w-max"
         >
           <Link
             v-for="sub in category.children"
             :key="sub.id"
             :href="`/category/${sub.id}`"
-            class="block px-4 py-2 hover:bg-gray-200"
+            class="block px-4 py-2 hover:bg-gray-200 whitespace-nowrap"
           >
             {{ sub.name }}
           </Link>

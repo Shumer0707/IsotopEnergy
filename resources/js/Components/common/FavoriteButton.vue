@@ -1,17 +1,15 @@
 <template>
   <button
     @click="toggleFavorite"
-    :title="inFavorites ? 'Удалить из избранного' : 'Избранное'"
-    :class="['sm:p-2',
+    :title="inFavorites ? 'Удалить из избранного' : 'В избранное'"
+    :class="[
+      'transition rounded sm:p-2',
       inFavorites
-        ? ' rounded hover:bg-red-300'
-        : sizeClass + 'hover:text-pink-600 transition',
-      isFavorite && !inFavorites ? ' text-pink-500' : ''
+        ? 'text-my_red hover:text-red-300'
+        : [sizeClass, isFavorite ? 'text-my_red hover:text-my_red' : 'text-gray-400 hover:text-my_red_op'],
     ]"
   >
-    <template v-if="inFavorites">
-      ✖
-    </template>
+    <template v-if="inFavorites">✖</template>
     <template v-else>
       <font-awesome-icon class="text-xl sm:text-2xl" :icon="isFavorite ? ['fas', 'heart'] : ['far', 'heart']" />
     </template>
@@ -19,30 +17,30 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useFavoritesStore } from '@/Stores/favorites'
+  import { computed } from 'vue'
+  import { useFavoritesStore } from '@/Stores/favorites'
 
-const props = defineProps({
-  productId: {
-    type: Number,
-    required: true,
-  },
-  product: Object,
-  sizeClass: {
-    type: String,
-    default: 'text-base',
-  },
-  inFavorites: {
-    type: Boolean,
-    default: false,
-  },
-})
+  const props = defineProps({
+    productId: {
+      type: Number,
+      required: true,
+    },
+    product: Object,
+    sizeClass: {
+      type: String,
+      default: 'text-base',
+    },
+    inFavorites: {
+      type: Boolean,
+      default: false,
+    },
+  })
 
-const favorites = useFavoritesStore()
-favorites.load()
-const isFavorite = computed(() => favorites.isFavorite(props.productId))
+  const favorites = useFavoritesStore()
+  favorites.load()
+  const isFavorite = computed(() => favorites.isFavorite(props.productId))
 
-const toggleFavorite = () => {
-  favorites.localToggle(props.product)
-}
+  const toggleFavorite = () => {
+    favorites.localToggle(props.product)
+  }
 </script>

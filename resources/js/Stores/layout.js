@@ -5,6 +5,7 @@ export const useLayoutStore = defineStore('layout', () => {
   const headerBottom = ref(0)
   const cartButtonRightOffset = ref(12)
   const categoryButtonLeftOffset = ref(0)
+  const langButtonRightOffset = ref(0)
 
   const setHeaderBottom = (value) => {
     headerBottom.value = value
@@ -18,6 +19,10 @@ export const useLayoutStore = defineStore('layout', () => {
     categoryButtonLeftOffset.value = value
   }
 
+  const setLangButtonRightOffset = (value) => {
+    langButtonRightOffset.value = value
+  }
+
   return {
     headerBottom,
     setHeaderBottom,
@@ -25,5 +30,7 @@ export const useLayoutStore = defineStore('layout', () => {
     setCartButtonRightOffset,
     categoryButtonLeftOffset,
     setCategoryButtonLeftOffset,
+    langButtonRightOffset,
+    setLangButtonRightOffset,
   }
 })

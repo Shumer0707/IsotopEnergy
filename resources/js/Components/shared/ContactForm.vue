@@ -29,7 +29,7 @@
         <button
           type="submit"
           :disabled="form.processing"
-          class="self-start bg-gray-700 text-white px-6 py-2 rounded-xl hover:bg-gray-800 disabled:opacity-50"
+          class="self-start bg-my_grin text-white px-6 py-2 rounded-xl hover:bg-gray-800 disabled:opacity-50"
         >
           <span v-if="form.processing">Отправка...</span>
           <span v-else>Отправить</span>

@@ -40,22 +40,9 @@
 
       <!-- Правая часть -->
       <div class="flex justify-end items-center 2xl:gap-10 lg:gap-6 gap-4">
-        <div class="relative">
-          <button @click="toggleLangs" class="flex flex-row items-center gap-2 text-2xl hover:text-gray-300">
-            <font-awesome-icon icon="globe" class="lg:text-2xl text-xl" />
-            <span class="text-lg">{{ t['lang'] }}</span>
-            <font-awesome-icon icon="chevron-down" class="text-xs" />
-            <!-- 🌐 -->
-          </button>
-
-          <div v-if="showLangs" class="absolute z-50 mt-2 right-0 bg-white text-black rounded shadow-md py-1 w-24 text-center">
-            <button @click="changeLocale('ro')" class="block w-full px-2 py-1 hover:bg-gray-100">RO</button>
-            <button @click="changeLocale('ru')" class="block w-full px-2 py-1 hover:bg-gray-100">RU</button>
-            <button @click="changeLocale('en')" class="block w-full px-2 py-1 hover:bg-gray-100">EN</button>
-          </div>
-        </div>
+        <LanguageSwitcher />
         <Link href="/favorites" class="hover:text-gray-300">
-          <font-awesome-icon :icon="['far', 'heart']" class="text-white hover:text-pink-600 lg:text-3xl text-2xl" />
+          <font-awesome-icon :icon="['far', 'heart']" class="text-white hover:text-my_red lg:text-3xl text-2xl" />
         </Link>
         <MiniCart />
       </div>
@@ -72,6 +59,7 @@
   import { useLayoutStore } from '@/Stores/layout'
   import { useTranslations } from '@/composables/useTranslations'
   import ProductSearch from '@/Components/common/ProductSearch.vue'
+  import LanguageSwitcher from '@/Components/shared/LanguageSwitcher.vue'
 
   const t = useTranslations()
   const layout = useLayoutStore()

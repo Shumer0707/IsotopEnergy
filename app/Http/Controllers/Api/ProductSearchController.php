@@ -11,13 +11,16 @@ class ProductSearchController extends Controller
 {
   public function __invoke(Request $request)
   {
-    $term = strtolower($request->input('q'));
+    $term = $request->input('q');
 
-    $products = Product::with('description')
-      ->whereHas('description', function ($query) use ($term) {
-        $query->whereRaw('LOWER(title) LIKE ?', ["%{$term}%"]);
-      })
-      ->limit(10)
+    $descriptionIds = \App\Models\Description::search($term)
+      ->get()
+      ->pluck('product_id')
+      ->unique()
+      ->take(10);
+
+    $products = \App\Models\Product::with('description')
+      ->whereIn('id', $descriptionIds)
       ->get();
 
     return response()->json($products);

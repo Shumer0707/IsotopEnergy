@@ -127,15 +127,15 @@
 
       <div class="flex justify-between text-sm mb-2">
         <span>Скидка:</span>
-        <span class="text-green-600">-{{ totalDiscount.toFixed(2) }} mdl</span>
+        <span class="text-my_red">-{{ totalDiscount.toFixed(2) }} mdl</span>
       </div>
 
       <div class="flex justify-between font-bold text-lg mb-4">
         <span>Итоговая цена:</span>
-        <span class="text-pink-600">{{ totalWithDiscount.toFixed(2) }} mdl</span>
+        <span>{{ totalWithDiscount.toFixed(2) }} mdl</span>
       </div>
 
-      <button @click="isModalOpen = true" class="w-full bg-gray-600 text-white py-2 rounded hover:bg-gray-700">
+      <button @click="isModalOpen = true" class="w-full bg-my_green text-white py-2 rounded hover:bg-my_green_op">
         Оформить заказ
       </button>
     </div>

@@ -44,14 +44,14 @@
     <!-- 🔹 Цена + кнопки -->
     <div class="flex justify-between items-center mt-auto">
       <div>
-        <div v-if="product.promotion?.discount_group" class="text-xs text-gray-400 line-through">{{ product.price }} mdl</div>
-        <div class="text-pink-600 font-bold text-sm sm:text-lg">{{ product.discounted_price }} mdl</div>
+        <div v-if="product.promotion?.discount_group" class="text-xs text-my_red line-through">{{ product.price }} mdl</div>
+        <div class="text-black font-bold text-sm sm:text-lg">{{ product.discounted_price }} mdl</div>
       </div>
 
       <div class="flex gap-2 items-center">
         <button
           @click="cart.toggle(product.id)"
-          :class="['p-1 sm:p-2 text-white rounded', inCart ? 'bg-bt_sc hover:bg-more_op' : 'bg-more_op hover:bg-bt_sc_op']"
+          :class="['p-1 sm:p-2 text-white rounded', inCart ? 'bg-my_green' : 'bg-more_op hover:bg-my_green_op']"
         >
           <font-awesome-icon icon="shopping-cart" class="text-lg" />
         </button>

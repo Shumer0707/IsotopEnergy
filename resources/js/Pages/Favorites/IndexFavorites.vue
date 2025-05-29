@@ -19,7 +19,7 @@
 </script>
 
 <template>
-  <div class="px-4 sm:px-6 lg:px-8 py-6">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
     <!-- 🔹 Заголовок -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
       <h1 class="text-2xl font-bold">Избранное</h1>
@@ -32,7 +32,7 @@
     <div v-if="products.length === 0" class="text-gray-500">Нет избранных товаров.</div>
 
     <!-- 🔹 Сетка карточек -->
-    <div v-else class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-4">
+    <div v-else class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
       <ProductCard
         v-for="product in products"
         :key="product.id"

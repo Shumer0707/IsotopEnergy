@@ -12,7 +12,7 @@ defineProps({
         :href="link.url"
         class="px-3 py-1 text-sm rounded border"
         :class="{
-          'bg-pink-600 text-white border-pink-600': link.active,
+          'bg-my_red text-white border-my_red': link.active,
           'text-gray-500 cursor-not-allowed bg-gray-100': !link.url,
           'hover:bg-gray-200': link.url && !link.active,
         }"

@@ -51,7 +51,7 @@
       <button
         v-if="currentPage < lastPage"
         @click="fetchProducts(currentPage + 1)"
-        class="px-4 py-2 rounded bg-bt_sc text-white hover:bg-more"
+        class="px-4 py-2 rounded bg-my_green text-my_white hover:bg-my_green_op"
       >
         Показать ещё
       </button>

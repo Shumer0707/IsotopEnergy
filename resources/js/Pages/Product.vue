@@ -1,8 +1,9 @@
 <script setup>
-  import { ref, computed } from 'vue'
+  import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
   import QuantityControl from '@/Components/common/QuantityControl.vue'
   import FavoriteButton from '@/Components/common/FavoriteButton.vue'
+  import { useCartStore } from '@/Stores/cart'
   import { Swiper, SwiperSlide } from 'swiper/vue'
   import { Navigation, Mousewheel } from 'swiper'
   import 'swiper/css'
@@ -11,6 +12,9 @@
   const props = defineProps({
     product: Object,
   })
+
+  const cart = useCartStore()
+  const isMobile = ref(false)
   const swiper = ref(null)
   const activeImage = ref(
     props.product.main_image
@@ -34,6 +38,19 @@
       }) ?? []
     )
   })
+
+  const checkMobile = () => {
+    isMobile.value = window.matchMedia('(max-width: 768px)').matches
+  }
+
+  onMounted(() => {
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+  })
+
+  onBeforeUnmount(() => {
+    window.removeEventListener('resize', checkMobile)
+  })
 </script>
 
 <template>
@@ -41,9 +58,10 @@
     <div class="flex flex-col md:flex-row gap-8 bg-white rounded-xl shadow p-6">
       <!-- 🔹 Галерея -->
       <div class="flex flex-col sm:flex-row gap-4 md:w-1/2">
-        <div class="relative w-20">
+        <div :class="['relative', isMobile ? 'w-full h-24' : 'w-20']">
           <!-- Кнопка вверх -->
           <button
+            v-if="!isMobile"
             @click="swiper.slidePrev()"
             class="absolute top-0 left-0 right-0 h-6 z-10 text-sm text-gray-400 hover:text-pink-600"
           >
@@ -53,12 +71,12 @@
           <!-- Swiper -->
           <Swiper
             :modules="[Mousewheel]"
-            direction="vertical"
+            :direction="isMobile ? 'horizontal' : 'vertical'"
             :slides-per-view="4"
             :space-between="8"
-            :mousewheel="true"
+            :mousewheel="!isMobile"
             @swiper="(s) => (swiper = s)"
-            class="mt-6 mb-6 max-h-[400px] py-6"
+            :class="['py-6', isMobile ? 'h-24 w-full px-6' : 'max-h-[400px] mt-6 mb-6']"
           >
             <SwiperSlide v-for="(img, index) in product.images" :key="index" @click="setImage(img.path)">
               <div :class="['w-20 h-20 rounded overflow-hidden cursor-pointer shadow-sm transition p-1']">
@@ -75,6 +93,7 @@
 
           <!-- Кнопка вниз -->
           <button
+            v-if="!isMobile"
             @click="swiper.slideNext()"
             class="absolute bottom-0 left-0 right-0 h-6 z-10 bg-white text-gray-500 hover:text-pink-600"
           >
@@ -98,7 +117,7 @@
 
       <!-- 🔸 Информация о товаре -->
       <div class="flex flex-col gap-4 md:w-1/2 justify-center md:justify-start self-center">
-        <div class="flex flex-col gap-4 md:w-1/2">
+        <div class="flex flex-col gap-4">
           <!-- Название и бренд -->
           <div>
             <h1 class="text-2xl font-bold leading-snug">
@@ -109,7 +128,7 @@
               Артикул: {{ product.id }}
               <br />
               Наличие:
-              <span class="text-green-600 font-semibold">В наличии</span>
+              <span class="text-my_grin font-semibold">В наличии</span>
             </div>
           </div>
 
@@ -117,14 +136,14 @@
           <div class="space-y-1">
             <div
               v-if="product.promotion?.discount_group"
-              class="inline-block bg-pink-100 text-pink-600 text-xs font-bold px-2 py-1 rounded"
+              class="inline-block bg-my_grin_op text-my_red text-xs font-bold px-2 py-1 rounded"
             >
               СКИДКА -{{ product.promotion.discount_group.discount_percent }}%
             </div>
-            <div v-if="product.promotion?.discount_group" class="text-sm text-gray-400 line-through">
+            <div v-if="product.promotion?.discount_group" class="text-sm text-my_red line-through">
               {{ product.price }} {{ product.currency }}
             </div>
-            <div class="text-2xl font-bold text-pink-600">{{ product.discounted_price }} {{ product.currency }}</div>
+            <div class="text-2xl font-bold text-black">{{ product.discounted_price }} {{ product.currency }}</div>
           </div>
 
           <!-- Кнопки действия + QuantityControl -->
@@ -133,9 +152,14 @@
             <QuantityControl :product-id="product.id" />
             <!-- Кнопки -->
             <div class="flex gap-4">
-              <button class="bg-pink-600 hover:bg-pink-700 text-white text-sm px-6 py-2 rounded-xl">Добавить в карзину</button>
-              <!-- <button class="bg-gray-200 hover:bg-gray-300 text-sm px-6 py-2 rounded-xl">В корзину</button> -->
-              <FavoriteButton :product-id="product.id" size-class="text-2xl" />
+              <button
+                v-if="!cart.items[product.id]"
+                @click="cart.toggle(product.id)"
+                class="bg-my_green hover:bg-my_green_op text-white text-sm px-6 py-2 rounded-xl"
+              >
+                Добавить в корзину
+              </button>
+              <FavoriteButton :product-id="product.id" :product="product" size-class="text-2xl" />
             </div>
           </div>
           <!-- Иконки преимуществ -->
