@@ -1,36 +1,45 @@
-// Stores/favorites.js
 import { defineStore } from 'pinia'
 import axios from 'axios'
+import { useAppStateStore } from './appState'
 
 export const useFavoritesStore = defineStore('favorites', {
   state: () => ({
-    items: [], // теперь это массив товаров, а не id
+    items: [], // Массив товаров
   }),
 
+  getters: {
+    // 🔹 Количество избранных
+    count: (state) => state.items.length,
+
+    // 🔹 Проверка, есть ли товар в избранном
+    isFavorite: (state) => (id) => state.items.some((p) => p.id === id),
+  },
+
   actions: {
+    // 🔹 Загрузка избранного с сервера
     async load() {
+      console.log('[FavoritesStore] Загружаем с сервера...')
       const res = await axios.get(route('favorites.data'))
       this.items = res.data.products
+
+      const app = useAppStateStore()
+      app.markLoaded('favorites')
     },
 
-    isFavorite(productId) {
-      return this.items.some((p) => p.id === productId)
-    },
-
+    // 🔹 Переключение товара в избранном (локально + на сервере)
     localToggle(product) {
       const index = this.items.findIndex((p) => p.id === product.id)
 
       if (index !== -1) {
-        // Удаляем локально
+        // Удаляем
         this.items.splice(index, 1)
       } else {
-        // Добавляем локально
+        // Добавляем
         this.items.push(product)
       }
 
-      // Отправляем на бэк
+      // 🔁 Отправка запроса и откат в случае ошибки
       axios.post(route('favorites.toggle'), { product_id: product.id }).catch(() => {
-        // В случае ошибки — откатим
         if (index === -1) {
           this.items = this.items.filter((p) => p.id !== product.id)
         } else {
@@ -39,14 +48,16 @@ export const useFavoritesStore = defineStore('favorites', {
       })
     },
 
+    // 🔹 Удалить товар
     async remove(productId) {
-      const res = await axios.delete(route('favorites.remove', productId))
-      this.items = this.items.filter(p => p.id !== productId)
+      await axios.delete(route('favorites.remove', productId))
+      this.items = this.items.filter((p) => p.id !== productId)
     },
 
+    // 🔹 Очистить все
     async clear() {
       await axios.delete(route('favorites.clear'))
       this.items = []
-    }
+    },
   },
 })

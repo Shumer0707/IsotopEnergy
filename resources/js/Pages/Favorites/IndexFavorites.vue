@@ -7,10 +7,6 @@
   const favorites = useFavoritesStore()
   const cart = useCartStore()
 
-  onMounted(() => {
-    favorites.load()
-  })
-
   const products = computed(() => favorites.items)
 
   const openProduct = (id) => {

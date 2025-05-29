@@ -41,9 +41,17 @@
       <!-- Правая часть -->
       <div class="flex justify-end items-center 2xl:gap-10 lg:gap-6 gap-4">
         <LanguageSwitcher />
-        <Link href="/favorites" class="hover:text-gray-300">
-          <font-awesome-icon :icon="['far', 'heart']" class="text-white hover:text-my_red lg:text-3xl text-2xl" />
-        </Link>
+        <div class="relative">
+          <Link href="/favorites" class="hover:text-gray-300">
+            <font-awesome-icon :icon="['far', 'heart']" class="text-white hover:text-my_red lg:text-3xl text-2xl" />
+          </Link>
+          <span
+            v-if="favoritesCount > 0"
+            class="absolute -top-1.5 -left-3 bg-my_red text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center"
+          >
+            {{ favoritesCount }}
+          </span>
+        </div>
         <MiniCart />
       </div>
     </div>
@@ -55,17 +63,21 @@
   import CategoryNav from '@/Components/shared/CategoryNav.vue'
   import { useCartMiniUiStore } from '@/Stores/cartMiniUi'
   import MiniCart from '@/Components/common/MiniCart.vue'
-  import { ref, onMounted } from 'vue'
+  import { ref, onMounted, computed } from 'vue'
   import { useLayoutStore } from '@/Stores/layout'
   import { useTranslations } from '@/composables/useTranslations'
   import ProductSearch from '@/Components/common/ProductSearch.vue'
   import LanguageSwitcher from '@/Components/shared/LanguageSwitcher.vue'
+  import { useFavoritesStore } from '@/Stores/favorites'
 
   const t = useTranslations()
   const layout = useLayoutStore()
   const headerRef = ref(null)
   const cartMiniUi = useCartMiniUiStore()
   const showLangs = ref(false)
+
+  const favorites = useFavoritesStore()
+  const favoritesCount = computed(() => favorites.count)
 
   onMounted(() => {
     if (headerRef.value) {

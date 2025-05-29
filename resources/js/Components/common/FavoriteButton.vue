@@ -37,7 +37,6 @@
   })
 
   const favorites = useFavoritesStore()
-  favorites.load()
   const isFavorite = computed(() => favorites.isFavorite(props.productId))
 
   const toggleFavorite = () => {
