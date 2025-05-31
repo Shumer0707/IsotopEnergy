@@ -25,7 +25,7 @@
     <!-- 🔹 Изображение -->
     <div class="h-20 lg:h-40 bg-gray-100 rounded flex items-center justify-center mb-2 lg:mb-4 overflow-hidden">
       <img
-        :src="product.main_image ? `/storage/${product.main_image}` : '/images/placeholder.jpg'"
+        :src="product.main_image ? `/storage/${product.main_image}` : '/images/placeholder.webp'"
         alt="product image"
         class="max-h-full max-w-full object-contain cursor-pointer"
         @click="onClick?.(product.id)"

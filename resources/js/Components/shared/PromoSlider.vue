@@ -1,4 +1,5 @@
 <script setup>
+  import { registerImage } from '@/utils/imageLoadRegistry'
   import { Swiper, SwiperSlide } from 'swiper/vue'
   import { Navigation, Pagination, Autoplay } from 'swiper'
   import 'swiper/css'
@@ -28,6 +29,8 @@
       image: '/storage/varia/promo-3.webp',
     },
   ]
+
+  slides.forEach(slide => registerImage(slide.image))
 </script>
 
 <template>

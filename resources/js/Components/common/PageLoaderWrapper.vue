@@ -1,0 +1,42 @@
+<template>
+  <div class="relative">
+    <!-- Спиннер -->
+    <transition name="fade">
+      <div
+        v-if="loading"
+        class="flex justify-center items-center absolute inset-0 z-10 bg-white"
+      >
+        <svg class="animate-spin h-8 w-8 text-gray-400" viewBox="0 0 24 24" fill="none">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+          <path
+            class="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+          />
+        </svg>
+      </div>
+    </transition>
+
+    <!-- Контент (всегда в DOM, но плавный переход) -->
+    <transition name="fade" appear>
+      <div
+        :class="{
+          'opacity-0 pointer-events-none': loading,
+          'opacity-100': !loading,
+          'transition-opacity duration-500': true,
+        }"
+      >
+        <slot />
+      </div>
+    </transition>
+  </div>
+</template>
+
+<script setup>
+defineProps({
+  loading: {
+    type: Boolean,
+    required: true,
+  },
+})
+</script>

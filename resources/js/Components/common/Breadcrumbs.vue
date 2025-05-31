@@ -5,25 +5,21 @@
   import { useCategoryStore } from '@/Stores/category'
 
   const page = usePage()
-  const locale = computed(() => usePage().props.locale)
-  const navCategories = computed(() => categoryStore.navCategories)
+  const locale = computed(() => page.props.locale)
   const categoryStore = useCategoryStore()
-  const props = defineProps({
-    segments: {
-      type: Array,
-      required: true,
-    },
-  })
 
-  const parent = computed(() => {
-    const all = navCategories.value
-    return all.find((c) => c.children?.some((child) => child.id === sub.value?.id))
-  })
+  const navCategories = computed(() => categoryStore.navCategories)
 
   const sub = computed(() => {
     const all = navCategories.value.flatMap((c) => c.children || [])
     return all.find((child) => child.id === page.props.category?.id)
   })
+
+  const parent = computed(() => {
+    return navCategories.value.find((c) => c.children?.some((child) => child.id === sub.value?.id))
+  })
+
+  const product = computed(() => page.props.product)
 
   const translations = useTranslations()
 
@@ -51,20 +47,29 @@
 
       crumbs.push({
         name: sub.value.translation?.name ?? '...',
+        href: route('category.show', sub.value.id),
+      })
+    }
+
+    // Название товара
+    if (product.value?.description?.title) {
+      crumbs.push({
+        name: product.value.description.title,
         href: null,
       })
-
-      return crumbs
     }
 
     // fallback
-    props.segments.forEach((segment, index) => {
-      const path = '/' + props.segments.slice(0, index + 1).join('/')
-      crumbs.push({
-        name: labels[segment] || decodeURIComponent(segment),
-        href: index === props.segments.length - 1 ? null : path,
+    if (crumbs.length === 1) {
+      const segments = page.url.split('/').filter(Boolean)
+      segments.forEach((segment, index) => {
+        const path = '/' + segments.slice(0, index + 1).join('/')
+        crumbs.push({
+          name: labels[segment] || decodeURIComponent(segment),
+          href: index === segments.length - 1 ? null : path,
+        })
       })
-    })
+    }
 
     return crumbs
   })

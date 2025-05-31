@@ -25,7 +25,7 @@
         @click="openModal(category)"
       >
         <img
-          :src="category.logo ? `/storage/${category.logo}` : `/images/placeholder.jpg`"
+          :src="category.logo ? `/storage/${category.logo}` : `/images/placeholder.webp`"
           alt="logo"
           class="w-20 h-20 object-contain rounded-md bg-white"
         />

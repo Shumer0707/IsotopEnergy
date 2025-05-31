@@ -44,7 +44,7 @@
           <div class="col-span-2 text-center">Кол-во</div>
           <div class="col-span-2 text-right">Цена за шт.</div>
           <div class="col-span-2 text-right">Всего</div>
-          <div class="col-span-2 text-right">Жопа</div>
+          <div class="col-span-2 text-right">Удалить</div>
         </div>
 
         <!-- Список товаров -->
@@ -108,6 +108,10 @@
             </button>
           </div>
         </div>
+        <!-- Очистить корзину -->
+        <button @click="cart.clear" class="flex justify-end w-full mt-2 text-sm text-red-600 hover:underline" v-if="cart.products.length">
+          Очистить корзину
+        </button>
       </div>
     </div>
 

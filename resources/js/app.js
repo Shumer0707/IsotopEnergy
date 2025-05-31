@@ -8,7 +8,7 @@ import { ZiggyVue } from '../../vendor/tightenco/ziggy'
 import { createPinia } from 'pinia'
 import Layout from './Layouts/Layout.vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import './Utils/icons'
+import './utils/icons'
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel'
 
