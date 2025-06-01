@@ -1,17 +1,21 @@
 <script setup>
-  import { onMounted } from 'vue'
+  import { onMounted, ref, reactive } from 'vue'
   import { useCategoryStore } from '@/Stores/category'
+  import SubcategoryModal from '@/Components/shared/SubcategoryModal.vue'
 
   const categoryStore = useCategoryStore()
+  const triggerRefs = reactive({})
 
-  onMounted(() => {
-    if (!categoryStore.isLoaded) {
-      categoryStore.loadCategories()
-    }
-  })
+  // onMounted(() => {
+  //   if (!categoryStore.isLoaded) {
+  //     categoryStore.loadCategories()
+  //   }
+  // })
 
-  const openModal = (category) => {
-    categoryStore.openCategory(category.id)
+  function openModal(category) {
+    requestAnimationFrame(() => {
+      categoryStore.openCategory(category.id)
+    })
   }
 </script>
 
@@ -23,6 +27,7 @@
         :key="category.id"
         class="flex flex-col items-center cursor-pointer"
         @click="openModal(category)"
+        :ref="(el) => (triggerRefs[category.id] = el)"
       >
         <img
           :src="category.logo ? `/storage/${category.logo}` : `/images/placeholder.webp`"
@@ -34,5 +39,13 @@
         </span>
       </div>
     </div>
+
+    <!-- Подключаем модалку -->
+    <SubcategoryModal
+      v-if="categoryStore.activeCategory"
+      :category="categoryStore.activeCategory"
+      :button-ref="triggerRefs[categoryStore.activeCategory.id]"
+      @close="categoryStore.closeCategory"
+    />
   </div>
 </template>

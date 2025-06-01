@@ -13,7 +13,7 @@ import {
   faMagnifyingGlass,
 } from '@fortawesome/free-solid-svg-icons'
 import { faHeart as farHeart } from '@fortawesome/free-regular-svg-icons'
-
+import { faFacebook, faInstagram, faTiktok } from '@fortawesome/free-brands-svg-icons'
 library.add(
   fasHeart,
   farHeart,
@@ -25,5 +25,8 @@ library.add(
   faChevronUp,
   faChevronDown,
   faGlobe,
-  faMagnifyingGlass
+  faMagnifyingGlass,
+  faFacebook,
+  faInstagram,
+  faTiktok
 )

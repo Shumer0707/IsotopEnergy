@@ -28,12 +28,25 @@ body.modal-open {
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 50, 45, 0.4) transparent;
 }
+/* -------------------------------------------- */
+@layer utilities {
+  @keyframes logo-spin-bounce {
+    0% {
+      transform: rotate(0deg) scale(1);
+      opacity: 0.8;
+    }
+    50% {
+      transform: rotate(180deg) scale(1.15);
+      opacity: 1;
+    }
+    100% {
+      transform: rotate(360deg) scale(1);
+      opacity: 0.8;
+    }
+  }
 
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s ease;
+  .animate-logo-spin-bounce {
+    animation: logo-spin-bounce 2s infinite ease-in-out;
+  }
 }
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
+

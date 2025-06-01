@@ -3,6 +3,7 @@
   import { useTranslations } from '@/composables/useTranslations'
   import { computed } from 'vue'
   import { useCategoryStore } from '@/Stores/category'
+  import SubcategoryModal from '../shared/SubcategoryModal.vue'
 
   const page = usePage()
   const locale = computed(() => page.props.locale)
@@ -25,7 +26,9 @@
 
   function openModal() {
     if (parent.value) {
-      categoryStore.openCategory(parent.value.id)
+      requestAnimationFrame(() => {
+        categoryStore.openCategory(parent.value.id)
+      })
     }
   }
 
@@ -100,4 +103,10 @@
       </ol>
     </nav>
   </div>
+  <SubcategoryModal
+    v-if="categoryStore.activeCategory"
+    :category="categoryStore.activeCategory"
+    :button-ref="null"
+    @close="categoryStore.closeCategory"
+  />
 </template>

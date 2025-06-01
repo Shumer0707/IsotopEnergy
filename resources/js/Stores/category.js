@@ -6,21 +6,25 @@ export const useCategoryStore = defineStore('category', () => {
   const activeCategory = ref(null)
   const navCategories = ref([])
   const isLoaded = ref(false)
+  const isLoading = ref(false)
 
   async function loadCategories() {
-    if (isLoaded.value) return // не грузим повторно
+    if (isLoaded.value || isLoading.value) return
 
+    isLoading.value = true
     try {
       const res = await axios.get('/layout-data')
       navCategories.value = res.data.navCategories
       isLoaded.value = true
     } catch (e) {
       console.error('Ошибка при загрузке navCategories:', e)
+    } finally {
+      isLoading.value = false
     }
   }
 
   function openCategory(categoryId) {
-    const parent = navCategories.value.find(c => c.id === categoryId)
+    const parent = navCategories.value.find((c) => c.id === categoryId)
 
     if (!parent) return
 
@@ -53,4 +57,3 @@ export const useCategoryStore = defineStore('category', () => {
     reset,
   }
 })
-

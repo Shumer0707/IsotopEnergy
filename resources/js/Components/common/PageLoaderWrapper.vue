@@ -1,23 +1,13 @@
 <template>
   <div class="relative">
-    <!-- Спиннер -->
+    <!-- Лоадер -->
     <transition name="fade">
-      <div
-        v-if="loading"
-        class="flex justify-center items-center absolute inset-0 z-10 bg-white"
-      >
-        <svg class="animate-spin h-8 w-8 text-gray-400" viewBox="0 0 24 24" fill="none">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-          <path
-            class="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-          />
-        </svg>
+      <div v-if="loading" class="fixed inset-0 z-40 bg-white flex items-center justify-center min-h-screen">
+        <img src="/favicon-1.svg" alt="Loading logo" class="w-20 h-20 animate-logo-spin-bounce" />
       </div>
     </transition>
 
-    <!-- Контент (всегда в DOM, но плавный переход) -->
+    <!-- Контент -->
     <transition name="fade" appear>
       <div
         :class="{
@@ -33,10 +23,10 @@
 </template>
 
 <script setup>
-defineProps({
-  loading: {
-    type: Boolean,
-    required: true,
-  },
-})
+  defineProps({
+    loading: {
+      type: Boolean,
+      required: true,
+    },
+  })
 </script>

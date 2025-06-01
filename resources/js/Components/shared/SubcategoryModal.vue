@@ -24,13 +24,6 @@
     Escape: () => categoryStore.closeCategory(),
   })
 
-  watch(
-    category,
-    (val) => {
-      console.log('Модалка получила category:', val)
-    },
-    { immediate: true }
-  )
 </script>
 
 <template>
