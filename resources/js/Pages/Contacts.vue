@@ -9,6 +9,7 @@
       <div
         class="bg-white shadow-md border border-gray-200 rounded-xl p-6 space-y-6 text-base text-gray-800 leading-6 min-h-[300px] h-full"
       >
+        <!-- Адрес -->
         <p class="flex items-start gap-3">
           <font-awesome-icon icon="fa-solid fa-location-dot" class="text-gray-600 mt-1 shrink-0" />
           <span>
@@ -18,6 +19,7 @@
           </span>
         </p>
 
+        <!-- График -->
         <p class="flex items-start gap-3">
           <font-awesome-icon icon="fa-solid fa-clock" class="text-gray-600 mt-1 shrink-0" />
           <span>
@@ -31,6 +33,7 @@
           </span>
         </p>
 
+        <!-- Телефон -->
         <p class="flex items-start gap-3">
           <font-awesome-icon icon="fa-solid fa-phone" class="text-gray-600 mt-1 shrink-0" />
           <span>
@@ -40,6 +43,7 @@
           </span>
         </p>
 
+        <!-- Почта -->
         <p class="flex items-start gap-3">
           <font-awesome-icon icon="fa-solid fa-envelope" class="text-gray-600 mt-1 shrink-0" />
           <span>
@@ -48,6 +52,22 @@
             isotopenergy@gmail.com
           </span>
         </p>
+
+        <!-- Социальные сети -->
+        <div class="pt-2 border-t border-gray-200">
+          <p class="font-semibold mb-2">Мы в соцсетях:</p>
+          <div class="flex gap-4 text-xl text-gray-600">
+            <a href="https://www.tiktok.com" target="_blank" class="hover:text-black">
+              <font-awesome-icon :icon="['fab', 'tiktok']" />
+            </a>
+            <a href="https://www.instagram.com" target="_blank" class="hover:text-black">
+              <font-awesome-icon :icon="['fab', 'instagram']" />
+            </a>
+            <a href="https://www.facebook.com" target="_blank" class="hover:text-black">
+              <font-awesome-icon :icon="['fab', 'facebook']" />
+            </a>
+          </div>
+        </div>
       </div>
 
       <div class="h-full">
