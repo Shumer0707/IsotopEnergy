@@ -1,2 +1,9 @@
 User-agent: *
-Disallow:
+Disallow: /admin/
+Disallow: /cart
+Disallow: /favorites
+Disallow: /checkout
+Disallow: /login
+Disallow: /register
+
+Sitemap: https://isotopenergy.md/sitemap.xml
