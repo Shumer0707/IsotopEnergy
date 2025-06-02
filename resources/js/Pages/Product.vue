@@ -8,7 +8,9 @@
   import { Navigation, Mousewheel } from 'swiper'
   import 'swiper/css'
   import 'swiper/css/navigation'
+  import { useTranslations } from '@/composables/useTranslations'
 
+  const t = useTranslations()
   const props = defineProps({
     product: Object,
   })
@@ -108,7 +110,7 @@
             v-if="product.promotion?.discount_group"
             class="absolute top-2 left-2 bg-gray-200 text-xs font-bold px-3 py-1 rounded z-10"
           >
-            СКИДКА -{{ product.promotion.discount_group.discount_percent }}%
+            {{ t['product_discount'] }} -{{ product.promotion.discount_group.discount_percent }}%
           </div>
 
           <img :src="activeImage" alt="product image" class="max-w-full max-h-[400px] object-contain" />
@@ -125,10 +127,10 @@
             </h1>
 
             <div class="text-sm text-gray-500 mt-1">
-              Артикул: {{ product.id }}
+              {{ t['product_art'] }} {{ product.id }}
               <br />
-              Наличие:
-              <span class="text-my_grin font-semibold">В наличии</span>
+              {{ t['product_availability'] }}
+              <span class="text-my_grin font-semibold">{{ t['product_stock'] }}</span>
             </div>
           </div>
 
@@ -138,7 +140,7 @@
               v-if="product.promotion?.discount_group"
               class="inline-block bg-my_grin_op text-my_red text-xs font-bold px-2 py-1 rounded"
             >
-              СКИДКА -{{ product.promotion.discount_group.discount_percent }}%
+              {{ t['product_discount'] }} -{{ product.promotion.discount_group.discount_percent }}%
             </div>
             <div v-if="product.promotion?.discount_group" class="text-sm text-my_red line-through">
               {{ product.price }} {{ product.currency }}
@@ -157,7 +159,7 @@
                 @click="cart.toggle(product.id)"
                 class="bg-my_green hover:bg-my_green_op text-white text-sm px-6 py-2 rounded-xl"
               >
-                Добавить в корзину
+                {{ t['product_add'] }}
               </button>
               <FavoriteButton :product-id="product.id" :product="product" size-class="text-2xl" />
             </div>
@@ -167,26 +169,26 @@
             <div class="flex flex-col items-center gap-1 text-center">
               <span class="text-2xl">🔒</span>
               <span class="text-xs leading-tight">
-                Удобство оплаты
+                {{ t['product_text_1'] }}
                 <br />
-                Онлайн или при доставке.
+                {{ t['product_text_1_1'] }}
               </span>
             </div>
 
             <div class="flex flex-col items-center gap-1 text-center">
               <span class="text-2xl">🚚</span>
               <span class="text-xs leading-tight">
-                Доставка по Молдове
+                {{ t['product_text_2'] }}
                 <br />
-                Курьерской службой.
+                {{ t['product_text_2_2'] }}
               </span>
             </div>
             <div class="flex flex-col items-center gap-1 text-center">
               <span class="text-2xl">✅</span>
               <span class="text-xs leading-tight">
-                Гарантия качества
+                {{ t['product_text_3'] }}
                 <br />
-                от производителя и магазина.
+                {{ t['product_text_3_3'] }}
               </span>
             </div>
           </div>
@@ -197,7 +199,7 @@
     <div class="grid md:grid-cols-2 gap-6 mt-10">
       <!-- Характеристики -->
       <div>
-        <h2 class="text-lg font-semibold mb-4">Характеристики</h2>
+        <h2 class="text-lg font-semibold mb-4">{{ t['product_characteristics'] }}</h2>
         <table class="w-full text-sm text-gray-700">
           <tbody>
             <tr v-for="(attribute, index) in attributes" :key="index" class="border-b last:border-0">
@@ -210,7 +212,7 @@
 
       <!-- Описание -->
       <div>
-        <h2 class="text-lg font-semibold mb-4">Описание</h2>
+        <h2 class="text-lg font-semibold mb-4">{{ t['product_description'] }}</h2>
         <p class="text-sm text-gray-800 leading-relaxed whitespace-pre-line">
           {{ product.description?.full_description ?? 'Описание отсутствует.' }}
         </p>

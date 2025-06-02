@@ -4,6 +4,9 @@
   import { useCartStore } from '@/Stores/cart'
   import { computed, onMounted } from 'vue'
   import ProductCard from '@/Components/shared/ProductCard.vue'
+  import { useTranslations } from '@/composables/useTranslations'
+
+  const t = useTranslations()
   const favorites = useFavoritesStore()
   const cart = useCartStore()
 
@@ -18,14 +21,14 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
     <!-- 🔹 Заголовок -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-      <h1 class="text-2xl font-bold">Избранное</h1>
+      <h1 class="text-2xl font-bold">{{ t['favorite_title'] }}</h1>
       <button @click="favorites.clear()" class="text-sm text-red-600 hover:underline whitespace-nowrap">
-        Очистить избранное
+        {{ t['favorite_delete_all'] }}
       </button>
     </div>
 
     <!-- 🔹 Пусто -->
-    <div v-if="products.length === 0" class="text-gray-500">Нет избранных товаров.</div>
+    <div v-if="products.length === 0" class="text-gray-500">{{ t['favorite_not'] }}</div>
 
     <!-- 🔹 Сетка карточек -->
     <div v-else class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">

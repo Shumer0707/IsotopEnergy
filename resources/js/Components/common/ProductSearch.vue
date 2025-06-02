@@ -1,83 +1,85 @@
 <script setup>
-import axios from 'axios'
-import { router } from '@inertiajs/vue3'
-import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
+  import axios from 'axios'
+  import { router } from '@inertiajs/vue3'
+  import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
+  import { useTranslations } from '@/composables/useTranslations'
 
-const query = ref('')
-const suggestions = ref([])
-const wrapperRef = ref(null)
-let debounceTimeout = null
-const selectedIndex = ref(-1)
-const noMatchMessage = ref(false)
+  const t = useTranslations()
+  const query = ref('')
+  const suggestions = ref([])
+  const wrapperRef = ref(null)
+  let debounceTimeout = null
+  const selectedIndex = ref(-1)
+  const noMatchMessage = ref(false)
 
-const DEBOUNCE_DELAY = 300
+  const DEBOUNCE_DELAY = 300
 
-const openProduct = (id) => {
-  query.value = ''
-  suggestions.value = []
-  selectedIndex.value = -1
-  router.visit(`/product/${id}`)
-}
-
-const handleSearch = () => {
-  const exactMatch = suggestions.value.find(
-    (product) => product.description?.title.toLowerCase() === query.value.trim().toLowerCase()
-  )
-
-  if (exactMatch) {
-    openProduct(exactMatch.id)
-  } else {
-    noMatchMessage.value = true
-    setTimeout(() => (noMatchMessage.value = false), 3000)
-  }
-}
-
-const onKeyDown = (e) => {
-  if (e.key === 'ArrowDown' && suggestions.value.length) {
-    selectedIndex.value = (selectedIndex.value + 1) % suggestions.value.length
-    e.preventDefault()
-  } else if (e.key === 'ArrowUp' && suggestions.value.length) {
-    selectedIndex.value = (selectedIndex.value - 1 + suggestions.value.length) % suggestions.value.length
-    e.preventDefault()
-  } else if (e.key === 'Escape') {
+  const openProduct = (id) => {
+    query.value = ''
     suggestions.value = []
     selectedIndex.value = -1
-  } else if (e.key === 'Enter') {
-    if (selectedIndex.value >= 0) {
-      openProduct(suggestions.value[selectedIndex.value].id)
+    router.visit(`/product/${id}`)
+  }
+
+  const handleSearch = () => {
+    const exactMatch = suggestions.value.find(
+      (product) => product.description?.title.toLowerCase() === query.value.trim().toLowerCase()
+    )
+
+    if (exactMatch) {
+      openProduct(exactMatch.id)
     } else {
-      handleSearch()
+      noMatchMessage.value = true
+      setTimeout(() => (noMatchMessage.value = false), 3000)
     }
   }
-}
 
-watch(query, (newQuery) => {
-  clearTimeout(debounceTimeout)
-
-  if (newQuery.length < 2) {
-    suggestions.value = []
-    return
+  const onKeyDown = (e) => {
+    if (e.key === 'ArrowDown' && suggestions.value.length) {
+      selectedIndex.value = (selectedIndex.value + 1) % suggestions.value.length
+      e.preventDefault()
+    } else if (e.key === 'ArrowUp' && suggestions.value.length) {
+      selectedIndex.value = (selectedIndex.value - 1 + suggestions.value.length) % suggestions.value.length
+      e.preventDefault()
+    } else if (e.key === 'Escape') {
+      suggestions.value = []
+      selectedIndex.value = -1
+    } else if (e.key === 'Enter') {
+      if (selectedIndex.value >= 0) {
+        openProduct(suggestions.value[selectedIndex.value].id)
+      } else {
+        handleSearch()
+      }
+    }
   }
 
-  debounceTimeout = setTimeout(() => {
-    axios
-      .get('/search-products', { params: { q: newQuery } })
-      .then(({ data }) => suggestions.value = data)
-      .catch(() => suggestions.value = [])
-  }, DEBOUNCE_DELAY)
-})
+  watch(query, (newQuery) => {
+    clearTimeout(debounceTimeout)
 
-const handleClickOutside = (event) => {
-  if (wrapperRef.value && !wrapperRef.value.contains(event.target)) {
-    suggestions.value = []
-    selectedIndex.value = -1
-    noMatchMessage.value = false
-    query.value = '' // очищаем, чтобы не показывалось "ничего не найдено"
+    if (newQuery.length < 2) {
+      suggestions.value = []
+      return
+    }
+
+    debounceTimeout = setTimeout(() => {
+      axios
+        .get('/search-products', { params: { q: newQuery } })
+        .then(({ data }) => (suggestions.value = data))
+        .catch(() => (suggestions.value = []))
+    }, DEBOUNCE_DELAY)
+  })
+
+  const handleClickOutside = (event) => {
+    if (wrapperRef.value && !wrapperRef.value.contains(event.target)) {
+      suggestions.value = []
+      selectedIndex.value = -1
+      noMatchMessage.value = false
+      query.value = '' // очищаем, чтобы не показывалось "ничего не найдено"
+    }
   }
-}
 
-onMounted(() => document.addEventListener('click', handleClickOutside))
-onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
+  onMounted(() => document.addEventListener('click', handleClickOutside))
+  onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
 </script>
 
 <template>
@@ -86,7 +88,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
       v-model="query"
       @keydown="onKeyDown"
       type="text"
-      placeholder="Поиск по товарам..."
+      :placeholder="t.search_text ?? 'Поиск...'"
       class="w-full bg-my_white pl-4 pr-10 py-1.5 sm:py-3 rounded-xl text-black placeholder-gray-500 focus:outline-none"
     />
     <button
@@ -96,10 +98,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
       <font-awesome-icon icon="magnifying-glass" class="lg:text-xl text-lg" />
     </button>
 
-    <ul
-      v-if="suggestions.length"
-      class="absolute left-0 right-0 top-full mt-2 bg-my_white rounded-xl shadow z-50 text-black"
-    >
+    <ul v-if="suggestions.length" class="absolute left-0 right-0 top-full mt-2 bg-my_white rounded-xl shadow z-50 text-black">
       <li
         v-for="(product, index) in suggestions"
         :key="product.id"

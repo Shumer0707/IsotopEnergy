@@ -34,13 +34,13 @@
 
   const breadcrumbs = computed(() => {
     const labels = {
-      about: translations.value.About,
-      contacts: translations.value.Contacts,
-      cart: translations.value.Cart,
+      about: translations.value.about,
+      contacts: translations.value.contacts,
+      cart: translations.value.cart,
       favorites: translations.value.favorites,
     }
 
-    const crumbs = [{ name: translations.value.Home || 'Главная', href: '/' }]
+    const crumbs = [{ name: translations.value.home || 'Главная', href: '/' }]
 
     if (parent.value && sub.value) {
       crumbs.push({

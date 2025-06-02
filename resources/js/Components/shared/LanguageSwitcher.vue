@@ -2,10 +2,10 @@
   import { ref, onMounted, watch, nextTick, onBeforeUnmount } from 'vue'
   import { useLayoutStore } from '@/Stores/layout'
   import { router } from '@inertiajs/vue3'
-  import { useTranslations } from '@/composables/useTranslations'
   import OverlayLayer from '@/Components/common/OverlayLayer.vue'
   import { useClickOutside } from '@/composables/useClickOutside'
   import { useKeyboardShortcuts } from '@/composables/useKeyboardShortcuts'
+  import { useTranslations } from '@/composables/useTranslations'
 
   const t = useTranslations()
   const layout = useLayoutStore()

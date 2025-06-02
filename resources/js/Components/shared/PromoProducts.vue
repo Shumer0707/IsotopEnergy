@@ -5,7 +5,9 @@
   import { useCartStore } from '@/Stores/cart'
   // import { useFavoritesStore } from '@/Stores/favorites'
   import ProductCard from '@/Components/shared/ProductCard.vue'
+  import { useTranslations } from '@/composables/useTranslations'
 
+  const t = useTranslations()
   // const favorites = useFavoritesStore()
   const promoProducts = ref([])
   const currentPage = ref(1)
@@ -46,14 +48,14 @@
         @click="fetchProducts(currentPage - 1)"
         class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
       >
-        Назад
+        {{ t['back'] }}
       </button>
       <button
         v-if="currentPage < lastPage"
         @click="fetchProducts(currentPage + 1)"
         class="px-4 py-2 rounded bg-my_green text-my_white hover:bg-my_green_op"
       >
-        Показать ещё
+        {{ t['show'] }}
       </button>
     </div>
   </div>

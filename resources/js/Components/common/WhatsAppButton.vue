@@ -21,20 +21,20 @@
         class="block px-4 py-3 text-gray-800 hover:bg-green-50 flex items-center gap-2"
       >
         <i class="fa-brands fa-whatsapp text-green-500 text-lg"></i>
-        Написать в WhatsApp
+        {{ t['whatsapp_write'] }}
       </a>
       <button @click="showForm = true" class="w-full text-left px-4 py-3 text-gray-800 hover:bg-gray-100 flex items-center gap-2">
         <i class="fa-solid fa-phone text-blue-500 text-sm"></i>
-        Заказать звонок
+        {{ t['whatsapp_order'] }}
       </button>
     </div>
 
     <!-- Модалка формы -->
     <div v-if="showForm" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50" @click.self="closeForm">
       <div class="bg-white p-6 rounded shadow-md w-96">
-        <h2 class="text-lg font-semibold mb-4">Оставьте заявку</h2>
+        <h2 class="text-lg font-semibold mb-4">{{ t['whatsapp_leave'] }}</h2>
         <form @submit.prevent="submitForm">
-          <input v-model="form.name" type="text" placeholder="Ваше имя" class="w-full mb-1 border border-gray-300 p-2 rounded" />
+          <input v-model="form.name" type="text" :placeholder=t.whatsapp_name class="w-full mb-1 border border-gray-300 p-2 rounded" />
           <p v-if="errors.name" class="text-sm text-red-500 mb-2">
             {{ errors.name }}
           </p>
@@ -50,8 +50,8 @@
             {{ errors.phone }}
           </p>
           <div class="flex justify-end space-x-2">
-            <button type="button" @click="showForm = false" class="px-4 py-2 bg-gray-300 rounded">Отмена</button>
-            <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Отправить</button>
+            <button type="button" @click="showForm = false" class="px-4 py-2 bg-gray-300 rounded">{{ t['whatsapp_back'] }}</button>
+            <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">{{ t['whatsapp_send'] }}</button>
           </div>
         </form>
       </div>
@@ -63,7 +63,9 @@
   import { ref, onMounted, watch, onUnmounted, nextTick } from 'vue'
   import IMask from 'imask'
   import { useClickOutside } from '@/composables/useClickOutside'
+  import { useTranslations } from '@/composables/useTranslations'
 
+  const t = useTranslations()
   const phoneInput = ref(null)
   const isOpen = ref(false)
   const showForm = ref(false)

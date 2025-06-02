@@ -3,7 +3,9 @@
   import { useCartStore } from '@/Stores/cart'
   import axios from 'axios'
   import { useModalScrollLock } from '@/composables/useModalScrollLock'
+  import { useTranslations } from '@/composables/useTranslations'
 
+  const t = useTranslations()
   useModalScrollLock()
   const emit = defineEmits(['close'])
   const cart = useCartStore()
@@ -147,34 +149,34 @@
     <div class="bg-white rounded-xl p-6 w-full max-w-5xl shadow-lg relative overflow-y-auto max-h-[90vh] animate-fade-in">
       <button class="absolute top-2 right-3 text-gray-400 hover:text-black text-2xl" @click="emit('close')">×</button>
 
-      <h2 class="text-2xl font-bold mb-6 text-center">Оформление заказа</h2>
-      <div class="text-sm"><p>(* - обязательные поля)</p></div>
+      <h2 class="text-2xl font-bold mb-6 text-center">{{ t['order_title'] }}</h2>
+      <div class="text-sm"><p>(* - {{ t['order_mandatory'] }})</p></div>
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Левая часть -->
         <div class="lg:col-span-2 space-y-4">
           <!-- Контактные данные -->
           <div class="bg-gray-100 border border-gray-200 rounded-lg overflow-hidden">
             <div class="border-b border-gray-200 px-4 py-2">
-              <h3 class="text-sm font-semibold text-gray-700">Контактные данные</h3>
+              <h3 class="text-sm font-semibold text-gray-700">{{ t['order_data_title'] }}</h3>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 px-4 py-3">
               <div>
-                <input v-model="lastName" type="text" placeholder="Фамилия*" class="w-full border rounded p-2 text-sm" />
+                <input v-model="lastName" type="text" :placeholder=t.order_surname class="w-full border rounded p-2 text-sm" />
                 <p v-if="errors.lastName" class="text-xs text-red-500 mt-1">{{ errors.lastName }}</p>
               </div>
 
               <div>
-                <input v-model="firstName" type="text" placeholder="Имя*" class="w-full border rounded p-2 text-sm" />
+                <input v-model="firstName" type="text" :placeholder=t.order_name class="w-full border rounded p-2 text-sm" />
                 <p v-if="errors.firstName" class="text-xs text-red-500 mt-1">{{ errors.firstName }}</p>
               </div>
 
               <div>
-                <input v-model="phone" type="text" placeholder="Телефон*" class="w-full border rounded p-2 text-sm" />
+                <input v-model="phone" type="text" :placeholder=t.order_phone class="w-full border rounded p-2 text-sm" />
                 <p v-if="errors.phone" class="text-xs text-red-500 mt-1">{{ errors.phone }}</p>
               </div>
 
               <div>
-                <input v-model="email" type="email" placeholder="Email" class="w-full border rounded p-2 text-sm" />
+                <input v-model="email" type="email" :placeholder=t.order_mail class="w-full border rounded p-2 text-sm" />
               </div>
             </div>
           </div>
@@ -182,16 +184,16 @@
           <!-- Способ получения -->
           <div class="bg-gray-100 border border-gray-200 rounded-lg overflow-hidden">
             <div class="border-b border-gray-200 px-4 py-2">
-              <h3 class="text-sm font-semibold text-gray-700">Способ получения</h3>
+              <h3 class="text-sm font-semibold text-gray-700">{{ t['order_delivery_title'] }}</h3>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 px-4 py-3">
               <label class="flex items-center gap-2 border rounded px-3 py-2 cursor-pointer text-sm">
                 <input type="radio" v-model="deliveryMethod" value="pickup" />
-                <span>Самовывоз</span>
+                <span>{{ t['order_pickup'] }}</span>
               </label>
               <label class="flex items-center gap-2 border rounded px-3 py-2 cursor-pointer text-sm">
                 <input type="radio" v-model="deliveryMethod" value="delivery" />
-                <span>Доставка</span>
+                <span>{{ t['order_delivery'] }}</span>
               </label>
             </div>
           </div>
@@ -199,24 +201,24 @@
           <!-- Адрес доставки -->
           <div v-if="deliveryMethod === 'delivery'" class="bg-gray-100 border border-gray-200 rounded-lg overflow-hidden">
             <div class="border-b border-gray-200 px-4 py-2">
-              <h3 class="text-sm font-semibold text-gray-700">Адрес доставки</h3>
+              <h3 class="text-sm font-semibold text-gray-700">{{ t['order_delivery_address'] }}</h3>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 px-4 py-3">
               <div>
-                <input v-model="country" type="text" placeholder="Страна*" class="w-full border rounded p-2 text-sm" />
+                <input v-model="country" type="text" :placeholder=t.order_country class="w-full border rounded p-2 text-sm" />
                 <p v-if="errors.country" class="text-xs text-red-500 mt-1">{{ errors.country }}</p>
               </div>
 
               <div>
                 <select v-model="region" class="w-full border rounded p-2 text-sm bg-white">
-                  <option disabled value="">-- Выберите регион --</option>
+                  <option disabled value="">-- {{ t['order_region'] }} --</option>
                   <option v-for="r in moldovaRegions" :key="r" :value="r">{{ r }}</option>
                 </select>
                 <p v-if="errors.region" class="text-xs text-red-500 mt-1">{{ errors.region }}</p>
               </div>
 
               <div>
-                <input v-model="city" type="text" placeholder="Населённый пункт*" class="w-full border rounded p-2 text-sm" />
+                <input v-model="city" type="text" :placeholder=t.order_settlement class="w-full border rounded p-2 text-sm" />
                 <p v-if="errors.city" class="text-xs text-red-500 mt-1">{{ errors.city }}</p>
               </div>
 
@@ -224,7 +226,7 @@
                 <input
                   v-model="address"
                   type="text"
-                  placeholder="Адрес (улица, дом, участок...)*"
+                  :placeholder=t.order_address
                   class="w-full border rounded p-2 text-sm"
                 />
                 <p v-if="errors.address" class="text-xs text-red-500 mt-1">{{ errors.address }}</p>
@@ -235,20 +237,20 @@
           <!-- Способы оплаты -->
           <div class="bg-gray-100 border border-gray-200 rounded-lg overflow-hidden">
             <div class="border-b border-gray-200 px-4 py-2">
-              <h3 class="text-sm font-semibold text-gray-700">Способы оплаты</h3>
+              <h3 class="text-sm font-semibold text-gray-700">{{ t['order_payment_title'] }}</h3>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 px-4 py-3">
               <label class="flex items-center gap-2 border rounded px-3 py-2 cursor-pointer text-sm">
                 <input type="radio" v-model="paymentMethod" value="cash" />
-                <span>Наличными</span>
+                <span>{{ t['order_cash'] }}</span>
               </label>
               <label class="flex items-center gap-2 border rounded px-3 py-2 cursor-pointer text-sm">
                 <input type="radio" v-model="paymentMethod" value="card" />
-                <span>Картой курьеру</span>
+                <span>{{ t['order_card'] }}</span>
               </label>
               <label class="flex items-center gap-2 border rounded px-3 py-2 cursor-pointer text-sm">
                 <input type="radio" v-model="paymentMethod" value="invoice" />
-                <span>Банковский чек</span>
+                <span>{{ t['order_check'] }}</span>
               </label>
             </div>
           </div>
@@ -256,13 +258,13 @@
           <!-- Комментарий -->
           <div class="bg-gray-100 border border-gray-200 rounded-lg overflow-hidden">
             <div class="border-b border-gray-200 px-4 py-2">
-              <h3 class="text-sm font-semibold text-gray-700">Дополнительная информация</h3>
+              <h3 class="text-sm font-semibold text-gray-700">{{ t['order_information'] }}</h3>
             </div>
             <div class="px-4 py-3">
               <textarea
                 v-model="comment"
                 rows="3"
-                placeholder="Комментарий к заказу..."
+                :placeholder=t.order_comment
                 class="w-full border rounded p-2 text-sm"
               />
             </div>
@@ -271,7 +273,7 @@
 
         <!-- 🔸 Правая часть -->
         <div class="bg-gray-100 p-4 rounded-lg space-y-4">
-          <h3 class="text-lg font-semibold border-b pb-2">Ваш заказ</h3>
+          <h3 class="text-lg font-semibold border-b pb-2">{{ t['cart_details'] }}</h3>
 
           <div v-for="product in cart.products" :key="product.id" class="flex items-start gap-4 text-sm">
             <img
@@ -288,19 +290,19 @@
 
           <div class="border-t pt-4 space-y-2 text-sm">
             <div class="flex justify-between">
-              <span>Товаров:</span>
+              <span>{{ t['cart_all_items'] }}</span>
               <span>{{ totalQuantity }}</span>
             </div>
             <div class="flex justify-between">
-              <span>Сумма без скидки:</span>
+              <span>{{ t['cart_not_discount'] }}</span>
               <span>{{ totalWithoutDiscount.toFixed(2) }} mdl</span>
             </div>
             <div class="flex justify-between text-my_red">
-              <span>Скидка:</span>
+              <span>{{ t['cart_discount'] }}</span>
               <span>-{{ totalDiscount.toFixed(2) }} mdl</span>
             </div>
             <div class="flex justify-between font-bold text-base pt-1">
-              <span>Итог:</span>
+              <span>{{ t['cart_all_price'] }}</span>
               <span>{{ totalWithDiscount.toFixed(2) }} mdl</span>
             </div>
           </div>
@@ -310,7 +312,7 @@
             :disabled="loading"
             class="w-full bg-my_green hover:bg-my_green_op text-white py-2 rounded mt-4 transition-colors"
           >
-            {{ loading ? 'Отправка...' : 'Подтвердить заказ' }}
+            {{ loading ? 'Отправка...' : t.order_send }}
           </button>
 
           <p v-if="error" class="text-red-500 text-sm mt-2">{{ error }}</p>

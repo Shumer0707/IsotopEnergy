@@ -4,7 +4,7 @@
   <!-- Хлебные крошки уже есть выше -->
 
   <section class="max-w-7xl mx-auto px-4 py-12">
-    <h2 class="text-2xl font-bold mb-4">Наши контакты</h2>
+    <h2 class="text-2xl font-bold mb-4">{{ t['contact_title'] }}</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
       <div
         class="bg-white shadow-md border border-gray-200 rounded-xl p-6 space-y-6 text-base text-gray-800 leading-6 min-h-[300px] h-full"
@@ -13,9 +13,9 @@
         <p class="flex items-start gap-3">
           <font-awesome-icon icon="fa-solid fa-location-dot" class="text-gray-600 mt-1 shrink-0" />
           <span>
-            <span class="font-semibold">Адрес:</span>
+            <span class="font-semibold">{{ t['adress_title'] }}</span>
             <br />
-            г. Бельцы, ул. Алпишеня
+            {{ t['adress_text'] }}
           </span>
         </p>
 
@@ -23,13 +23,13 @@
         <p class="flex items-start gap-3">
           <font-awesome-icon icon="fa-solid fa-clock" class="text-gray-600 mt-1 shrink-0" />
           <span>
-            <span class="font-semibold">График работы:</span>
+            <span class="font-semibold">{{ t['contact_schedule'] }}</span>
             <br />
-            Пн–Пт: 9:00–20:00
+            {{ t['contact_schedule_1'] }}: 9:00–20:00
             <br />
-            Сб: 9:00–18:00
+            {{ t['contact_schedule_2'] }}: 9:00–18:00
             <br />
-            Вс: выходной
+            {{ t['contact_schedule_3'] }}
           </span>
         </p>
 
@@ -37,7 +37,7 @@
         <p class="flex items-start gap-3">
           <font-awesome-icon icon="fa-solid fa-phone" class="text-gray-600 mt-1 shrink-0" />
           <span>
-            <span class="font-semibold">Телефон:</span>
+            <span class="font-semibold">{{ t['contact_phone'] }}</span>
             <br />
             +373 699 77 777
           </span>
@@ -47,7 +47,7 @@
         <p class="flex items-start gap-3">
           <font-awesome-icon icon="fa-solid fa-envelope" class="text-gray-600 mt-1 shrink-0" />
           <span>
-            <span class="font-semibold">Почта:</span>
+            <span class="font-semibold">{{ t['contact_mail'] }}</span>
             <br />
             isotopenergy@gmail.com
           </span>
@@ -55,7 +55,7 @@
 
         <!-- Социальные сети -->
         <div class="pt-2 border-t border-gray-200">
-          <p class="font-semibold mb-2">Мы в соцсетях:</p>
+          <p class="font-semibold mb-2">{{ t['contact_soc'] }}</p>
           <div class="flex gap-4 text-xl text-gray-600">
             <a href="https://www.tiktok.com" target="_blank" class="hover:text-black">
               <font-awesome-icon :icon="['fab', 'tiktok']" />
@@ -92,4 +92,7 @@
 <script setup>
   import ContactForm from '@/Components/shared/ContactForm.vue'
   import { Head } from '@inertiajs/vue3'
+  import { useTranslations } from '@/composables/useTranslations'
+
+  const t = useTranslations()
 </script>

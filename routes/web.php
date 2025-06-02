@@ -22,6 +22,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\LayoutController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\TestController;
+use Inertia\Inertia;
 
 // 🔹 Общедоступные маршруты
 Route::get('/', [PageController::class, 'home'])->name('home');
@@ -115,3 +116,8 @@ Route::post('/contact', [ContactController::class, 'store'])->middleware('thrott
 
 // 🔹 Общедоступные маршруты
 Route::get('/test', [TestController::class, 'index'])->name('test');
+
+// 🔸 Обработка 404 — должен быть в самом конце!
+Route::fallback(function () {
+    return Inertia::render('Errors/NotFound')->toResponse(request())->setStatusCode(404);
+});

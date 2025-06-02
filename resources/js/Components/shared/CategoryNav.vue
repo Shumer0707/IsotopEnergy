@@ -7,7 +7,9 @@
   import { useClickOutside } from '@/composables/useClickOutside'
   import { useKeyboardShortcuts } from '@/composables/useKeyboardShortcuts'
   import SubcategoryModal from '@/Components/shared/SubcategoryModal.vue'
+  import { useTranslations } from '@/composables/useTranslations'
 
+  const t = useTranslations()
   const layout = useLayoutStore()
   const categoryStore = useCategoryStore()
   const showCategories = ref(false)
@@ -85,7 +87,7 @@
       class="flex items-center gap-2 whitespace-nowrap bg-my_green hover:bg-my_green_op text-white px-4 sm:px-6 py-2 sm:py-3 rounded-xl text-sm lg:text-base"
     >
       <font-awesome-icon icon="chevron-down" class="text-xs" />
-      <span>Все категории</span>
+      <span>{{ t['btn_category'] }}</span>
     </button>
 
     <!-- Меню категорий через Teleport -->

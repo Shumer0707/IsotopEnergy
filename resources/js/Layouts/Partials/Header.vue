@@ -6,9 +6,9 @@
     >
       <!-- Навигация -->
       <nav class="flex flex-wrap justify-center sm:justify-start gap-4 sm:gap-12">
-        <Link href="/" class="hover:underline">Главная</Link>
-        <Link href="/about" class="hover:underline">О нас</Link>
-        <Link href="/contacts" class="hover:underline">Контакты</Link>
+        <Link href="/" class="hover:underline">{{ t['home'] }}</Link>
+        <Link href="/about" class="hover:underline">{{ t['about'] }}</Link>
+        <Link href="/contacts" class="hover:underline">{{ t['contacts'] }}</Link>
       </nav>
 
       <!-- Телефон -->
@@ -65,10 +65,10 @@
   import MiniCart from '@/Components/common/MiniCart.vue'
   import { ref, onMounted, computed } from 'vue'
   import { useLayoutStore } from '@/Stores/layout'
-  import { useTranslations } from '@/composables/useTranslations'
   import ProductSearch from '@/Components/common/ProductSearch.vue'
   import LanguageSwitcher from '@/Components/shared/LanguageSwitcher.vue'
   import { useFavoritesStore } from '@/Stores/favorites'
+  import { useTranslations } from '@/composables/useTranslations'
 
   const t = useTranslations()
   const layout = useLayoutStore()

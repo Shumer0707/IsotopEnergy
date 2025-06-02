@@ -2,7 +2,9 @@
   import FavoriteButton from '../common/FavoriteButton.vue'
   import { useCartStore } from '@/Stores/cart'
   import { computed } from 'vue'
+  import { useTranslations } from '@/composables/useTranslations'
 
+  const t = useTranslations()
   const cart = useCartStore()
 
   const props = defineProps({
@@ -18,8 +20,11 @@
 <template>
   <div class="bg-white rounded-2xl shadow p-4 relative flex flex-col h-full justify-between">
     <!-- 🔹 Скидка -->
-    <div v-if="product.promotion?.discount_group" class="absolute top-2 left-2 bg-gray-300 text-xs font-semibold px-2 sm:py-1 rounded">
-      СКИДКА -{{ product.promotion.discount_group.discount_percent }}%
+    <div
+      v-if="product.promotion?.discount_group"
+      class="absolute top-2 left-2 bg-gray-300 text-xs font-semibold px-2 sm:py-1 rounded"
+    >
+      {{ t['product_discount'] }} -{{ product.promotion.discount_group.discount_percent }}%
     </div>
 
     <!-- 🔹 Изображение -->
@@ -37,7 +42,7 @@
       <h3 class="text-sm sm:text-base font-semibold leading-tight mb-1">
         {{ product.description?.title ?? 'Без названия' }}
       </h3>
-      <p class="text-xs text-gray-500">Артикул: {{ product.id }}</p>
+      <p class="text-xs text-gray-500">{{ t['product_art'] }} {{ product.id }}</p>
       <p class="text-sm text-gray-600">{{ product.brand.name }}</p>
     </div>
 

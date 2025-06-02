@@ -5,25 +5,27 @@
   import 'swiper/css'
   import 'swiper/css/navigation'
   import 'swiper/css/pagination'
+  import { useTranslations } from '@/composables/useTranslations'
 
+  const t = useTranslations()
   const slides = [
     {
-      title: 'Скидки до 50%',
-      text: 'На всю линейку штукатурок',
+      title: t.value.slider_title_1,
+      text: t.value.slider_text_1,
       button: 'Узнать больше',
       link: '#',
       image: '/storage/varia/promo-1.webp',
     },
     {
-      title: 'Новинка',
-      text: 'Грунтовка глубокого проникновения',
+      title: t.value.slider_title_2,
+      text: t.value.slider_text_2,
       button: 'Смотреть товар',
       link: '#',
       image: '/storage/varia/promo-2.webp',
     },
     {
-      title: 'Распродажа',
-      text: 'Грунтовка глубокого проникновения',
+      title: t.value.slider_title_3,
+      text: t.value.slider_text_3,
       button: 'Смотреть товар',
       link: '#',
       image: '/storage/varia/promo-3.webp',
