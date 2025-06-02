@@ -13,7 +13,7 @@ import './utils/icons'
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel'
 
 // 🔹 Определяем страницы, которые должны использовать Layout.vue
-const publicPages = ['Home', 'About', 'Cart', 'Contacts', 'Product', 'Products/ProductsByCategory', 'Favorites/IndexFavorites'] // Названия компонентов страниц
+const publicPages = ['Home', 'About', 'Cart', 'Contacts', 'Product', 'Products/ProductsByCategory', 'Favorites/IndexFavorites', 'Errors/NotFound'] // Названия компонентов страниц
 
 createInertiaApp({
   title: (title) => `${title} - ${appName}`,

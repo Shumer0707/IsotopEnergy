@@ -152,4 +152,8 @@ return [
 
   'product_characteristics' => 'Caracteristici',
   'product_description' => 'Descriere',
+
+  //404
+  '404_title' => 'Ne pare rău, pagina nu a fost găsită',
+  '404_btn' => 'Înapoi la pagina principală',
 ];
