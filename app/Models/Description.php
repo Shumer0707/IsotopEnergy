@@ -10,6 +10,15 @@ class Description extends Model
 {
   use HasFactory, Searchable;
 
+  // ✅ разрешаем массовое заполнение
+  protected $fillable = [
+    'product_id',
+    'language',
+    'title',
+    'short_description',
+    'full_description',
+  ];
+
   protected static function booted()
   {
     static::saved(fn($model) => $model->searchable());

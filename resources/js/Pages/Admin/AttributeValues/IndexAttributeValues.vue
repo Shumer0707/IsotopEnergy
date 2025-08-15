@@ -115,7 +115,7 @@ const deleteValue = (id) => {
                                     :key="attr.id"
                                     :value="attr.id"
                                 >
-                                    {{ attr.name_ru }}
+                                    {{ attr.translation.name }}
                                 </option>
                             </select>
                             <button
