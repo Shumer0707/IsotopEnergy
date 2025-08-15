@@ -10,18 +10,18 @@ class BrandSeeder extends Seeder
     public function run()
     {
         Brand::create([
-            'name' => 'Makita',
-            'logo' => 'brands/makita.png',
+            'name' => 'IsotopEnergy',
+            'logo' => 'logo/logo.png',
         ]);
 
-        Brand::create([
-            'name' => 'Bosch',
-            'logo' => 'brands/bosch.png',
-        ]);
+        // Brand::create([
+        //     'name' => 'Bosch',
+        //     'logo' => 'brands/bosch.png',
+        // ]);
 
-        Brand::create([
-            'name' => 'Knauf',
-            'logo' => 'brands/knauf.png',
-        ]);
+        // Brand::create([
+        //     'name' => 'Knauf',
+        //     'logo' => 'brands/knauf.png',
+        // ]);
     }
 }

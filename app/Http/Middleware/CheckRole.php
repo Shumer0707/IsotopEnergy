@@ -9,14 +9,6 @@ class CheckRole
 {
     public function handle(Request $request, Closure $next, ...$roles)
     {
-        // dd([
-        //     'gatherMiddleware' => request()->route()->gatherMiddleware(),
-        //     'user' => $request->user(),
-        //     'roles' => $roles,
-        // ]);
-        // dd($request->user());
-        // dd($roles);
-
         if (empty($roles)) {
             abort(403, 'Unauthorized'); // Если роли не переданы, доступ запрещен
         }

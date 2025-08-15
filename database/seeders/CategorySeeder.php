@@ -8,84 +8,96 @@ use App\Models\CategoryTranslation;
 
 class CategorySeeder extends Seeder
 {
-    public function run()
-    {
-        $parentCategories = [
-            'Инструменты', 'Стройматериалы', 'Отделка', 'Крепёж', 'Электрика',
-            'Сантехника', 'Окна и двери', 'Изоляция', 'Лаки и краски', 'Сад и огород'
-        ];
+  public function run()
+  {
+    // Основные категории и подкатегории
+    $categories = [
+      'Термопанели' => [
+        'Термопанели UKR',
+        'Термопанели POL',
+        'Термопанели POL Cerad',
+      ],
+      'Декоративные элементы' => [
+        'Молдинги',
+        'Карнизы',
+        'Капитель',
+        'База',
+        'Капельник',
+        'Пилястра',
+        'Колона',
+        'Декор карниза',
+      ],
+    ];
 
-        foreach ($parentCategories as $ruName) {
-            $category = Category::create(['parent_id' => null]);
+    foreach ($categories as $parentName => $subcategories) {
+      $parent = Category::create(['parent_id' => null]);
+      $this->createTranslations($parent->id, $parentName);
 
-            $this->createTranslations($category->id, $ruName);
-
-            $subCount = rand(3, 5);
-            for ($i = 1; $i <= $subCount; $i++) {
-                $sub = Category::create(['parent_id' => $category->id]);
-
-                $this->createTranslations(
-                    $sub->id,
-                    $ruName . ' - Подкатегория ' . $i,
-                    'Subcategorie ' . $i,
-                    'Subcategory ' . $i
-                );
-            }
-        }
+      foreach ($subcategories as $subName) {
+        $sub = Category::create(['parent_id' => $parent->id]);
+        $this->createTranslations($sub->id, $subName);
+      }
     }
+  }
 
-    private function createTranslations($categoryId, $nameRu, $nameRo = null, $nameEn = null)
-    {
-        CategoryTranslation::insert([
-            [
-                'category_id' => $categoryId,
-                'language' => 'ru',
-                'name' => $nameRu,
-            ],
-            [
-                'category_id' => $categoryId,
-                'language' => 'ro',
-                'name' => $nameRo ?? $this->translateToRo($nameRu),
-            ],
-            [
-                'category_id' => $categoryId,
-                'language' => 'en',
-                'name' => $nameEn ?? $this->translateToEn($nameRu),
-            ],
-        ]);
-    }
+  private function createTranslations($categoryId, $nameRu)
+  {
+    CategoryTranslation::insert([
+      [
+        'category_id' => $categoryId,
+        'language' => 'ru',
+        'name' => $nameRu,
+      ],
+      [
+        'category_id' => $categoryId,
+        'language' => 'ro',
+        'name' => $this->translateToRo($nameRu),
+      ],
+      [
+        'category_id' => $categoryId,
+        'language' => 'en',
+        'name' => $this->translateToEn($nameRu),
+      ],
+    ]);
+  }
 
-    private function translateToRo($ru)
-    {
-        return match ($ru) {
-            'Инструменты' => 'Unelte',
-            'Стройматериалы' => 'Materiale de construcție',
-            'Отделка' => 'Finisaje',
-            'Крепёж' => 'Elemente de fixare',
-            'Электрика' => 'Electricitate',
-            'Сантехника' => 'Instalații sanitare',
-            'Окна и двери' => 'Ferestre și uși',
-            'Изоляция' => 'Izolație',
-            'Лаки и краски' => 'Lacuri și vopsele',
-            'Сад и огород' => 'Grădină și legume',
-            default => $ru,
-        };
-    }
+  private function translateToRo($ru)
+  {
+    return match ($ru) {
+      'Термопанели' => 'Panouri termice',
+      'Термопанели UKR' => 'Panouri termice UKR',
+      'Термопанели POL' => 'Panouri termice POL',
+      'Термопанели POL Cerad' => 'Panouri termice POL Cerad',
+      'Декоративные элементы' => 'Elemente decorative',
+      'Молдинги' => 'Profile decorative',
+      'Карнизы' => 'Cornise',
+      'Капитель' => 'Capitel',
+      'База' => 'Bază',
+      'Капельник' => 'Picurător',
+      'Пилястра' => 'Pilastru',
+      'Колона' => 'Coloană',
+      'Декор карниза' => 'Decor de cornișă',
+      default => $ru,
+    };
+  }
 
-    private function translateToEn($ru)
-    {
-        return match ($ru) {
-            'Инструменты' => 'Tools',
-            'Стройматериалы' => 'Building Materials',
-            'Отделка' => 'Finishing',
-            'Крепёж' => 'Fasteners',
-            'Электрика' => 'Electricity',
-            'Сантехника' => 'Plumbing',
-            'Окна и двери' => 'Windows and Doors',
-            'Изоляция' => 'Insulation',
-            'Лаки и краски' => 'Paints and Varnishes',
-            'Сад и огород' => 'Garden',
-            default => $ru,
-        };
-    }
+  private function translateToEn($ru)
+  {
+    return match ($ru) {
+      'Термопанели' => 'Thermal Panels',
+      'Термопанели UKR' => 'Thermal Panels UKR',
+      'Термопанели POL' => 'Thermal Panels POL',
+      'Термопанели POL Cerad' => 'Thermal Panels POL Cerad',
+      'Декоративные элементы' => 'Decorative Elements',
+      'Молдинги' => 'Moldings',
+      'Карнизы' => 'Cornices',
+      'Капитель' => 'Capital',
+      'База' => 'Base',
+      'Капельник' => 'Drip Cap',
+      'Пилястра' => 'Pilaster',
+      'Колона' => 'Column',
+      'Декор карниза' => 'Cornice Decor',
+      default => $ru,
+    };
+  }
 }

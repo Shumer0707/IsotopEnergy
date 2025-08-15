@@ -14,12 +14,12 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             BrandSeeder::class,
             ProductAttributeSeeder::class,
-            ProductSeeder::class,
-            AttributeValueSeeder::class,
-            ProductAttributeValueSeeder::class,
-            DescriptionSeeder::class,
-            DiscountGroupSeeder::class,
-            PromotionSeeder::class,
+            // ProductSeeder::class,
+            // AttributeValueSeeder::class,
+            // ProductAttributeValueSeeder::class,
+            // DescriptionSeeder::class,
+            // DiscountGroupSeeder::class,
+            // PromotionSeeder::class,
         ]);
     }
 }
