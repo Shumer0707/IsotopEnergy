@@ -1,20 +1,21 @@
 <script setup>
-  import { onMounted, ref, reactive } from 'vue'
+  import { onMounted, reactive } from 'vue'
   import { useCategoryStore } from '@/Stores/category'
   import SubcategoryModal from '@/Components/shared/SubcategoryModal.vue'
+  import { Link } from '@inertiajs/vue3'
 
   const categoryStore = useCategoryStore()
   const triggerRefs = reactive({})
 
-  // onMounted(() => {
-  //   if (!categoryStore.isLoaded) {
-  //     categoryStore.loadCategories()
-  //   }
-  // })
+  onMounted(() => {
+    if (!categoryStore.isLoaded) {
+      categoryStore.loadCategories()
+    }
+  })
 
-  function openModal(category) {
+  function openModalById(id) {
     requestAnimationFrame(() => {
-      categoryStore.openCategory(category.id)
+      categoryStore.openCategory(id)
     })
   }
 </script>
@@ -22,25 +23,27 @@
 <template>
   <div>
     <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 xl:grid-cols-10 gap-8 sm:gap-4 text-sm sm:text-base">
-      <div
-        v-for="category in categoryStore.navCategories"
-        :key="category.id"
+      <Link
+        v-for="sub in categoryStore.allSubcategories"
+        :key="sub.id"
+        :href="`/category/${sub.id}`"
         class="flex flex-col items-center cursor-pointer"
-        @click="openModal(category)"
-        :ref="(el) => (triggerRefs[category.id] = el)"
+        :ref="(el) => (triggerRefs[sub.id] = el)"
       >
         <img
-          :src="category.logo ? `/storage/${category.logo}` : `/images/placeholder.webp`"
+          :src="sub.logo ? `/storage/${sub.logo}` : `/images/placeholder.webp`"
           alt="logo"
           class="w-20 h-20 object-contain rounded-md bg-white"
         />
         <span class="text-md mt-2 text-center">
-          {{ category.translation?.name ?? 'Без названия' }}
+          {{ sub.translation?.name ?? 'Без названия' }}
         </span>
-      </div>
+        <span class="text-xs text-gray-500 mt-1">
+          {{ sub.parent_name }}
+        </span>
+      </Link>
     </div>
 
-    <!-- Подключаем модалку -->
     <SubcategoryModal
       v-if="categoryStore.activeCategory"
       :category="categoryStore.activeCategory"

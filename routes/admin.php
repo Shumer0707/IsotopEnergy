@@ -2,15 +2,15 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\{
-    DashboardController,
-    AdminProductController,
-    AdminCategoryController,
-    AdminAttributeController,
-    AdminAttributeValueController,
-    AdminBrandController,
-    AdminImageController,
-    AdminPromotionController,
-    AdminDiscountGroupController
+  DashboardController,
+  AdminProductController,
+  AdminCategoryController,
+  AdminAttributeController,
+  AdminAttributeValueController,
+  AdminBrandController,
+  AdminImageController,
+  AdminPromotionController,
+  AdminDiscountGroupController
 };
 
 //
@@ -57,7 +57,7 @@ Route::get('/attribute-values', [AdminAttributeValueController::class, 'index'])
 Route::post('/attribute-values/store', [AdminAttributeValueController::class, 'store'])->name('attribute-values.store');
 Route::post('/attribute-values/update/{attributeValue}', [AdminAttributeValueController::class, 'update'])->name('attribute-values.update');
 Route::delete('/attribute-values/{attributeValue}', [AdminAttributeValueController::class, 'destroy'])->name('attribute-values.destroy');
-
+Route::post('/attribute-values/quick-store', [AdminAttributeValueController::class, 'quickStore'])->name('admin.attribute-values.quick-store');
 //
 // 🔹 Бренды
 //

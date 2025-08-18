@@ -133,7 +133,8 @@
             </p>
           </div>
 
-          <div class="w-full md:w-1/3">
+          <!-- Значение + быстрый ввод -->
+          <div class="w-full md:w-1/3 flex items-start gap-2">
             <select
               v-model="attr.value_id"
               data-error
@@ -147,9 +148,16 @@
                 {{ v.translated_value }}
               </option>
             </select>
-            <p v-if="form.errors[`attributes.${index}.value_id`]" class="mt-1 text-sm text-red-600">
-              {{ form.errors[`attributes.${index}.value_id`] }}
-            </p>
+
+            <button
+              type="button"
+              class="px-2 py-1 text-xs rounded bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50"
+              :disabled="!attr.attribute_id"
+              @click="openQuickAdd(index)"
+              title="Добавить новое значение"
+            >
+              ➕
+            </button>
           </div>
 
           <button
@@ -185,11 +193,16 @@
       </div>
     </form>
   </div>
+
+  <!-- Модалка быстрого добавления -->
+  <QuickAddValueModal :isOpen="isQuickAddOpen" @close="isQuickAddOpen = false" @save="handleQuickAddSave" />
 </template>
 
 <script setup>
+  import axios from 'axios'
+  import QuickAddValueModal from '@/Pages/Admin/AttributeValues/QuickAddValueModal.vue'
+  import { ref, computed } from 'vue'
   import { useForm } from '@inertiajs/vue3'
-  import { computed } from 'vue'
 
   const emit = defineEmits(['productAdded', 'cancel'])
 
@@ -237,15 +250,49 @@
     })
   }
 
-  const addAttribute = () => {
-    form.attributes.push({ attribute_id: '', value_id: '' })
+  const addAttribute = () => form.attributes.push({ attribute_id: '', value_id: '' })
+  const removeAttribute = (index) => form.attributes.splice(index, 1)
+
+  /** Локальный список всех значений (инициализация из пропсов) */
+  const allValues = ref([...(props.values ?? [])])
+
+  /** Фильтрация значений по выбранному атрибуту */
+  const filteredValues = (attrId) => allValues.value.filter((v) => v.attribute_id === attrId)
+
+  /** Управление модалкой быстрого добавления */
+  const isQuickAddOpen = ref(false)
+  const quickAddIndex = ref(null)
+
+  const openQuickAdd = (index) => {
+    quickAddIndex.value = index
+    isQuickAddOpen.value = true
   }
 
-  const removeAttribute = (index) => {
-    form.attributes.splice(index, 1)
-  }
+  /** Сохранение нового значения через axios */
+  const handleQuickAddSave = async ({ ru, ro, en }) => {
+    const row = quickAddIndex.value
+    const attrId = form.attributes[row]?.attribute_id
+    if (!attrId) {
+      alert('Сначала выберите атрибут.')
+      return
+    }
 
-  const filteredValues = (attrId) => {
-    return props.values.filter((v) => v.attribute_id === attrId)
+    try {
+      const { data } = await axios.post('/admin/attribute-values/quick-store', {
+        attribute_id: attrId,
+        translations: { ru, ro, en },
+      })
+
+      // добавить новое значение в локальный список и выбрать его
+      allValues.value.push(data)
+      form.attributes[row].value_id = data.id
+      isQuickAddOpen.value = false
+    } catch (e) {
+      const msg =
+        e?.response?.data?.message ||
+        (e?.response?.data?.errors && Object.values(e.response.data.errors).flat().join('\n')) ||
+        'Не удалось создать значение.'
+      alert(msg)
+    }
   }
 </script>

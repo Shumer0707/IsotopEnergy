@@ -12,12 +12,25 @@
   const t = useTranslations()
   const layout = useLayoutStore()
   const categoryStore = useCategoryStore()
+
   const showCategories = ref(false)
   const navRef = ref(null)
   const categoryButtonRef = ref(null)
   const activeCategory = ref(null)
   const triggerRefs = reactive({})
 
+  // Ховер-логика для подменю
+  const hoveredId = ref(null)
+  let hideTimer = null
+  function onEnter(id) {
+    if (hideTimer) clearTimeout(hideTimer)
+    hoveredId.value = id
+  }
+  function onLeave() {
+    hideTimer = setTimeout(() => (hoveredId.value = null), 120)
+  }
+
+  // Esc и клик вне области
   useKeyboardShortcuts({
     Escape: () => {
       if (showCategories.value) showCategories.value = false
@@ -34,32 +47,32 @@
     categoryButtonRef
   )
 
+  // Смещение меню относительно кнопки
   const updateCategoryOffset = () => {
     if (categoryButtonRef.value) {
       const rect = categoryButtonRef.value.getBoundingClientRect()
       layout.setCategoryButtonLeftOffset(rect.left)
     }
   }
-
   onMounted(() => {
     updateCategoryOffset()
     window.addEventListener('resize', updateCategoryOffset)
   })
-
   onBeforeUnmount(() => {
     window.removeEventListener('resize', updateCategoryOffset)
   })
 
   const locale = computed(() => usePage().props.locale)
 
+  // Показ/скрытие списка категорий
   const toggleCategories = () => {
     showCategories.value = !showCategories.value
-
     if (!categoryStore.isLoaded && showCategories.value) {
       categoryStore.loadCategories()
     }
   }
 
+  // Подготовка данных категорий
   const categories = computed(() => {
     return categoryStore.navCategories.map((category) => ({
       id: category.id,
@@ -71,10 +84,21 @@
     }))
   })
 
+  // Открытие модалки подкатегорий
   function openSubcategories(category) {
     requestAnimationFrame(() => {
       categoryStore.openCategory(category.id)
     })
+  }
+
+  const isClosing = ref(false)
+
+  function closeAfterClick() {
+    isClosing.value = true // блокируем мышь
+    hoveredId.value = null
+    showCategories.value = false
+    activeCategory.value = null
+    setTimeout(() => (isClosing.value = false), 400) // после анимации
   }
 </script>
 
@@ -90,7 +114,7 @@
       <span>{{ t['btn_category'] }}</span>
     </button>
 
-    <!-- Меню категорий через Teleport -->
+    <!-- Меню категорий (Teleport) -->
     <Teleport to="body">
       <OverlayLayer v-model:show="showCategories" />
 
@@ -100,7 +124,13 @@
         :class="showCategories ? 'translate-y-0' : '-translate-y-[120%]'"
       >
         <div class="px-4 py-2 bg-my_white rounded-b-md shadow-xl border-t-0 border border-more text-black">
-          <div v-for="category in categories" :key="category.id" class="relative group">
+          <div
+            v-for="category in categories"
+            :key="category.id"
+            class="relative"
+            @mouseenter="onEnter(category.id)"
+            @mouseleave="onLeave"
+          >
             <button
               class="block w-full px-4 py-2 text-left hover:bg-gray-200 rounded-md"
               @click.prevent="openSubcategories(category)"
@@ -108,23 +138,43 @@
             >
               {{ category.name }}
             </button>
-            <div
-              class="absolute px-4 py-2 rounded-xl left-full top-0 bg-white shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 overflow-hidden max-h-0 group-hover:max-h-[400px] w-0 group-hover:min-w-max border border-more"
+
+            <!-- Подменю -->
+            <Transition
+              enter-active-class="transition duration-150 ease-out"
+              enter-from-class="opacity-0 scale-95"
+              enter-to-class="opacity-100 scale-100"
+              leave-active-class="transition duration-100 ease-in"
+              leave-from-class="opacity-100 scale-100"
+              leave-to-class="opacity-0 scale-95"
             >
-              <Link
-                v-for="sub in category.children"
-                :key="sub.id"
-                :href="`/category/${sub.id}`"
-                class="block w-full px-4 py-2 text-left hover:bg-gray-200 rounded-md whitespace-nowrap"
+              <div
+                v-show="hoveredId === category.id"
+                class="absolute left-full top-0 ml-2 z-50 px-4 py-2 rounded-xl bg-white shadow-md border border-more min-w-56 max-h-[70vh] overflow-auto pointer-events-auto"
+                :class="{ 'pointer-events-none': isClosing }"
+                @mouseenter="onEnter(category.id)"
+                @mouseleave="onLeave"
               >
-                {{ sub.name }}
-              </Link>
-            </div>
+                <!-- Мостик, чтобы не было разрыва между пунктом и подменю -->
+                <span class="absolute -left-2 top-0 h-full w-2"></span>
+
+                <Link
+                  v-for="sub in category.children"
+                  :key="sub.id"
+                  :href="`/category/${sub.id}`"
+                  class="block w-full px-4 py-2 text-left hover:bg-gray-200 rounded-md whitespace-nowrap"
+                  @click="closeAfterClick"
+                >
+                  {{ sub.name }}
+                </Link>
+              </div>
+            </Transition>
           </div>
         </div>
       </div>
     </Teleport>
 
+    <!-- Модалка подкатегорий (по клику) -->
     <SubcategoryModal
       v-if="categoryStore.activeCategory"
       :category="categoryStore.activeCategory"
