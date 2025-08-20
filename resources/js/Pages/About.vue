@@ -38,12 +38,12 @@
   </section>
 
   <!-- 🔹 Партнёры -->
-  <section class="bg-gray-100 py-12">
+  <!-- <section class="bg-gray-100 py-12">
     <div class="max-w-7xl mx-auto px-4 text-center">
       <h3 class="text-xl font-semibold mb-6">{{ t['partners_title'] }}</h3>
       <PartnersCarousel />
     </div>
-  </section>
+  </section> -->
 </template>
 
 <script setup>

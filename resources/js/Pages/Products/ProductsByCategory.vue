@@ -15,6 +15,7 @@
     sort: String,
     filters: Object,
     max_price: Number,
+    available_filters: Array,
   })
 
   const cart = useCartStore()
@@ -24,6 +25,8 @@
     categoryId: props.category.id,
     sort: props.sort,
     filters: props.filters,
+    max_price: props.max_price,
+    available_filters: props.available_filters,
   })
 
   const openProduct = (id) => router.visit(`/product/${id}`)
@@ -32,7 +35,7 @@
 <template>
   <div class="max-w-7xl mx-auto px-4">
     <div class="flex flex-col lg:flex-row gap-6">
-      <FilterPanel :brands="brands" :maxPrice="max_price" />
+      <FilterPanel :brands="brands" />
 
       <div class="flex-1">
         <h1 class="text-2xl font-bold mb-4">

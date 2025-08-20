@@ -1,16 +1,27 @@
 <template>
   <Head>
-    <title>IsotopEnergy — Стройматериалы в Оргееве</title>
-    <meta
-      name="description"
-      content="Интернет-магазин стройматериалов: цемент, клей, блоки, утеплитель. Скидки, акции, доставка по Оргееву и всей Молдове."
-    />
+    <title>{{ t['title'] }}</title>
+    <meta name="description" :content="t['content']" />
   </Head>
 
   <!-- 🔹 Hero Section -->
   <section>
     <div class="mx-auto">
       <PromoSlider />
+    </div>
+  </section>
+
+  <section class="mt-4 py-12 px-4 max-w-4xl mx-auto text-center bg-my_white rounded-xl shadow-md">
+    <h1 class="text-2xl lg:text-3xl font-bold text-my_black mb-4 border-b-4 border-my_green inline-block pb-2">
+      {{ t['h1-title'] }}
+    </h1>
+    <p class="lg:text-lg text-md text-more">
+      {{ t['h1-description'] }}
+    </p>
+    <div class="mt-6">
+      <a href="/about" class="bg-my_green hover:bg-my_green_op text-my_white px-6 py-3 rounded-lg font-semibold transition">
+        Подробнее о нас
+      </a>
     </div>
   </section>
 

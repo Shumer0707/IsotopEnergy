@@ -1,6 +1,9 @@
 <?php
 
 return [
+  // seo
+  'title' => 'IsotopEnergy — Termopanele și decor arhitectural, Moldova',
+  'content' => 'Producem termopanele pentru izolația caselor și decor arhitectural (cornișe, muluri, coloane). Calitate înaltă, preț competitiv. Livrare în toată Moldova, gratuit de la 60 m².',
   // Layout
   'home' => 'Acasa',
   'about' => 'Despre noi',
@@ -24,6 +27,10 @@ return [
 
 
   //home
+  'h1-title' => 'Termopanele și decor arhitectural în Moldova',
+  'h1-description' => 'IsotopEnergy — producător modern de termopanele și decor arhitectural.
+    Oferim soluții eficiente energetic pentru izolarea caselor și elemente elegante
+    pentru fațade și interioare. Livrare în toată Moldova, gratuit de la 60 m² de termopanele.',
   'slider_title_1' => 'Reduceri de până la 50%',
   'slider_text_1' => 'La toată gama de tencuieli',
   'slider_title_2' => 'Noutate',

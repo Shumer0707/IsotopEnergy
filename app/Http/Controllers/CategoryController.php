@@ -10,6 +10,8 @@ use App\Services\Product\ProductFilterService;
 
 class CategoryController extends Controller
 {
+  // App/Http/Controllers/CategoryController.php
+
   public function show(Request $request, $id, ProductFilterService $filterService)
   {
     $category = Category::with([
@@ -21,25 +23,61 @@ class CategoryController extends Controller
 
     $brands = Brand::select('id', 'name')->get();
 
-    $filters = json_decode($request->input('filters'), true) ?? [];
+    // max_price первым
+    $max_price = (int) ceil((($category->products()->max('price') ?? 10000) / 1000)) * 1000;
+
+    // фильтры из JSON
+    $raw = $request->input('filters', '');
+    $decoded = is_string($raw) && $raw !== '' ? json_decode($raw, true) : [];
+    $filters = is_array($decoded) ? $decoded : [];
+
     $sort = $request->input('sort');
 
-    $productsQuery = $filterService->filter($category, $filters, $sort);
+    // нормализация цены
+    $from = isset($filters['price_from']) ? (int)$filters['price_from'] : 0;
+    $to   = isset($filters['price_to'])   ? (int)$filters['price_to']   : $max_price;
+    $from = max(0, min($from, $max_price));
+    $to   = max(0, min($to,   $max_price));
+    if ($from > $to) [$from, $to] = [$to, $from];
 
-    $max_price = ceil(($category->products()->max('price') ?? 10000) / 1000) * 1000;
+    // бренды → числа
+    $brandsFilter = [];
+    if (!empty($filters['brands'])) {
+      $brandsFilter = array_values(array_filter(array_map('intval', (array)$filters['brands']), fn($v) => $v > 0));
+    }
+
+    // attrs → {attrId: number[]}
+    $attrs = [];
+    if (!empty($filters['attrs']) && is_array($filters['attrs'])) {
+      foreach ($filters['attrs'] as $attrId => $valueIds) {
+        $aId = (int)$attrId;
+        if ($aId <= 0) continue;
+        $vals = array_values(array_filter(array_map('intval', (array)$valueIds), fn($v) => $v > 0));
+        if ($vals) $attrs[$aId] = array_values(array_unique($vals));
+      }
+    }
+
+    $normFilters = [
+      'brands'     => $brandsFilter,
+      'attrs'      => $attrs,
+      'price_from' => $from,
+      'price_to'   => $to,
+    ];
+
+    $productsQuery = $filterService->filter($category, $normFilters, $sort);
+
+    // доступные фильтры для рендера UI
+    $available = $filterService->availableFilters($category);
 
     return Inertia::render('Products/ProductsByCategory', [
-      'category' => $category,
-      'parentCategory' => $category->parent,
-      'products' => $productsQuery->paginate(4)->withQueryString(),
-      'brands' => $brands,
-      'max_price' => $max_price,
-      'filters' => [
-        'brands' => $filters['brands'] ?? [],
-        'price_from' => $filters['price_from'] ?? 0,
-        'price_to' => $filters['price_to'] ?? $max_price,
-      ],
-      'sort' => $sort,
+      'category'          => $category,
+      'parentCategory'    => $category->parent,
+      'products'          => $productsQuery->paginate(4)->withQueryString(),
+      'brands'            => $brands,
+      'max_price'         => $max_price,
+      'filters'           => $normFilters,
+      'sort'              => $sort,
+      'available_filters' => $available, // ← добавили
     ]);
   }
 }
