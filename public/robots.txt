@@ -1,9 +1,18 @@
 User-agent: *
+# Служебные разделы
 Disallow: /admin/
 Disallow: /cart
 Disallow: /favorites
 Disallow: /checkout
 Disallow: /login
 Disallow: /register
+Disallow: /search
 
+# Режем дубли от параметров (оставляем пагинацию page= открытой)
+Disallow: /*?*sort=
+Disallow: /*?*filter=
+Disallow: /*?*brand=
+# Если есть свои параметры фильтров — добавь их по аналогии
+
+# Карта сайта
 Sitemap: https://isotopenergy.md/sitemap.xml

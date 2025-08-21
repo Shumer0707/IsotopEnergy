@@ -7,6 +7,7 @@
   import { useProductFilterStore } from '@/Stores/productFilter'
   import ProductCard from '@/Components/shared/ProductCard.vue'
   import ProductSortAndCount from '@/Components/shared/ProductSortAndCount.vue'
+  import CategoryHeadSeo from '@/Components/seo/pages/CategoryHeadSeo.vue'
 
   const props = defineProps({
     category: Object,
@@ -33,6 +34,7 @@
 </script>
 
 <template>
+  <CategoryHeadSeo :category="category" :products="products" />
   <div class="max-w-7xl mx-auto px-4">
     <div class="flex flex-col lg:flex-row gap-6">
       <FilterPanel :brands="brands" />

@@ -9,6 +9,7 @@
   import 'swiper/css'
   import 'swiper/css/navigation'
   import { useTranslations } from '@/composables/useTranslations'
+  import ProductHeadSeo from '@/Components/seo/pages/ProductHeadSeo.vue'
 
   const t = useTranslations()
   const props = defineProps({
@@ -56,6 +57,7 @@
 </script>
 
 <template>
+  <ProductHeadSeo :product="product" />
   <div class="max-w-7xl mx-auto px-4">
     <div class="flex flex-col md:flex-row gap-8 bg-white rounded-xl shadow p-6">
       <!-- 🔹 Галерея -->
@@ -84,6 +86,7 @@
               <div :class="['w-20 h-20 rounded overflow-hidden cursor-pointer shadow-sm transition p-1']">
                 <img
                   :src="`/storage/${img.path}`"
+                  :alt="`${product.description?.title} — foto ${index + 1}`"
                   :class="[
                     'w-full h-full object-contain',
                     activeImage.includes(img.path) ? 'ring-2 ring-pink-500 shadow-md ring-offset-2 ring-offset-white' : 'border',
@@ -113,7 +116,11 @@
             {{ t['product_discount'] }} -{{ product.promotion.discount_group.discount_percent }}%
           </div>
 
-          <img :src="activeImage" alt="product image" class="max-w-full max-h-[400px] object-contain" />
+          <img
+            :src="activeImage"
+            :alt="product.description?.title || 'product image'"
+            class="max-w-full max-h-[400px] object-contain"
+          />
         </div>
       </div>
 

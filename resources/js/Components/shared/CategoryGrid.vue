@@ -38,7 +38,7 @@
         <span class="text-md mt-2 text-center">
           {{ sub.translation?.name ?? 'Без названия' }}
         </span>
-        <span class="text-xs text-gray-500 mt-1">
+        <span class="text-xs text-gray-500 mt-1 text-center">
           {{ sub.parent_name }}
         </span>
       </Link>

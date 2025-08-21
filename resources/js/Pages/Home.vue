@@ -1,8 +1,5 @@
 <template>
-  <Head>
-    <title>{{ t['title'] }}</title>
-    <meta name="description" :content="t['content']" />
-  </Head>
+  <HomeHeadSeo />
 
   <!-- 🔹 Hero Section -->
   <section>
@@ -12,7 +9,7 @@
   </section>
 
   <section class="mt-4 py-12 px-4 max-w-4xl mx-auto text-center bg-my_white rounded-xl shadow-md">
-    <h1 class="text-2xl lg:text-3xl font-bold text-my_black mb-4 border-b-4 border-my_green inline-block pb-2">
+    <h1 class="font-heading text-2xl lg:text-3xl font-bold text-my_black mb-4 border-b-4 border-my_green inline-block pb-2">
       {{ t['h1-title'] }}
     </h1>
     <p class="lg:text-lg text-md text-more">
@@ -63,6 +60,7 @@
   import PromoProducts from '@/Components/shared/PromoProducts.vue'
   import AdvantagesBlock from '@/Components/common/AdvantagesBlock.vue'
   import { useTranslations } from '@/composables/useTranslations'
+  import HomeHeadSeo from '@/Components/seo/pages/HomeHeadSeo.vue'
 
   const t = useTranslations()
 </script>

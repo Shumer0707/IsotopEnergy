@@ -15,7 +15,7 @@
       <div class="flex justify-center sm:justify-end items-center gap-2">
         <span class="sm:text-lg"><font-awesome-icon icon="phone" class="lg:text-lg text-md" /></span>
         <!-- 📞 -->
-        <span class="lg:text-lg">+373 699 77 771</span>
+        <span class="lg:text-lg">+373 608 38 688</span>
       </div>
     </div>
 

@@ -1,23 +1,49 @@
 <template>
-  <Head title="Контакты" />
-
-  <!-- Хлебные крошки уже есть выше -->
+  <ContactsHeadSeo />
 
   <section class="max-w-7xl mx-auto px-4 py-12">
-    <h2 class="text-2xl font-bold mb-4">{{ t['contact_title'] }}</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+    <h1 class="text-2xl lg:text-3xl font-bold mb-6">
+      {{ t['contact_title'] }}
+    </h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 items-stretch">
+      <!-- Инфо-блок -->
       <div
-        class="bg-white shadow-md border border-gray-200 rounded-xl p-6 space-y-6 text-base text-gray-800 leading-6 min-h-[300px] h-full"
+        class="bg-white shadow-md border border-gray-200 rounded-xl p-6 space-y-6 text-base text-gray-800 leading-6 h-full flex flex-col min-h-[360px]"
       >
-        <!-- Адрес -->
-        <p class="flex items-start gap-3">
-          <font-awesome-icon icon="fa-solid fa-location-dot" class="text-gray-600 mt-1 shrink-0" />
-          <span>
-            <span class="font-semibold">{{ t['adress_title'] }}</span>
-            <br />
-            {{ t['adress_text'] }}
-          </span>
-        </p>
+        <!-- Шоу-рум -->
+        <div>
+          <p class="font-semibold mb-1">{{ t['contact_showroom'] }}</p>
+          <p class="flex items-start gap-3">
+            <font-awesome-icon icon="fa-solid fa-location-dot" class="text-gray-600 mt-1 shrink-0" />
+            <span>{{ showroomAddr }}</span>
+          </p>
+          <a
+            :href="mapsAddrLink(showroomAddr)"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-main hover:underline text-sm"
+          >
+            {{ t['open_in_maps'] }}
+          </a>
+        </div>
+
+        <!-- Производство -->
+        <div class="pt-4 border-t border-gray-200">
+          <p class="font-semibold mb-1">{{ t['contact_production'] }}</p>
+          <p class="flex items-start gap-3">
+            <font-awesome-icon icon="fa-solid fa-location-dot" class="text-gray-600 mt-1 shrink-0" />
+            <span>str. Vasile Lupu 191, Orhei, Moldova</span>
+          </p>
+          <a
+            :href="coordsLink(productionCoords)"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-main hover:underline text-sm"
+          >
+            {{ t['open_in_maps'] }}
+          </a>
+        </div>
 
         <!-- График -->
         <p class="flex items-start gap-3">
@@ -39,7 +65,7 @@
           <span>
             <span class="font-semibold">{{ t['contact_phone'] }}</span>
             <br />
-            +373 699 77 777
+            <a href="tel:+37360838688" class="hover:underline">+373 608 38 688</a>
           </span>
         </p>
 
@@ -49,35 +75,56 @@
           <span>
             <span class="font-semibold">{{ t['contact_mail'] }}</span>
             <br />
-            isotopenergy@gmail.com
+            <a href="mailto:isotopenergy@gmail.com" class="hover:underline">isotopenergy@gmail.com</a>
           </span>
         </p>
 
-        <!-- Социальные сети -->
+        <!-- Соцсети -->
         <div class="pt-2 border-t border-gray-200">
           <p class="font-semibold mb-2">{{ t['contact_soc'] }}</p>
           <div class="flex gap-4 text-xl text-gray-600">
-            <a href="https://www.tiktok.com" target="_blank" class="hover:text-black">
+            <a href="https://www.tiktok.com" target="_blank" rel="noopener noreferrer" class="hover:text-black">
               <font-awesome-icon :icon="['fab', 'tiktok']" />
             </a>
-            <a href="https://www.instagram.com" target="_blank" class="hover:text-black">
+            <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" class="hover:text-black">
               <font-awesome-icon :icon="['fab', 'instagram']" />
             </a>
-            <a href="https://www.facebook.com" target="_blank" class="hover:text-black">
+            <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" class="hover:text-black">
               <font-awesome-icon :icon="['fab', 'facebook']" />
             </a>
           </div>
         </div>
       </div>
 
-      <div class="h-full">
-        <div class="rounded-xl overflow-hidden shadow-md w-full h-full">
+      <!-- Карта с переключателем -->
+      <div class="h-full flex flex-col">
+        <div class="flex gap-2 mb-3">
+          <button
+            @click="active = 'showroom'"
+            :class="[
+              'px-3 py-2 rounded-lg text-sm font-medium transition',
+              active === 'showroom' ? 'bg-my_green text-white' : 'bg-gray-200 text-gray-700',
+            ]"
+          >
+            {{ t['contact_showroom'] }}
+          </button>
+          <button
+            @click="active = 'production'"
+            :class="[
+              'px-3 py-2 rounded-lg text-sm font-medium transition',
+              active === 'production' ? 'bg-my_green text-white' : 'bg-gray-200 text-gray-700',
+            ]"
+          >
+            {{ t['contact_production'] }}
+          </button>
+        </div>
+
+        <div class="rounded-xl overflow-hidden shadow-md w-full flex-1 min-h-[360px]">
           <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2682.136172755125!2d27.9274437922014!3d47.75941300317316!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40cb672c9938c16b%3A0x80e2057e0c88a1!2zQWxpxZ9hciBOb3ZhaSAzLCBNRC0zMTAwLCBCxINsyJtpLCDQnNC-0LvQtNC-0LLQsA!5e0!3m2!1sru!2s!4v1747054732023!5m2!1sru!2s"
-            width="100%"
-            height="100%"
+            :src="mapSrc"
+            class="w-full h-full block"
             style="border: 0"
-            allowfullscreen=""
+            :title="active === 'showroom' ? t['map_title_showroom'] : t['map_title_production']"
             loading="lazy"
             referrerpolicy="no-referrer-when-downgrade"
           ></iframe>
@@ -90,9 +137,35 @@
 </template>
 
 <script setup>
-  import ContactForm from '@/Components/shared/ContactForm.vue'
   import { Head } from '@inertiajs/vue3'
+  import { ref, computed } from 'vue'
+  import ContactForm from '@/Components/shared/ContactForm.vue'
   import { useTranslations } from '@/composables/useTranslations'
+  import ContactsHeadSeo from '@/Components/seo/pages/ContactsHeadSeo.vue'
 
   const t = useTranslations()
+
+  // адрес шоу-рума строкой
+  const showroomAddr = 'str. Unirii 51/e, Orhei, Moldova'
+
+  // координаты производства (точка на str. Vasile Lupu 191)
+  const productionCoords = { lat: 47.402578, lng: 28.817316 }
+
+  // переключатель активной карты
+  const active = ref('showroom')
+
+  // helpers
+  const mapsAddrLink = (addr) => `https://www.google.com/maps?q=${encodeURIComponent(addr)}`
+
+  const mapsAddrEmbed = (addr) => `https://www.google.com/maps?q=${encodeURIComponent(addr)}&output=embed`
+
+  const coordsEmbed = (coords, label = 'IsotopEnergy — producție', zoom = 18) =>
+    `https://www.google.com/maps?q=${encodeURIComponent(`${coords.lat},${coords.lng} (${label})`)}&z=${zoom}&output=embed`
+
+  const coordsLink = (coords) => `https://www.google.com/maps?q=${coords.lat},${coords.lng}`
+
+  // текущий src для iframe (адрес для шоу-рума, координаты для производства)
+  const mapSrc = computed(() =>
+    active.value === 'showroom' ? mapsAddrEmbed(showroomAddr) : coordsEmbed(productionCoords, t.value['contact_production'])
+  )
 </script>

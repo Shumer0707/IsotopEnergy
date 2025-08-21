@@ -1,10 +1,11 @@
 <template>
   <div class="min-h-screen flex flex-col">
+    <GlobalSchema />
     <Header />
 
     <main class="bg-my_white flex-1 w-full py-4 max-w-screen-3xl mx-auto">
       <PageLoaderWrapper :loading="!isReady">
-        <Breadcrumbs v-if="usePage().url !== '/'" :segments="usePage().url.split('/').filter(Boolean)" />
+        <Breadcrumbs v-if="usePage().url !== '/'" />
         <slot />
       </PageLoaderWrapper>
     </main>
@@ -27,6 +28,7 @@
   import { useCategoryStore } from '@/Stores/category'
   import { useInitialLoad } from '@/composables/useInitialLoad'
   import PageLoaderWrapper from '@/Components/common/PageLoaderWrapper.vue'
+  import GlobalSchema from '@/Components/seo/GlobalSchema.vue'
 
   const categoryStore = useCategoryStore()
   const cart = useCartStore()

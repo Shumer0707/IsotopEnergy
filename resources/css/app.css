@@ -1,6 +1,12 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  body { @apply font-sans text-my_black; } /* Poppins по умолчанию */
+  h1, h2, h3 { @apply font-heading; }     /* Raleway для заголовков */
+}
 .test-bg {
     @apply bg-red-500;
   }

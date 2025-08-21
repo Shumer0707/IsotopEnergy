@@ -2,8 +2,8 @@
 
 return [
   // seo
-  'title' => 'IsotopEnergy — Termopanele și decor arhitectural, Moldova',
-  'content' => 'Producem termopanele pentru izolația caselor și decor arhitectural (cornișe, muluri, coloane). Calitate înaltă, preț competitiv. Livrare în toată Moldova, gratuit de la 60 m².',
+  'home_meta_title' => 'IsotopEnergy — Termopanele și decor arhitectural, Moldova',
+  'home_meta_description' => 'Producem termopanele pentru izolația caselor și decor arhitectural (cornișe, muluri, coloane). Calitate înaltă, preț competitiv. Livrare în toată Moldova, gratuit de la 60 m².',
   // Layout
   'home' => 'Acasa',
   'about' => 'Despre noi',
@@ -31,41 +31,69 @@ return [
   'h1-description' => 'IsotopEnergy — producător modern de termopanele și decor arhitectural.
     Oferim soluții eficiente energetic pentru izolarea caselor și elemente elegante
     pentru fațade și interioare. Livrare în toată Moldova, gratuit de la 60 m² de termopanele.',
-  'slider_title_1' => 'Reduceri de până la 50%',
-  'slider_text_1' => 'La toată gama de tencuieli',
-  'slider_title_2' => 'Noutate',
-  'slider_text_2' => 'Deep penetrating primer',
-  'slider_title_3' => 'Reduceri',
-  'slider_text_3' => 'Grund de penetrare profundă',
+  'slider_title_1' => 'Casa caldă pornește de aici',
 
-  'catalog' => 'Catalog',
+  'slider_section_h2' => 'Oferte principale',
+  'slider_text_1'  => 'Termopanele și decor arhitectural. Producție în Moldova, livrare în toată țara.',
+
+  'slider_title_2' => 'Termopanele pentru proiectul tău',
+  'slider_text_2'  => 'Grosimi și densități EPS la alegere, gamă largă de clinker. Calcul pentru obiect.',
+
+  'slider_title_3' => 'Decor pentru fațadă și interior',
+  'slider_text_3'  => 'Gamă mare de muluri, cornișe, coloane. Acoperire acrilică — durabilitate și culoare stabilă.',
+
+  'slider_btn_1' => 'Calculează prețul',
+  'slider_btn_2' => 'Catalog termopanele',
+  'slider_btn_3' => 'Catalog decor',
+
+  'catalog' => 'Categorii: termopanele și decor',
 
   'advantages' => 'Avantajele noastre',
 
-  'advantages_title_1' => 'PREȚURI ACCESIBILE',
-  'advantages_text_1' => 'Calitate accesibilă pentru toți.',
-  'advantages_title_2' => 'BRANDURI VERIFICATE',
-  'advantages_text_2' => 'Testate de noi, aprobate de voi.',
-  'advantages_title_3' => 'LIVRARE ÎN TOATĂ MOLDOVA',
-  'advantages_text_3' => 'În toate orașele și satele.',
-  'advantages_title_4' => 'GAMĂ LARGĂ',
-  'advantages_text_4' => 'Alegerea ideală este aici.',
+  'advantages' => 'Avantajele noastre',
 
-  'sale_title' => 'Produse la promoție',
+  'advantages_title_1' => 'Producător local',
+  'advantages_text_1'  => 'Preț direct de la producător, execuție rapidă.',
+
+  'advantages_title_2' => 'Eficiență termică',
+  'advantages_text_2'  => 'Izolație ridicată pentru case calde și durabile.',
+
+  'advantages_title_3' => 'Livrare în toată Moldova',
+  'advantages_text_3'  => 'Gratuit de la 60 m² de termopanele.',
+
+  'advantages_title_4' => 'Personalizare',
+  'advantages_text_4'  => 'Dimensiuni și texturi la comandă; pentru fațadă și interior.',
+
+  'sale_title' => 'Promoții și oferte',
 
   'partners_title' => 'Partenerii noștri',
 
   //about
-  'about_title' => 'Despre compania ISOTOP ENERGY',
-  'about_text_strong_1' => 'Compania ISOTOP ENERGY',
-  'about_text_1' => 'activează cu succes pe teritoriul Republicii Moldova din anul 1994, oferind en-gros și cu amănuntul specii de lemn de conifere și foioase, lambriu, grinzi, imitație de lemn, OSB, placaj, armătură, țevi, ciment, șpaleți și multe alte materiale de construcție. Produsele personalizate includ scări modulare, leagăne, locuri de joacă pentru copii și elemente decorative din lemn 100% natural.',
-  'about_text_2' => 'SA «MIG» colaborează cu companii și firme de încredere. De aceea, produsele comercializate se remarcă prin fiabilitate și siguranță. Calitatea produselor a fost remarcată la expozițiile: „Stil Bide-2000”, „Stil Bide-2002”, „Domus-2006”, „Domus-2007”.',
-  'about_text_3' => 'Diversitatea produselor, politica flexibilă de prețuri și sistemul de reduceri permit companiei SA «MIG» să satisfacă cerințele unei game largi de clienți. Întregul sortiment beneficiază de garanție, oferind încredere clienților în alegerea făcută.',
-  'about_text_strong_4' => 'Scopul nostru',
-  'about_text_4' => 'este să oferim fiecărui client o experiență deosebită în lucrul cu materialele de construcție.',
+  'about_meta_title' => 'Despre IsotopEnergy — termopanele și decor arhitectural, Moldova',
+  'about_meta_description' => 'IsotopEnergy — producție de termopanele și decor arhitectural. Adrese: Orhei, Vasile Lupu 191 (producere); Unirii 51/e (showroom). Livrare în toată Moldova; gratuit de la 60 m².',
+
+  'about_title' => 'Despre IsotopEnergy',
+
+  'about_text_strong_1' => 'IsotopEnergy',
+  'about_text_1' => '— producție nouă în Moldova. Fabricăm termopanele pentru izolația caselor și decor arhitectural (cornișe, muluri, coloane) pentru fațadă și interior. Producere — Orhei, str. Vasile Lupu 191; showroom — str. Unirii 51/e. Livrăm în toată țara.',
+
+  'about_text_2' => 'Termopanele din EPS sunt disponibile în grosimi și densități variate — alegem soluția potrivită climatului și materialului pereților. Gama largă de plăci clinker, texturi și culori. Realizăm tăieri industriale pentru colțuri, pante și elemente de îmbinare — montaj rapid și geometrie curată.',
+
+  'about_text_3' => 'Decor arhitectural: muluri, cornișe, pilaștri, portaluri, coloane etc. Producem la dimensiuni, pentru exterior și interior. Acoperire acrilică de clasă industrială: rezistență la UV și umezeală, culoare stabilă, durabilitate îndelungată.',
+
+  'about_text_strong_4' => 'Abordarea noastră',
+  'about_text_4' => 'Oferim consultanță, ajutor la măsurători și calcul de materiale. Preț corect de producător și termene transparente. Livrare în toată Moldova, gratuit de la 60 m² de termopanele. Recomandări privind detaliile și tehnologia de montaj.',
+
+  'about_text_5' => 'De ce ni se încredințează: utilaje moderne, control al calității la fiecare etapă, ambalare îngrijită și logistică stabilă. Suntem o echipă tânără, cu experiență în producție și finisaje.',
+  'about_text_6' => 'Pentru cine: proprietari de case, dezvoltatori și antreprenori; proiecte de termo-modernizare și construcții noi. Alegem soluția potrivită bugetului și arhitecturii.',
+
+  'about_img_alt' => 'Producția noastră',
 
   //contact
-  'contact_title' => 'Datele noastre de contact',
+  'contacts_meta_title'       => 'Contacte IsotopEnergy — producere și showroom în Moldova',
+  'contacts_meta_description' => 'Adrese: Orhei, Vasile Lupu 191 (producere); Unirii 51/e (showroom). Livrare în toată Moldova, gratuit de la 60 m².',
+
+  'contact_title' => 'Contacte',
   'contact_title_2' => 'Contactați-ne',
   'contact_text' => 'Scrieți-ne sau sunați-ne, adresați orice întrebare aveți, iar noi vă vom răspunde cu plăcere în cel mai scurt timp!',
   'contact_name' => 'Cum vă numiți?',
@@ -77,6 +105,12 @@ return [
   'contact_send' => 'Se trimite...',
   'contact_send_end' => 'Trimite',
   'contact_send_thanks' => 'Mulțumim! Mesajul dvs. a fost trimis.',
+
+  'contact_showroom'     => 'Showroom',
+  'contact_production'   => 'Producere',
+  'open_in_maps'         => 'Deschide în Google Maps',
+  'map_title_showroom'   => 'Hartă — showroom IsotopEnergy',
+  'map_title_production' => 'Hartă — producere IsotopEnergy',
 
   'contact_soc' => 'Suntem pe rețelele sociale:',
   'contact_schedule' => 'Program de lucru:',
