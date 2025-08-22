@@ -2,7 +2,7 @@
   import { ref, onMounted, watch, nextTick, computed } from 'vue'
   import { useCartMiniUiStore } from '@/Stores/cartMiniUi'
   import { useCartStore } from '@/Stores/cart'
-  import { router } from '@inertiajs/vue3'
+  import { router, usePage } from '@inertiajs/vue3'
   import { useLayoutStore } from '@/Stores/layout'
   import { useKeyboardShortcuts } from '@/composables/useKeyboardShortcuts'
   import OverlayLayer from '@/Components/common/OverlayLayer.vue'
@@ -13,6 +13,7 @@
   const cartMiniUi = useCartMiniUiStore()
   const cartButtonRef = ref(null)
   const miniCartRef = ref(null)
+  const page = usePage()
 
   // Автозакрытие при клике вне
   useClickOutside(
@@ -53,7 +54,7 @@
 
   const goToCart = () => {
     cartMiniUi.closeMiniCart()
-    router.visit('/cart')
+    router.visit(route('cart', { locale: page.props.locale }))
   }
 
   const toggleMiniCart = () => {

@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex flex-col">
+  <div :key="$page.props.locale" class="min-h-screen flex flex-col">
     <GlobalSchema />
     <Header />
 

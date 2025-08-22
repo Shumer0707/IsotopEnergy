@@ -6,9 +6,9 @@
     >
       <!-- Навигация -->
       <nav class="flex flex-wrap justify-center sm:justify-start gap-4 sm:gap-12">
-        <Link href="/" class="hover:underline">{{ t['home'] }}</Link>
-        <Link href="/about" class="hover:underline">{{ t['about'] }}</Link>
-        <Link href="/contacts" class="hover:underline">{{ t['contacts'] }}</Link>
+        <Link :href="`/${$page.props.locale}/`" class="hover:underline">{{ t['home'] }}</Link>
+        <Link :href="`/${$page.props.locale}/about`" class="hover:underline">{{ t['about'] }}</Link>
+        <Link :href="`/${$page.props.locale}/contacts`" class="hover:underline">{{ t['contacts'] }}</Link>
       </nav>
 
       <!-- Телефон -->
@@ -42,7 +42,7 @@
       <div class="flex justify-end items-center 2xl:gap-10 lg:gap-6 gap-4">
         <LanguageSwitcher />
         <div class="relative">
-          <Link href="/favorites" class="hover:text-gray-300">
+          <Link :href="`/${$page.props.locale}/favorites`" class="hover:text-gray-300">
             <font-awesome-icon :icon="['far', 'heart']" class="text-white hover:text-my_red lg:text-3xl text-2xl" />
           </Link>
           <span

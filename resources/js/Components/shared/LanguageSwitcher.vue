@@ -51,11 +51,8 @@
   }
 
   const changeLocale = (lang) => {
-    router.visit(route('set-locale', lang), {
-      method: 'get',
-      preserveScroll: true,
-    })
-    showLangs.value = false
+    const back = window.location.pathname + window.location.search
+    window.location.href = route('set-locale', { locale: lang, back })
   }
 </script>
 
@@ -84,9 +81,9 @@
       <button @click="changeLocale('ru')" class="block w-full px-4 py-2 text-left hover:bg-gray-200 rounded-md whitespace-nowrap">
         RU
       </button>
-      <button @click="changeLocale('en')" class="block w-full px-4 py-2 text-left hover:bg-gray-200 rounded-md whitespace-nowrap">
+      <!-- <button @click="changeLocale('en')" class="block w-full px-4 py-2 text-left hover:bg-gray-200 rounded-md whitespace-nowrap">
         EN
-      </button>
+      </button> -->
     </div>
   </Teleport>
 </template>

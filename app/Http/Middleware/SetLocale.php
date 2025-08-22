@@ -10,32 +10,23 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SetLocale
 {
-    public function handle(Request $request, Closure $next): Response
-    {
-        // Если передан новый язык, обновляем session
-        if ($request->has('lang')) {
-            $locale = $request->get('lang');
-            Session::put('locale', $locale);
-        }
-        // Если язык уже есть в session — используем его
-        elseif (Session::has('locale')) {
-            $locale = Session::get('locale');
-        }
-        // Если нет, пробуем взять из cookie
-        elseif ($request->cookie('lang')) {
-            $locale = $request->cookie('lang');
-            Session::put('locale', $locale);
-        }
-        // Если ничего нет, ставим ru
-        else {
-            $locale = 'ru';
-            Session::put('locale', $locale);
-        }
+  public function handle(Request $request, Closure $next): Response
+  {
+    $supported = ['ru', 'ro'];
 
-        App::setLocale($locale);
+    $locale = $request->route('locale')
+      ?? Session::get('locale')
+      ?? $request->cookie('lang')
+      ?? 'ru';
 
-        // Устанавливаем куку с языком (независимо от способа определения)
-        $response = $next($request);
-        return $response->withCookie(cookie('lang', $locale, 60 * 24 * 30)); // 30 дней
+    if (!in_array($locale, $supported, true)) {
+      $locale = 'ru';
     }
+
+    App::setLocale($locale);
+    Session::put('locale', $locale);
+
+    $response = $next($request);
+    return $response->withCookie(cookie('lang', $locale, 60 * 24 * 30));
+  }
 }
