@@ -7,24 +7,33 @@
     product: { type: Object, required: true },
   })
 
-  /* locale */
+  // locale
   const page = usePage()
   const locale = computed(() => page.props.locale || 'ru')
 
-  /* URLs */
+  // URLs
   const siteUrl = typeof window !== 'undefined' ? window.location.origin : ''
-  const path = typeof window !== 'undefined' ? window.location.pathname : '/'
+  const pathname = typeof window !== 'undefined' ? window.location.pathname : '/'
+  const search = typeof window !== 'undefined' ? window.location.search : ''
   const href = typeof window !== 'undefined' ? window.location.href : ''
 
-  /* canonical + hreflang (ru=/..., ro=/ro/...) */
-  const ruPath = computed(() => path.replace(/^\/ro(\/|$)/, '/'))
-  const roPath = computed(() =>
-    ruPath.value === '/' ? '/ro' : '/ro' + (ruPath.value.endsWith('/') ? ruPath.value.slice(0, -1) : ruPath.value)
-  )
-  const canonical = computed(() => siteUrl + path)
-  const hrefLang = (lang) => (lang === 'ro' ? siteUrl + roPath.value : siteUrl + ruPath.value)
+  // локаль в URL
+  const supported = ['ru', 'ro']
+  const parts = pathname.split('/').filter(Boolean)
+  const hasLocale = parts.length && supported.includes(parts[0])
 
-  /* данные товара */
+  // базовый путь БЕЗ языкового префикса
+  const basePath = '/' + (hasLocale ? parts.slice(1).join('/') : parts.join('/'))
+  const normalizedBase = !basePath || basePath === '//' ? '/' : basePath
+
+  // canonical: для товара обычно без query
+  const canonical = computed(() => siteUrl + pathname)
+
+  // hreflang
+  const altRu = computed(() => siteUrl + (normalizedBase === '/' ? '/ru' : '/ru' + normalizedBase))
+  const altRo = computed(() => siteUrl + (normalizedBase === '/' ? '/ro' : '/ro' + normalizedBase))
+
+  // данные товара
   const title = computed(() => props.product?.description?.title || 'Товар')
   const fullDesc = computed(() => props.product?.description?.full_description || '')
   const metaDescription = computed(() => {
@@ -36,34 +45,31 @@
   const price = computed(() => props.product?.discounted_price ?? props.product?.price)
   const currency = computed(() => props.product?.currency || 'MDL')
 
-  /* наличие (фоллбек — в наличии) */
+  // наличие
   const availability = computed(() => {
     const p = props.product || {}
     const inStock = (typeof p.stock === 'number' ? p.stock > 0 : undefined) ?? p.available ?? true
     return inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock'
   })
 
-  /* изображения */
+  // изображения (абсолютные)
   const images = computed(() => {
     const arr = []
     if (props.product?.main_image) arr.push(`/storage/${props.product.main_image}`)
     if (Array.isArray(props.product?.images)) {
       arr.push(...props.product.images.map((i) => `/storage/${i.path}`))
     }
-    // абсолютные URL для JSON-LD
     return [...new Set(arr)].map((u) => (u.startsWith('http') ? u : siteUrl + u))
   })
 
-  /* noindex для URL с лишними query (варианты/фильтры и т.п.) */
+  // noindex для любых query (если вдруг появятся параметры варианта и т.п.)
   const noindex = computed(() => {
     if (typeof window === 'undefined') return false
-    const q = new URLSearchParams(window.location.search)
-    // оставим только page (пагинация), остальное — повод для noindex
-    q.delete('page')
+    const q = new URLSearchParams(search)
     return q.toString().length > 0
   })
 
-  /* рейтинг (если есть) */
+  // рейтинг (если есть)
   const rating = computed(() => {
     const r = props.product?.rating
     if (!r) return null
@@ -73,7 +79,7 @@
     return { ratingValue: avg, reviewCount: count }
   })
 
-  /* JSON-LD Product */
+  // JSON-LD Product
   const productGraph = computed(() => {
     const node = {
       '@type': 'Product',
@@ -86,7 +92,7 @@
       offers: [
         {
           '@type': 'Offer',
-          url: href,
+          url: href, // локализованный URL товара
           price: price.value,
           priceCurrency: currency.value,
           availability: availability.value,
@@ -112,15 +118,18 @@
     <meta name="description" :content="metaDescription" />
 
     <link rel="canonical" :href="canonical" />
-    <link rel="alternate" hreflang="ru" :href="hrefLang('ru')" />
-    <link rel="alternate" hreflang="ro" :href="hrefLang('ro')" />
-    <link rel="alternate" hreflang="x-default" :href="hrefLang('ru')" />
+    <template v-if="hasLocale">
+      <link rel="alternate" hreflang="ru" :href="altRu" />
+      <link rel="alternate" hreflang="ro" :href="altRo" />
+      <link rel="alternate" hreflang="x-default" :href="altRu" />
+    </template>
 
     <meta property="og:type" content="product" />
     <meta property="og:url" :content="canonical" />
     <meta property="og:title" :content="title + ' | IsotopEnergy'" />
     <meta property="og:description" :content="metaDescription" />
     <meta v-if="images.length" property="og:image" :content="images[0]" />
+    <meta property="og:locale" :content="hasLocale ? parts[0] : 'ru'" />
 
     <meta v-if="noindex" name="robots" content="noindex,follow" />
   </Head>

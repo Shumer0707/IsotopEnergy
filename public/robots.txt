@@ -1,18 +1,44 @@
 User-agent: *
-# Служебные разделы
+
+# --- Разрешаем основной контент
+Allow: /ru/
+Allow: /ro/
+
+# --- Служебные API (без локали)
+Disallow: /layout-data
+Disallow: /promo-products
+Disallow: /search-products
+Disallow: /set-locale/
+Disallow: /order
+Disallow: /contact
+Disallow: /logout
+Disallow: /test
+
+# --- API корзины/избранного
+Disallow: /cart/
+Disallow: /favorites/
+
+# --- Страницы корзины/избранного (не для SEO)
+Disallow: /ru/cart
+Disallow: /ro/cart
+Disallow: /ru/favorites
+Disallow: /ro/favorites
+
+# --- Админка
 Disallow: /admin/
-Disallow: /cart
-Disallow: /favorites
-Disallow: /checkout
+
+# --- Аутентификация
 Disallow: /login
-Disallow: /register
-Disallow: /search
 
-# Режем дубли от параметров (оставляем пагинацию page= открытой)
-Disallow: /*?*sort=
-Disallow: /*?*filter=
-Disallow: /*?*brand=
-# Если есть свои параметры фильтров — добавь их по аналогии
+# --- Блокируем трекинговые параметры
+Disallow: /*?utm_*
+Disallow: /*?fbclid=*
+Disallow: /*?gclid=*
+Disallow: /*?ref=*
+Disallow: /*?source=*
 
-# Карта сайта
+# --- Разрешаем полезные параметры
+Allow: /*?page=*
+
+# --- Карта сайта
 Sitemap: https://isotopenergy.md/sitemap.xml

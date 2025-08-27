@@ -14,9 +14,14 @@ use App\Http\Controllers\{
   ContactController,
   TestController,
   LanguageController,
+  SitemapController,
 };
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Api\ProductSearchController;
+
+Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'index'])
+  ->name('sitemap')
+  ->withoutMiddleware(\App\Http\Middleware\HandleInertiaRequests::class);
 
 // 🔹 Редирект с корня на дефолтный язык
 Route::get('/', fn() => redirect('/ru'));
@@ -83,6 +88,7 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
 
 // Служебное
 Route::get('/test', [TestController::class, 'index'])->name('test');
+
 
 // 🔹 Админка (вынесена в отдельный файл)
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {

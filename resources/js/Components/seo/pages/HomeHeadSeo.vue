@@ -2,25 +2,16 @@
   import { Head, usePage } from '@inertiajs/vue3'
   import { computed } from 'vue'
   import { useTranslations } from '@/composables/useTranslations'
-  import SeoJSONLD from '@/Components/seo/SeoJSONLD.vue' // уже сделали ранее
+  import SeoJSONLD from '@/Components/seo/SeoJSONLD.vue'
+  import { useSeoLinks } from '@/composables/useSeoLinks'
 
   const t = useTranslations()
   const page = usePage()
   const locale = computed(() => page.props.locale)
 
-  const siteUrl = typeof window !== 'undefined' ? window.location.origin : ''
-  const path = typeof window !== 'undefined' ? window.location.pathname : '/'
-  const href = typeof window !== 'undefined' ? window.location.href : ''
+  const { siteUrl, href, canonical, alternates, og, isLocalized } = useSeoLinks()
 
-  // hreflang
-  const ruPath = computed(() => path.replace(/^\/ro(\/|$)/, '/'))
-  const roPath = computed(() =>
-    ruPath.value === '/' ? '/ro' : '/ro' + (ruPath.value.endsWith('/') ? ruPath.value.slice(0, -1) : ruPath.value)
-  )
-  const canonical = computed(() => siteUrl + path)
-  const hrefLang = (lang) => (lang === 'ro' ? siteUrl + roPath.value : siteUrl + ruPath.value)
-
-  // JSON-LD: HomePage + оффер доставки
+  // JSON-LD (как было)
   const homeGraph = computed(() => [
     {
       '@type': 'HomePage',
@@ -28,7 +19,7 @@
       url: href,
       name: t.value['h1-title'] ?? 'Термопанели и архитектурный декор в Молдове',
       isPartOf: { '@id': siteUrl + '#website' },
-      inLanguage: t.value?.__locale ?? (locale.value || 'ru'),
+      inLanguage: locale.value || 'ru',
       dateModified: new Date().toISOString().split('T')[0],
     },
     {
@@ -47,19 +38,25 @@
     <title>{{ t['home_meta_title'] }}</title>
     <meta name="description" :content="t['home_meta_description']" />
 
-    <!-- canonical + hreflang -->
+    <!-- canonical -->
     <link rel="canonical" :href="canonical" />
-    <link rel="alternate" hreflang="ru" :href="hrefLang('ru')" />
-    <link rel="alternate" hreflang="ro" :href="hrefLang('ro')" />
-    <link rel="alternate" hreflang="x-default" :href="hrefLang('ru')" />
+
+    <!-- hreflang (только если есть локализованный путь) -->
+    <template v-if="isLocalized">
+      <link rel="alternate" hreflang="ru" :href="alternates.ru" />
+      <link rel="alternate" hreflang="ro" :href="alternates.ro" />
+      <link rel="alternate" hreflang="x-default" :href="alternates.xDefault" />
+    </template>
 
     <!-- OG -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" :content="canonical" />
+    <meta property="og:url" :content="og.url" />
     <meta property="og:title" :content="t['home_meta_title']" />
     <meta property="og:description" :content="t['home_meta_description']" />
+    <!-- og:locale и alternate (необязательно, но можно оставить) -->
+    <meta property="og:locale" :content="og.locale" />
+    <meta v-for="alt in og.alternates" :key="alt" property="og:locale:alternate" :content="alt" />
   </Head>
 
-  <!-- JSON-LD в <head> добавит наш инжектор -->
   <SeoJSONLD :id="`${locale}-home`" :graph="homeGraph" />
 </template>

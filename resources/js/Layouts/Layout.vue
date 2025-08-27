@@ -5,7 +5,7 @@
 
     <main class="bg-my_white flex-1 w-full py-4 max-w-screen-3xl mx-auto">
       <PageLoaderWrapper :loading="!isReady">
-        <Breadcrumbs v-if="usePage().url !== '/'" />
+        <Breadcrumbs v-if="!['/ru', '/ro', '/'].includes(usePage().url.split('?')[0])" />
         <slot />
       </PageLoaderWrapper>
     </main>
