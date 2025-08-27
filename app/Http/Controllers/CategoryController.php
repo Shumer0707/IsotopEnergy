@@ -12,14 +12,14 @@ class CategoryController extends Controller
 {
   // App/Http/Controllers/CategoryController.php
 
-  public function show(Request $request, $id, ProductFilterService $filterService)
+  public function show(Request $request, string $locale, Category $category, ProductFilterService $filterService)
   {
-    $category = Category::with([
+    $category->load([
       'children',
       'translation',
       'parent.translation',
-      'parent.children.translation'
-    ])->findOrFail($id);
+      'parent.children.translation',
+    ]);
 
     $brands = Brand::select('id', 'name')->get();
 

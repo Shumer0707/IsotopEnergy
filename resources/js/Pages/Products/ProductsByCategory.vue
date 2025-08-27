@@ -21,6 +21,7 @@
 
   const cart = useCartStore()
   const filterStore = useProductFilterStore()
+  const page = usePage()
 
   filterStore.init({
     categoryId: props.category.id,
@@ -30,7 +31,10 @@
     available_filters: props.available_filters,
   })
 
-  const openProduct = (id) => router.visit(`/product/${id}`)
+  // const openProduct = (id) => router.visit(`/product/${id}`)
+  const openProduct = (id) => {
+    router.visit(route('product.show', { locale: page.props.locale, product: id }))
+  }
 </script>
 
 <template>

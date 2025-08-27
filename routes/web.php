@@ -35,7 +35,7 @@ Route::group([
 
   // Карточки/категории (страницы)
   Route::get('/product/{product}', [ProductController::class, 'show'])->name('product.show');
-  Route::get('/category/{id}', [CategoryController::class, 'show'])->name('category.show');
+  Route::get('/category/{category}', [CategoryController::class, 'show'])->name('category.show');
 
   // 404 внутри локали (страницы)
   Route::fallback(
@@ -83,6 +83,11 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
 
 // Служебное
 Route::get('/test', [TestController::class, 'index'])->name('test');
+
+// 🔹 Админка (вынесена в отдельный файл)
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+  require __DIR__ . '/admin.php';
+});
 
 // Глобальный 404 вне локали
 Route::fallback(

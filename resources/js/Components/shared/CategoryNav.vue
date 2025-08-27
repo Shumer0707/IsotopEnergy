@@ -161,7 +161,7 @@
                 <Link
                   v-for="sub in category.children"
                   :key="sub.id"
-                  :href="`/category/${sub.id}`"
+                  :href="`/${$page.props.locale}/category/${sub.id}`"
                   class="block w-full px-4 py-2 text-left hover:bg-gray-200 rounded-md whitespace-nowrap"
                   @click="closeAfterClick"
                 >

@@ -1,6 +1,6 @@
 <script setup>
   import axios from 'axios'
-  import { router } from '@inertiajs/vue3'
+  import { router, usePage } from '@inertiajs/vue3'
   import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
   import { useTranslations } from '@/composables/useTranslations'
 
@@ -11,6 +11,7 @@
   let debounceTimeout = null
   const selectedIndex = ref(-1)
   const noMatchMessage = ref(false)
+  const page = usePage()
 
   const DEBOUNCE_DELAY = 300
 
@@ -18,7 +19,7 @@
     query.value = ''
     suggestions.value = []
     selectedIndex.value = -1
-    router.visit(`/product/${id}`)
+    router.visit(route('product.show', { locale: page.props.locale, product: id }))
   }
 
   const handleSearch = () => {

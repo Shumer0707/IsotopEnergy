@@ -7,7 +7,7 @@ use Inertia\Inertia;
 
 class ProductController extends Controller
 {
-  public function show(Product $product)
+  public function show(string $locale, Product $product)
   {
     $product->load([
       'description',

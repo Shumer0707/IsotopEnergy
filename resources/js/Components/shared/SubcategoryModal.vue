@@ -23,7 +23,6 @@
   useKeyboardShortcuts({
     Escape: () => categoryStore.closeCategory(),
   })
-
 </script>
 
 <template>
@@ -53,16 +52,16 @@
             &times;
           </button>
 
-          <h2 class=" text-black text-xl font-semibold mb-4 text-center">
+          <h2 class="text-black text-xl font-semibold mb-4 text-center">
             {{ category.name }}
           </h2>
 
-          <div class=" text-black grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4 ">
+          <div class="text-black grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
             <Link
               v-for="sub in category.children"
               :key="sub.id"
-              :href="`/category/${sub.id}`"
-              class="flex flex-col items-center text-center hover:bg-gray-100 p-2 rounded "
+              :href="`/${$page.props.locale}/category/${sub.id}`"
+              class="flex flex-col items-center text-center hover:bg-gray-100 p-2 rounded"
               @click="categoryStore.closeCategory()"
             >
               <img src="/images/placeholder.jpg" alt="Subcategory" class="w-16 h-16 object-contain bg-white rounded-md" />

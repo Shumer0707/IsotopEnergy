@@ -4,7 +4,7 @@
   import { useTranslations } from '@/composables/useTranslations'
   import { useCategoryStore } from '@/Stores/category'
   import SubcategoryModal from '../shared/SubcategoryModal.vue'
-  import SeoJSONLD from '@/Components/seo/SeoJSONLD.vue' // ← инжектор JSON-LD
+  import SeoJSONLD from '@/Components/seo/SeoJSONLD.vue'
 
   const page = usePage()
   const locale = computed(() => page.props.locale)
@@ -29,6 +29,19 @@
     }
   }
 
+  // ── helper: локализованный путь (без показа локали в текстах)
+  const lp = (path = '/') => {
+    const p = path.startsWith('/') ? path : `/${path}`
+    return `/${locale.value}${p === '/' ? '' : p}`
+  }
+
+  // сегменты текущего URL БЕЗ локали (для авто-крошек)
+  const segmentsNoLocale = computed(() => {
+    const raw = (page.url.split('?')[0] || '').split('/').filter(Boolean)
+    const supported = ['ru', 'ro']
+    return raw.length && supported.includes(raw[0]) ? raw.slice(1) : raw
+  })
+
   const breadcrumbs = computed(() => {
     const labels = {
       about: translations.value.about,
@@ -37,24 +50,28 @@
       favorites: translations.value.favorites,
     }
 
-    const crumbs = [{ name: translations.value.home || 'Главная', href: '/' }]
+    // Home → всегда с локалью в href
+    const crumbs = [{ name: translations.value.home || 'Главная', href: lp('/') }]
 
+    // Категории из стора
     if (parent.value && sub.value) {
-      crumbs.push({ name: parent.value.translation?.name ?? '...', href: null })
-      crumbs.push({ name: sub.value.translation?.name ?? '...', href: route('category.show', sub.value.id) })
+      crumbs.push({ name: parent.value.translation?.name ?? '...', href: null }) // кликаем по модалке
+      crumbs.push({ name: sub.value.translation?.name ?? '...', href: lp(`/category/${sub.value.id}`) })
     }
 
+    // Продукт (последний элемент, без ссылки)
     if (product.value?.description?.title) {
       crumbs.push({ name: product.value.description.title, href: null })
     }
 
+    // Автогенерация для статических страниц, когда только Home
     if (crumbs.length === 1) {
-      const segments = page.url.split('/').filter(Boolean)
-      segments.forEach((segment, index) => {
-        const path = '/' + segments.slice(0, index + 1).join('/')
+      const segs = segmentsNoLocale.value
+      segs.forEach((segment, index) => {
+        const path = '/' + segs.slice(0, index + 1).join('/')
         crumbs.push({
           name: labels[segment] || decodeURIComponent(segment),
-          href: index === segments.length - 1 ? null : path,
+          href: index === segs.length - 1 ? null : lp(path),
         })
       })
     }
@@ -62,7 +79,7 @@
     return crumbs
   })
 
-  /* ✅ JSON-LD на основе тех же крошек */
+  // JSON-LD из тех же крошек
   const siteUrl = typeof window !== 'undefined' ? window.location.origin : ''
   const pageUrl = typeof window !== 'undefined' ? window.location.href : ''
 

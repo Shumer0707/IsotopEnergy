@@ -1,6 +1,6 @@
 <script setup>
   import { ref, onMounted } from 'vue'
-  import { Link, router } from '@inertiajs/vue3'
+  import { Link, router, usePage } from '@inertiajs/vue3'
   import axios from 'axios'
   import { useCartStore } from '@/Stores/cart'
   // import { useFavoritesStore } from '@/Stores/favorites'
@@ -12,11 +12,12 @@
   const promoProducts = ref([])
   const currentPage = ref(1)
   const lastPage = ref(1)
+  const page = usePage()
 
   const cart = useCartStore()
 
   const openProduct = (id) => {
-    router.visit(`/product/${id}`)
+    router.visit(route('product.show', { locale: page.props.locale, product: id }))
   }
 
   const fetchProducts = async (page = 1) => {

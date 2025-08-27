@@ -26,7 +26,7 @@
       <Link
         v-for="sub in categoryStore.allSubcategories"
         :key="sub.id"
-        :href="`/category/${sub.id}`"
+        :href="`/${$page.props.locale}/category/${sub.id}`"
         class="flex flex-col items-center cursor-pointer"
         :ref="(el) => (triggerRefs[sub.id] = el)"
       >
