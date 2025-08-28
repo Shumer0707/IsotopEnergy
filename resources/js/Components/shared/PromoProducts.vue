@@ -12,10 +12,10 @@
   const promoProducts = ref([])
   const currentPage = ref(1)
   const lastPage = ref(1)
-  const page = usePage()
 
   const cart = useCartStore()
 
+  const page = usePage()
   const openProduct = (id) => {
     router.visit(route('product.show', { locale: page.props.locale, product: id }))
   }

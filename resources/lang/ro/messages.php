@@ -17,13 +17,18 @@ return [
   'btn_category' => 'Toate categoriile',
   'back' => 'Înapoi',
   'show' => 'Arată mai mult',
-  'footer_text' => 'ISOTOP ENERGY este un magazin online modern care oferă o gamă largă de materiale specializate pentru fațade și acoperișuri.',
+  'footer_text' => 'ISOTOP ENERGY — producție modernă de panouri termoizolante și elemente decorative, cu calitate înaltă și prețuri accesibile.',
   'footer_navigation' => 'Navigare',
   'footer_main' => 'Produse principale',
   'footer_us' => 'Contactați-ne',
   'rights' => 'All rights reserved.',
   'adress_title' => 'Adresă',
   'adress_text' => 'Adresă text',
+  'cat_ucr' => 'Panouri termice UKR',
+  'cat_pol' => 'Panouri termice POL',
+  'cat_par' => 'Panouri termice PAR',
+  'cat_mol' => 'Profile decorative',
+  'cat_kar' => 'Cornise',
 
 
   //home

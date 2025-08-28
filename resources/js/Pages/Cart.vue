@@ -3,9 +3,13 @@
   import QuantityControl from '@/Components/common/QuantityControl.vue'
   import OrderModal from '@/Components/common/OrderModal.vue'
   import { onMounted, ref, computed } from 'vue'
-  import { router } from '@inertiajs/vue3'
+  import { router, usePage } from '@inertiajs/vue3'
   import { useTranslations } from '@/composables/useTranslations'
 
+  const page = usePage()
+  const openProduct = (id) => {
+    router.visit(route('product.show', { locale: page.props.locale, product: id }))
+  }
   const t = useTranslations()
   const isModalOpen = ref(false)
   const cart = useCartStore()
@@ -21,10 +25,6 @@
       return sum + price * cart.items[p.id]
     }, 0)
   )
-
-  const openProduct = (id) => {
-    router.visit(`/product/${id}`)
-  }
 
   onMounted(() => {
     cart.init()

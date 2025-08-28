@@ -24,6 +24,7 @@
   const page = usePage()
 
   filterStore.init({
+    locale: page.props.locale,
     categoryId: props.category.id,
     sort: props.sort,
     filters: props.filters,

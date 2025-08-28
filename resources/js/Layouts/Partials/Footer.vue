@@ -16,9 +16,15 @@
       <div class="flex flex-col items-center py-4 lg:p-4">
         <h3 class="font-semibold mb-2 text-center">{{ t['footer_navigation'] }}</h3>
         <ul class="space-y-1 text-sm text-left">
-          <li><Link href="/" class="hover:underline">{{ t['home'] }}</Link></li>
-          <li><Link href="/about" class="hover:underline">{{ t['about'] }}</Link></li>
-          <li><Link href="/contacts" class="hover:underline">{{ t['contacts'] }}</Link></li>
+          <li>
+            <Link :href="`/${$page.props.locale}/`" class="hover:underline">{{ t['home'] }}</Link>
+          </li>
+          <li>
+            <Link :href="`/${$page.props.locale}/about`" class="hover:underline">{{ t['about'] }}</Link>
+          </li>
+          <li>
+            <Link :href="`/${$page.props.locale}/contacts`" class="hover:underline">{{ t['contacts'] }}</Link>
+          </li>
         </ul>
       </div>
 
@@ -26,12 +32,11 @@
       <div class="flex flex-col items-center py-4 lg:p-4">
         <h3 class="font-semibold mb-2 text-center">{{ t['footer_main'] }}</h3>
         <ul class="space-y-1 text-sm text-left">
-          <li><Link href="/catalog/siding">Сайдинг(Заглушка)</Link></li>
-          <li><Link href="/catalog/panels">Сэндвич панели(Заглушка)</Link></li>
-          <li><Link href="/catalog/plaster">Штукатурка(Заглушка)</Link></li>
-          <li><Link href="/catalog/drainage">Водосточная система(Заглушка)</Link></li>
-          <li><Link href="/catalog/facade">Фасадные панели(Заглушка)</Link></li>
-          <li><Link href="/catalog/insulation">Утепление(Заглушка)</Link></li>
+          <li><Link :href="`/${$page.props.locale}/category/2`">{{ t['cat_ucr'] }}</Link></li>
+          <li><Link :href="`/${$page.props.locale}/category/3`">{{ t['cat_pol'] }}</Link></li>
+          <li><Link :href="`/${$page.props.locale}/category/4`">{{ t['cat_par'] }}</Link></li>
+          <li><Link :href="`/${$page.props.locale}/category/6`">{{ t['cat_mol'] }}</Link></li>
+          <li><Link :href="`/${$page.props.locale}/category/7`">{{ t['cat_kar'] }}</Link></li>
         </ul>
       </div>
 
@@ -39,9 +44,22 @@
       <div class="flex flex-col items-center py-4 lg:p-4">
         <h3 class="font-semibold mb-2 text-center">{{ t['footer_us'] }}</h3>
         <ul class="text-sm space-y-1 text-left">
-          <li>{{ t['adress_text'] }}</li>
-          <li>+373 699 77 771</li>
-          <li>email@gmail.com</li>
+          <li>
+            <span class="font-semibold">{{ t['contact_showroom'] }}</span>: str. Unirii 51/e, Orhei, Moldova
+          </li>
+          <li>
+            <span class="font-semibold">{{ t['contact_production'] }}</span>: str. Vasile Lupu 191, Orhei, Moldova
+          </li>
+          <li>
+            <span class="font-semibold">{{ t['contact_phone'] }}</span>
+            <a href="tel:+37360838688" class="hover:underline"> +373 608 38 688</a>
+          </li>
+          <li>
+            <span>
+              <span class="font-semibold">{{ t['contact_mail'] }}</span>
+              <a href="mailto:isotopenergy@gmail.com" class="hover:underline"> isotopenergy@gmail.com</a>
+            </span>
+          </li>
         </ul>
         <!-- Соц. сети -->
         <div class="flex gap-4 mt-3 text-xl text-gray-600">

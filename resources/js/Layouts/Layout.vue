@@ -12,6 +12,7 @@
 
     <Footer />
     <WhatsAppButton />
+    <ScrollToTop />
   </div>
 </template>
 
@@ -29,6 +30,7 @@
   import { useInitialLoad } from '@/composables/useInitialLoad'
   import PageLoaderWrapper from '@/Components/common/PageLoaderWrapper.vue'
   import GlobalSchema from '@/Components/seo/GlobalSchema.vue'
+  import ScrollToTop from '@/Components/common/ScrollToTop.vue'
 
   const categoryStore = useCategoryStore()
   const cart = useCartStore()

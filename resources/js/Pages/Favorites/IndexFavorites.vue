@@ -1,5 +1,5 @@
 <script setup>
-  import { router } from '@inertiajs/vue3'
+  import { router, usePage } from '@inertiajs/vue3'
   import { useFavoritesStore } from '@/Stores/favorites'
   import { useCartStore } from '@/Stores/cart'
   import { computed, onMounted } from 'vue'
@@ -12,8 +12,9 @@
 
   const products = computed(() => favorites.items)
 
+  const page = usePage()
   const openProduct = (id) => {
-    router.visit(`/product/${id}`)
+    router.visit(route('product.show', { locale: page.props.locale, product: id }))
   }
 </script>
 

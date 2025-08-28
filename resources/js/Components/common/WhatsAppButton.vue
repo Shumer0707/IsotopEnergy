@@ -16,7 +16,7 @@
       class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden sm:relative sm:bottom-auto sm:mt-2 fixed bottom-20 right-4 z-50 sm:z-auto sm:w-56 md:animate-fade-in"
     >
       <a
-        href="https://wa.me/37368684938"
+        href="https://wa.me/+37360838688"
         target="_blank"
         class="block px-4 py-3 text-gray-800 hover:bg-green-50 flex items-center gap-2"
       >
@@ -139,7 +139,7 @@
     isSubmitting.value = true
 
     const message = `Привет! Меня зовут ${name}, мой номер: ${phone}. Позвоните мне, пожалуйста.`
-    const url = `https://wa.me/37368684938?text=${encodeURIComponent(message)}`
+    const url = `https://wa.me/+37360838688?text=${encodeURIComponent(message)}`
     window.open(url, '_blank')
 
     setTimeout(() => {
