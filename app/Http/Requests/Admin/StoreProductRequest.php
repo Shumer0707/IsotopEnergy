@@ -43,6 +43,9 @@ class StoreProductRequest extends FormRequest
         'selected_combinations' => 'required_if:create_variations,true|array|min:1',
         'prices' => 'required_if:create_variations,true|array',
         'prices.*' => 'numeric|min:0.01',
+        'use_common_images' => 'nullable|boolean',
+        'common_images' => 'nullable|array',
+        'common_images.*' => 'file|image|max:10240',
         'variation_images' => 'nullable|array',
         'variation_images.*' => 'array',
         'variation_images.*.*' => 'file|image|max:10240', // 10MB макс для изображения

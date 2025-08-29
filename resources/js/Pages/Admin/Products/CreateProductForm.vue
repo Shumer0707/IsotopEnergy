@@ -99,6 +99,37 @@
       <div v-if="form.create_variations" class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded">
         <h4 class="font-semibold mb-4">Настройка вариаций</h4>
 
+        <!-- Общие фото для всех вариаций -->
+        <div class="mb-6 p-3 bg-white rounded border">
+          <label class="flex items-center mb-2">
+            <input type="checkbox" v-model="form.use_common_images" class="mr-2" />
+            <span class="font-medium">Использовать общие фото для всех вариаций</span>
+          </label>
+          <p class="text-sm text-gray-600 mb-3">Одни и те же изображения будут добавлены ко всем создаваемым товарам</p>
+
+          <div v-if="form.use_common_images">
+            <input type="file" multiple accept="image/*" @change="handleCommonImages" class="mb-2" />
+
+            <!-- Предпросмотр общих фото -->
+            <div v-if="form.common_images && form.common_images.length > 0" class="flex gap-2 flex-wrap">
+              <div
+                v-for="(file, index) in form.common_images"
+                :key="index"
+                class="relative w-16 h-16 border rounded overflow-hidden"
+              >
+                <img :src="getImagePreview(file)" alt="Preview" class="w-full h-full object-cover" />
+                <button
+                  type="button"
+                  @click="removeCommonImage(index)"
+                  class="absolute top-0 right-0 bg-red-600 text-white text-xs w-4 h-4 flex items-center justify-center"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Выбор атрибутов для вариаций -->
         <div v-for="(selectedValues, attrId) in form.variation_attributes" :key="attrId" class="mb-4">
           <div class="flex items-center justify-between mb-2">
@@ -347,6 +378,8 @@
     selected_combinations: [],
     prices: {},
     variation_images: {}, // Храним файлы для каждой вариации
+    use_common_images: false, // Использовать общие фото
+    common_images: [], // Общие фото для всех вариаций
   })
 
   const childCategories = computed(() => props.categories.filter((cat) => cat.parent_id !== null))
@@ -391,6 +424,16 @@
     generateRecursive(0, {})
     return combinations
   })
+
+  // Методы для работы с общими изображениями
+  const handleCommonImages = (event) => {
+    const files = Array.from(event.target.files)
+    form.common_images.push(...files)
+  }
+
+  const removeCommonImage = (index) => {
+    form.common_images.splice(index, 1)
+  }
 
   // Методы для работы с изображениями вариаций
   const handleVariationImages = (combinationKey, event) => {
@@ -476,6 +519,8 @@
         form.selected_combinations = []
         form.prices = {}
         form.variation_images = {}
+        form.use_common_images = false
+        form.common_images = []
       }
     }
   )

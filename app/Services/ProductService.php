@@ -21,14 +21,18 @@ class ProductService
       $productsQuery->where('category_id', $categoryId);
     }
 
-    $products = $productsQuery->get()->map(function ($product) {
+    // Применяем пагинацию перед загрузкой связанных данных
+    $products = $productsQuery->paginate(30); // 10 товаров на страницу
+
+    // Загружаем дополнительные связанные данные для каждого товара на текущей странице
+    $products->getCollection()->transform(function ($product) {
       $product->attributeValues = $product->attributeValues()->get();
       $product->images = $product->images()->get();
       return $product;
     });
 
     return [
-      'products' => $products,
+      'products' => $products, // Laravel автоматически сериализует пагинированные данные для Inertia
       'categories' => Category::with('translation')->get(),
       'brands' => Brand::all(),
       'attributes' => ProductAttribute::all(),
@@ -122,12 +126,14 @@ class ProductService
    *
    * @param array $baseData - данные базового товара
    * @param array $variationConfig - конфиг вариаций
-   * @param array $variationImages - изображения для вариаций (optional)
+   * @param array $variationImages - изображения для конкретных вариаций
+   * @param array $commonImages - общие изображения для всех вариаций
+   * @param bool $useCommonImages - использовать ли общие изображения
    * @return array - массив созданных товаров
    */
-  public function createVariations(array $baseData, array $variationConfig, array $variationImages = []): array
+  public function createVariations(array $baseData, array $variationConfig, array $variationImages = [], array $commonImages = [], bool $useCommonImages = false): array
   {
-    return DB::transaction(function () use ($baseData, $variationConfig, $variationImages) {
+    return DB::transaction(function () use ($baseData, $variationConfig, $variationImages, $commonImages, $useCommonImages) {
       $createdProducts = [];
 
       // Получаем все комбинации атрибутов
@@ -192,14 +198,23 @@ class ProductService
 
         $createdProducts[] = $product;
 
-        // Загружаем изображения для этой вариации если есть
-        // Загружаем изображения для этой вариации если есть
+        $imageService = app(\App\Services\ImageService::class);
+        $hasImages = false;
+
+        // Загружаем общие изображения если включена опция
+        if ($useCommonImages && !empty($commonImages)) {
+          $imageService->upload($product, $commonImages);
+          $hasImages = true;
+        }
+
+        // Загружаем индивидуальные изображения для этой вариации
         if (isset($variationImages[$combination['key']]) && !empty($variationImages[$combination['key']])) {
-
-          $imageService = app(\App\Services\ImageService::class);
           $imageService->upload($product, $variationImages[$combination['key']]);
+          $hasImages = true;
+        }
 
-          // Устанавливаем первое изображение как главное
+        // Устанавливаем первое изображение как главное если есть изображения
+        if ($hasImages) {
           $firstImage = $product->images()->first();
           if ($firstImage) {
             $product->update(['main_image' => $firstImage->path]);

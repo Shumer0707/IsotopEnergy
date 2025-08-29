@@ -24,7 +24,9 @@ class AdminProductController extends Controller
       $createdProducts = $service->createVariations(
         $request->getBaseProductData(),
         $request->getVariationConfig(),
-        $request->file('variation_images', []) // Передаем файлы изображений
+        $request->file('variation_images', []), // Индивидуальные изображения
+        $request->file('common_images', []), // Общие изображения
+        $request->boolean('use_common_images', false) // Флаг использования общих
       );
 
       return redirect()->route('admin.products.index')
