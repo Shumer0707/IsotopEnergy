@@ -11,29 +11,42 @@ use App\Services\ProductService;
 
 class AdminProductController extends Controller
 {
-    public function index(ProductService $service)
-    {
-        $categoryId = request('category');
+  public function index(ProductService $service)
+  {
+    $categoryId = request('category');
 
-        return Inertia::render('Admin/Products/IndexProducts', $service->getIndexData($categoryId));
+    return Inertia::render('Admin/Products/IndexProducts', $service->getIndexData($categoryId));
+  }
+  public function store(StoreProductRequest $request, ProductService $service)
+  {
+    // Проверяем, создаются ли вариации товара
+    if ($request->isCreatingVariations()) {
+      $createdProducts = $service->createVariations(
+        $request->getBaseProductData(),
+        $request->getVariationConfig(),
+        $request->file('variation_images', []) // Передаем файлы изображений
+      );
+
+      return redirect()->route('admin.products.index')
+        ->with('success', 'Создано вариаций товара: ' . count($createdProducts));
     }
-    public function store(StoreProductRequest $request, ProductService $service)
-    {
-        $service->store($request->validated());
 
-        return redirect()->route('admin.products.index')->with('success', 'Товар добавлен!');
-    }
+    // Обычное создание одного товара
+    $service->store($request->validated());
 
-    public function update(UpdateProductRequest $request, Product $product, ProductService $service)
-    {
-        $service->update($product, $request->validated());
+    return redirect()->route('admin.products.index')->with('success', 'Товар добавлен!');
+  }
 
-        return redirect()->route('admin.products.index')->with('success', 'Товар обновлён!');
-    }
+  public function update(UpdateProductRequest $request, Product $product, ProductService $service)
+  {
+    $service->update($product, $request->validated());
 
-    public function destroy(Product $product, ProductService $service)
-    {
-        $service->destroy($product);
-        return redirect()->route('admin.products.index')->with('success', 'Товар удалён!');
-    }
+    return redirect()->route('admin.products.index')->with('success', 'Товар обновлён!');
+  }
+
+  public function destroy(Product $product, ProductService $service)
+  {
+    $service->destroy($product);
+    return redirect()->route('admin.products.index')->with('success', 'Товар удалён!');
+  }
 }
