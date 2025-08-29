@@ -52,7 +52,7 @@
 <template>
   <aside class="mb-6 w-full sm:w-64 bg-white border rounded-lg p-4 shadow">
     <h2 class="font-semibold mb-3">Бренды</h2>
-    <div v-for="brand in brands" :key="brand.id" class="flex items-center space-x-2 mb-1">
+    <!-- <div v-for="brand in brands" :key="brand.id" class="flex items-center space-x-2 mb-1">
       <input
         type="checkbox"
         :value="brand.id"
@@ -61,7 +61,7 @@
         class="accent-pink-500"
       />
       <label class="text-sm text-gray-700">{{ brand.name }}</label>
-    </div>
+    </div> -->
 
     <h2 class="font-semibold mt-4 mb-2">Цена</h2>
     <PriceFilter />

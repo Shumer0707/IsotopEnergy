@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, computed, watch } from 'vue'
+  import { ref, computed } from 'vue'
   import { Link } from '@inertiajs/vue3'
   import OverlayLayer from '@/Components/common/OverlayLayer.vue'
   import { useClickOutside } from '@/composables/useClickOutside'
@@ -7,22 +7,39 @@
   import { useCategoryStore } from '@/Stores/category'
 
   const categoryStore = useCategoryStore()
-  const category = computed(() => categoryStore.activeCategory)
 
-  const emit = defineEmits(['close'])
-  const modalRef = ref(null)
-  const buttonRef = ref(null) // добавим проп или глобально передадим
-
-  defineProps({
+  // Убираем дублирование - используем либо проп, либо стор
+  const props = defineProps({
     category: Object,
     buttonRef: Object,
   })
 
-  useClickOutside(modalRef, () => categoryStore.closeCategory(), buttonRef)
+  // Используем категорию из пропсов, если она есть, иначе из стора
+  const category = computed(() => props.category || categoryStore.activeCategory)
+
+  const emit = defineEmits(['close'])
+  const modalRef = ref(null)
+
+  useClickOutside(
+    modalRef,
+    () => {
+      categoryStore.closeCategory()
+      emit('close')
+    },
+    props.buttonRef
+  )
 
   useKeyboardShortcuts({
-    Escape: () => categoryStore.closeCategory(),
+    Escape: () => {
+      categoryStore.closeCategory()
+      emit('close')
+    },
   })
+
+  const handleOverlayClick = () => {
+    categoryStore.closeCategory()
+    emit('close')
+  }
 </script>
 
 <template>
@@ -44,11 +61,11 @@
         @scroll.prevent
       >
         <!-- Затемнение -->
-        <OverlayLayer :show="true" @click="categoryStore.closeCategory()" />
+        <OverlayLayer :show="true" @click="handleOverlayClick" />
 
         <!-- Модалка -->
         <div ref="modalRef" class="bg-white rounded-xl p-6 w-full max-w-4xl shadow-lg relative z-50 shadow-xl border border-more">
-          <button @click="categoryStore.closeCategory()" class="absolute top-2 right-2 text-gray-500 hover:text-black text-xl">
+          <button @click="handleOverlayClick" class="absolute top-2 right-2 text-gray-500 hover:text-black text-xl">
             &times;
           </button>
 
@@ -62,7 +79,7 @@
               :key="sub.id"
               :href="`/${$page.props.locale}/category/${sub.id}`"
               class="flex flex-col items-center text-center hover:bg-gray-100 p-2 rounded"
-              @click="categoryStore.closeCategory()"
+              @click="handleOverlayClick"
             >
               <img src="/images/placeholder.jpg" alt="Subcategory" class="w-16 h-16 object-contain bg-white rounded-md" />
               <span class="text-sm mt-2">{{ sub.name }}</span>

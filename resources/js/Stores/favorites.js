@@ -18,7 +18,6 @@ export const useFavoritesStore = defineStore('favorites', {
   actions: {
     // 🔹 Загрузка избранного с сервера
     async load() {
-      console.log('[FavoritesStore] Загружаем с сервера...')
       const res = await axios.get(route('favorites.data'))
       this.items = res.data.products
 

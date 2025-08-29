@@ -42,6 +42,18 @@
     )
   })
 
+  // Вычисляем количество слайдов для показа
+  const slidesPerView = computed(() => {
+    const imageCount = props.product.images?.length || 0
+    return Math.min(imageCount, 4) // Максимум 4, но не больше чем есть изображений
+  })
+
+  // Показывать ли навигацию (только если изображений больше чем помещается)
+  const showNavigation = computed(() => {
+    const imageCount = props.product.images?.length || 0
+    return imageCount > (isMobile.value ? 4 : 4)
+  })
+
   const checkMobile = () => {
     isMobile.value = window.matchMedia('(max-width: 768px)').matches
   }
@@ -62,11 +74,11 @@
     <div class="flex flex-col md:flex-row gap-8 bg-white rounded-xl shadow p-6">
       <!-- 🔹 Галерея -->
       <div class="flex flex-col sm:flex-row gap-4 md:w-1/2">
-        <div :class="['relative', isMobile ? 'w-full h-24' : 'w-20']">
-          <!-- Кнопка вверх -->
+        <div v-if="product.images && product.images.length > 0" :class="['relative', isMobile ? 'w-full h-24' : 'w-20']">
+          <!-- Кнопка вверх (показываем только если есть навигация) -->
           <button
-            v-if="!isMobile"
-            @click="swiper.slidePrev()"
+            v-if="!isMobile && showNavigation"
+            @click="swiper?.slidePrev()"
             class="absolute top-0 left-0 right-0 h-6 z-10 text-sm text-gray-400 hover:text-pink-600"
           >
             <font-awesome-icon icon="chevron-up" />
@@ -76,11 +88,16 @@
           <Swiper
             :modules="[Mousewheel]"
             :direction="isMobile ? 'horizontal' : 'vertical'"
-            :slides-per-view="4"
+            :slides-per-view="slidesPerView"
             :space-between="8"
-            :mousewheel="!isMobile"
+            :mousewheel="!isMobile && showNavigation"
+            :allow-touch-move="showNavigation"
             @swiper="(s) => (swiper = s)"
-            :class="['py-6', isMobile ? 'h-24 w-full px-6' : 'max-h-[400px] mt-6 mb-6']"
+            :class="[
+              'py-6',
+              isMobile ? 'h-24 w-full px-6' : 'max-h-[400px] mt-6 mb-6',
+              !showNavigation ? 'swiper-no-swiping' : '',
+            ]"
           >
             <SwiperSlide v-for="(img, index) in product.images" :key="index" @click="setImage(img.path)">
               <div :class="['w-20 h-20 rounded overflow-hidden cursor-pointer shadow-sm transition p-1']">
@@ -96,14 +113,21 @@
             </SwiperSlide>
           </Swiper>
 
-          <!-- Кнопка вниз -->
+          <!-- Кнопка вниз (показываем только если есть навигация) -->
           <button
-            v-if="!isMobile"
-            @click="swiper.slideNext()"
+            v-if="!isMobile && showNavigation"
+            @click="swiper?.slideNext()"
             class="absolute bottom-0 left-0 right-0 h-6 z-10 bg-white text-gray-500 hover:text-pink-600"
           >
             <font-awesome-icon icon="chevron-down" />
           </button>
+        </div>
+
+        <!-- Fallback если нет изображений -->
+        <div v-else :class="['relative', isMobile ? 'w-full h-24' : 'w-20']">
+          <div class="w-20 h-20 rounded overflow-hidden shadow-sm p-1 border">
+            <img src="/images/placeholder.jpg" alt="No image" class="w-full h-full object-contain" />
+          </div>
         </div>
 
         <!-- Основное изображение -->
@@ -205,24 +229,51 @@
 
     <div class="grid md:grid-cols-2 gap-6 mt-10">
       <!-- Характеристики -->
-      <div>
-        <h2 class="text-lg font-semibold mb-4">{{ t['product_characteristics'] }}</h2>
-        <table class="w-full text-sm text-gray-700">
-          <tbody>
-            <tr v-for="(attribute, index) in attributes" :key="index" class="border-b last:border-0">
-              <td class="py-2 font-medium">{{ attribute.name }}</td>
-              <td class="py-2 text-right">{{ attribute.value }}</td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+            <span class="text-blue-600 text-sm">📋</span>
+          </div>
+          <h2 class="text-xl font-semibold text-gray-800">{{ t['product_characteristics'] }}</h2>
+        </div>
+
+        <div v-if="attributes.length > 0" class="space-y-3">
+          <div
+            v-for="(attribute, index) in attributes"
+            :key="index"
+            class="flex justify-between items-center py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors duration-150"
+            :class="index % 2 === 0 ? 'bg-gray-25' : 'bg-white'"
+          >
+            <span class="font-medium text-gray-700 text-sm">{{ attribute.name }}</span>
+            <span class="text-gray-600 text-sm font-semibold ml-4 text-right">{{ attribute.value }}</span>
+          </div>
+        </div>
+
+        <div v-else class="text-center py-8">
+          <div class="text-gray-400 mb-2">📝</div>
+          <p class="text-gray-500 text-sm">Характеристики не указаны</p>
+        </div>
       </div>
 
       <!-- Описание -->
-      <div>
-        <h2 class="text-lg font-semibold mb-4">{{ t['product_description'] }}</h2>
-        <p class="text-sm text-gray-800 leading-relaxed whitespace-pre-line">
-          {{ product.description?.full_description ?? 'Описание отсутствует.' }}
-        </p>
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+            <span class="text-green-600 text-sm">📖</span>
+          </div>
+          <h2 class="text-xl font-semibold text-gray-800">{{ t['product_description'] }}</h2>
+        </div>
+
+        <div v-if="product.description?.full_description" class="prose prose-sm max-w-none">
+          <p class="text-gray-700 leading-relaxed whitespace-pre-line text-sm">
+            {{ product.description.full_description }}
+          </p>
+        </div>
+
+        <div v-else class="text-center py-8">
+          <div class="text-gray-400 mb-2">📄</div>
+          <p class="text-gray-500 text-sm">Описание отсутствует</p>
+        </div>
       </div>
     </div>
   </div>

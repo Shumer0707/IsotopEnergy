@@ -72,7 +72,7 @@ class CategoryController extends Controller
     return Inertia::render('Products/ProductsByCategory', [
       'category'          => $category,
       'parentCategory'    => $category->parent,
-      'products'          => $productsQuery->paginate(4)->withQueryString(),
+      'products'          => $productsQuery->paginate(20)->withQueryString(),
       'brands'            => $brands,
       'max_price'         => $max_price,
       'filters'           => $normFilters,

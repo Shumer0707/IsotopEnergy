@@ -13,9 +13,9 @@ class CategorySeeder extends Seeder
     // Основные категории и подкатегории
     $categories = [
       'Термопанели' => [
-        'Термопанели UKR',
-        'Термопанели POL',
-        'Термопанели POL Cerad',
+        'Термопанели UCRAINE',
+        'Термопанели POLONIA',
+        'Термопанели PARADIS',
       ],
       'Декоративные элементы' => [
         'Молдинги',
@@ -65,9 +65,9 @@ class CategorySeeder extends Seeder
   {
     return match ($ru) {
       'Термопанели' => 'Panouri termice',
-      'Термопанели UKR' => 'Panouri termice UKR',
-      'Термопанели POL' => 'Panouri termice POL',
-      'Термопанели POL Cerad' => 'Panouri termice POL Cerad',
+      'Термопанели UCRAINE' => 'Panouri termice UCRAINE',
+      'Термопанели POLONIA' => 'Panouri termice POLONIA',
+      'Термопанели PARADIS' => 'Panouri termice PARADIS',
       'Декоративные элементы' => 'Elemente decorative',
       'Молдинги' => 'Profile decorative',
       'Карнизы' => 'Cornise',
@@ -85,9 +85,9 @@ class CategorySeeder extends Seeder
   {
     return match ($ru) {
       'Термопанели' => 'Thermal Panels',
-      'Термопанели UKR' => 'Thermal Panels UKR',
-      'Термопанели POL' => 'Thermal Panels POL',
-      'Термопанели POL Cerad' => 'Thermal Panels POL Cerad',
+      'Термопанели UCRAINE' => 'Thermal Panels UCRAINE',
+      'Термопанели POLONIA' => 'Thermal Panels POLONIA',
+      'Термопанели PARADIS' => 'Thermal Panels PARADIS',
       'Декоративные элементы' => 'Decorative Elements',
       'Молдинги' => 'Moldings',
       'Карнизы' => 'Cornices',

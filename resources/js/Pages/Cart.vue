@@ -59,7 +59,7 @@
           <div class="flex gap-4 items-center lg:col-span-6">
             <img
               :src="product.main_image ? `/storage/${product.main_image}` : '/images/placeholder.jpg'"
-              alt=""
+              :alt="`${product.description.title}`"
               @click="openProduct(product.id)"
               class="w-20 h-20 object-cover rounded shrink-0 cursor-pointer"
             />

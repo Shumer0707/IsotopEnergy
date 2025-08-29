@@ -24,9 +24,9 @@ return [
   'rights' => 'All rights reserved.',
   'adress_title' => 'Adresă',
   'adress_text' => 'Adresă text',
-  'cat_ucr' => 'Panouri termice UKR',
-  'cat_pol' => 'Panouri termice POL',
-  'cat_par' => 'Panouri termice PAR',
+  'cat_ucr' => 'Panouri termice UCRAINE',
+  'cat_pol' => 'Panouri termice POLONIA',
+  'cat_par' => 'Panouri termice PARADIS',
   'cat_mol' => 'Profile decorative',
   'cat_kar' => 'Cornise',
 

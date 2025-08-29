@@ -24,9 +24,9 @@ return [
   'rights' => 'Все права защищены.',
   'adress_title' => 'Адрес:',
   'adress_text' => 'Адрес текст',
-  'cat_ucr' => 'Термопанели UKR',
-  'cat_pol' => 'Термопанели POL',
-  'cat_par' => 'Термопанели PAR',
+  'cat_ucr' => 'Термопанели UCRAINE',
+  'cat_pol' => 'Термопанели POLONIA',
+  'cat_par' => 'Термопанели PARADIS',
   'cat_mol' => 'Молдинги',
   'cat_kar' => 'Карнизы',
 
