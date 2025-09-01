@@ -6,7 +6,7 @@
     >
       <!-- Навигация -->
       <nav class="flex flex-wrap justify-center sm:justify-start gap-4 sm:gap-12">
-        <Link :href="`/${$page.props.locale}/`" class="hover:underline">{{ t['home'] }}</Link>
+        <Link :href="`/${$page.props.locale}`" class="hover:underline">{{ t['home'] }}</Link>
         <Link :href="`/${$page.props.locale}/about`" class="hover:underline">{{ t['about'] }}</Link>
         <Link :href="`/${$page.props.locale}/contacts`" class="hover:underline">{{ t['contacts'] }}</Link>
       </nav>

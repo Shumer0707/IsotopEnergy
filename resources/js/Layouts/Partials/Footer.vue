@@ -17,7 +17,7 @@
         <h3 class="font-semibold mb-2 text-center">{{ t['footer_navigation'] }}</h3>
         <ul class="space-y-1 text-sm text-left">
           <li>
-            <Link :href="`/${$page.props.locale}/`" class="hover:underline">{{ t['home'] }}</Link>
+            <Link :href="`/${$page.props.locale}`" class="hover:underline">{{ t['home'] }}</Link>
           </li>
           <li>
             <Link :href="`/${$page.props.locale}/about`" class="hover:underline">{{ t['about'] }}</Link>
