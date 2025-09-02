@@ -176,7 +176,9 @@
             <div v-if="product.promotion?.discount_group" class="text-sm text-my_red line-through">
               {{ product.price }} {{ product.currency }}
             </div>
-            <div class="text-2xl font-bold text-black">{{ product.discounted_price }} {{ product.currency }}</div>
+            <div class="text-2xl font-bold text-black">
+              {{ product.discounted_price }} {{ product.currency }} {{ product.measurement }}
+            </div>
           </div>
 
           <!-- Кнопки действия + QuantityControl -->
