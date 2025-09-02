@@ -51,6 +51,7 @@ class ProductService
         'discount_price' => $data['discount_price'] ?? null,
         'currency' => $data['currency'],
         'main_image' => null,
+        'measurement' => $data['measurement'],
       ]);
 
       // 2. Создаём описания
@@ -87,6 +88,7 @@ class ProductService
         'price' => $data['price'],
         'discount_price' => $data['discount_price'] ?? null,
         'currency' => $data['currency'],
+        'measurement' => $data['measurement'],
       ]);
 
       // 2. Обновляем описания
@@ -159,6 +161,7 @@ class ProductService
           'discount_price' => $productData['discount_price'] ?? null,
           'currency' => $productData['currency'],
           'main_image' => null,
+          'measurement' => $productData['measurement'],
         ]);
 
         // Создаем описания с модифицированным названием

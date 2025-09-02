@@ -86,6 +86,19 @@
         <p v-if="form.errors.price" class="mt-1 text-sm text-red-600">{{ form.errors.price }}</p>
       </div>
 
+      <!-- Измерение -->
+      <div class="mt-6">
+        <label class="block">Единицы измерения</label>
+        <input
+          v-model="form.measurement"
+          data-error
+          :class="[
+            'w-full p-2 border rounded mb-1 max-w-xs',
+            form.errors.measurement ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300',
+          ]"
+        />
+      </div>
+
       <!-- Чекбокс создания вариаций -->
       <div class="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded">
         <label class="flex items-center">
@@ -366,6 +379,7 @@
     brand_id: '',
     price: '',
     currency: 'MDL',
+    measurement: '',
     descriptions: {
       ru: { title: '', short_description: '' },
       ro: { title: '', short_description: '' },
@@ -521,6 +535,7 @@
         form.variation_images = {}
         form.use_common_images = false
         form.common_images = []
+        form.measurement = {}
       }
     }
   )
@@ -536,6 +551,7 @@
       formData.append('price', form.price)
       formData.append('currency', form.currency)
       formData.append('create_variations', 'true')
+      formData.append('measurement', form.measurement)
 
       // Добавляем описания
       Object.keys(form.descriptions).forEach((lang) => {

@@ -49,7 +49,7 @@ class OrderController extends Controller
     $data['discount_amount'] = number_format($totalOriginal - $totalWithDiscount, 2, '.', '');
 
     // Письмо менеджеру
-    Mail::to('shumer0707@gmail.com')->send(new OrderCreated($data));
+    Mail::to('isotopenergy@gmail.com')->send(new OrderCreated($data));
 
     // Письмо клиенту
     if (!empty($data['email'])) {

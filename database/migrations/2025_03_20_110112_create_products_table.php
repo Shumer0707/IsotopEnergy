@@ -12,7 +12,7 @@ return new class extends Migration {
             $table->foreignId('category_id')->nullable()->constrained()->nullOnDelete(); // Категория товара
             $table->foreignId('brand_id')->nullable()->constrained()->nullOnDelete(); // Связь с брендом
             $table->decimal('price', 10, 2);
-            $table->decimal('discount_price', 10, 2)->nullable();
+            $table->string('measurement')->nullable();
             $table->string('currency', 3)->default('MDL');
             $table->string('main_image')->nullable(); // Главное фото
             $table->timestamps();

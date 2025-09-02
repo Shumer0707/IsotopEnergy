@@ -19,7 +19,7 @@ class ContactController extends Controller
     ]);
 
     // Отправляем письмо
-    Mail::to('admin@example.com')->send(new ContactMail($validated));
+    Mail::to('isotopenergy@gmail.com')->send(new ContactMail($validated));
 
     return back()->with('success', true);
   }

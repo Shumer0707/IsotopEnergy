@@ -29,6 +29,7 @@ class UpdateProductRequest extends FormRequest
       'attributes' => 'nullable|array',
       'attributes.*.attribute_id' => 'bail|required|integer|exists:product_attributes,id',
       'attributes.*.value_id' => 'bail|required|integer|exists:attribute_values,id',
+      'measurement' => 'nullable|string',
     ];
   }
 

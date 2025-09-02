@@ -264,9 +264,9 @@
           <h2 class="text-xl font-semibold text-gray-800">{{ t['product_description'] }}</h2>
         </div>
 
-        <div v-if="product.description?.full_description" class="prose prose-sm max-w-none">
+        <div v-if="product.description?.short_description" class="prose prose-sm max-w-none">
           <p class="text-gray-700 leading-relaxed whitespace-pre-line text-sm">
-            {{ product.description.full_description }}
+            {{ product.description.short_description }}
           </p>
         </div>
 

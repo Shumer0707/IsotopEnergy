@@ -93,16 +93,19 @@
           />
           <p v-if="form.errors.price" class="mt-1 text-sm text-red-600">{{ form.errors.price }}</p>
         </div>
+      </div>
 
-        <div>
-          <label class="block">Цена со скидкой (опционально)</label>
-          <input
-            type="number"
-            step="0.01"
-            v-model="form.discount_price"
-            :class="['w-full p-2 border rounded mb-1 border-gray-300']"
-          />
-        </div>
+      <!-- Измерение -->
+      <div class="mt-6">
+        <label class="block">Единицы измерения</label>
+        <input
+          v-model="form.measurement"
+          data-error
+          :class="[
+            'w-full p-2 border rounded mb-1 max-w-xs',
+            form.errors.measurement ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300',
+          ]"
+        />
       </div>
 
       <!-- Атрибуты -->
@@ -223,6 +226,7 @@
     price: props.product.price ?? '',
     discount_price: props.product.discount_price ?? '',
     currency: props.product.currency ?? 'MDL',
+    measurement: props.product.measurement,
     descriptions: {
       ru: { title: '', short_description: '', full_description: '' },
       ro: { title: '', short_description: '', full_description: '' },
