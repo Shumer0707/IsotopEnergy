@@ -89,14 +89,21 @@
       <!-- Измерение -->
       <div class="mt-6">
         <label class="block">Единицы измерения</label>
-        <input
+        <select
           v-model="form.measurement"
           data-error
           :class="[
             'w-full p-2 border rounded mb-1 max-w-xs',
             form.errors.measurement ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300',
           ]"
-        />
+        >
+          <option disabled value="">Выберите единицу измерения</option>
+          <option value="m²">m² (метр квадратный)</option>
+          <option value="m.p.">m.p. (метр погонный)</option>
+          <option value="kg">kg (килограмм)</option>
+          <option value="pcs">pcs (штука)</option>
+        </select>
+        <p v-if="form.errors.measurement" class="mt-1 text-sm text-red-600">{{ form.errors.measurement }}</p>
       </div>
 
       <!-- Чекбокс создания вариаций -->

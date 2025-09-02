@@ -1,11 +1,11 @@
 <script setup>
-defineProps({
-  sort: String,
-  total: Number,
-  from: Number,
-  to: Number,
-  onSortChange: Function,
-})
+  defineProps({
+    sort: String,
+    total: Number,
+    from: Number,
+    to: Number,
+    onSortChange: Function,
+  })
 </script>
 
 <template>
@@ -13,7 +13,7 @@ defineProps({
     <div class="text-sm text-gray-600 flex items-center gap-2">
       Сортировка:
       <select
-        class="border rounded px-2 py-1 text-sm"
+        class="border rounded px-2 py-1 pr-8 text-sm appearance-none bg-white"
         :value="sort"
         @change="onSortChange($event.target.value)"
       >
@@ -23,8 +23,6 @@ defineProps({
       </select>
     </div>
 
-    <div class="text-sm text-gray-600">
-      Показано {{ from }}–{{ to }} из {{ total }} товаров
-    </div>
+    <div class="text-sm text-gray-600">Показано {{ from }}–{{ to }} из {{ total }} товаров</div>
   </div>
 </template>

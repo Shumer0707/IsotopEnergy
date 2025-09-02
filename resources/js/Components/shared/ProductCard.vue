@@ -43,7 +43,7 @@
         {{ product.description?.title ?? 'Без названия' }}
       </h3>
       <p class="text-xs text-gray-500">{{ t['product_art'] }} {{ product.id }}</p>
-      <p class="text-sm text-gray-600">{{ product.brand.name }}</p>
+      <p v-if="product.brand?.name" class="text-sm text-gray-600">{{ product.brand.name }}</p>
     </div>
 
     <!-- 🔹 Цена + кнопки -->
