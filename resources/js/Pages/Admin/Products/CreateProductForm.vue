@@ -115,6 +115,26 @@
         <p class="text-sm text-gray-600 mt-1">Создать несколько товаров с разными характеристиками (размер, плотность и т.д.)</p>
       </div>
 
+      <!-- НОВОЕ ПОЛЕ: Шаг увеличения цены -->
+      <div v-if="form.create_variations" class="mt-4 p-3 bg-green-50 border border-green-200 rounded">
+        <label class="block font-medium mb-2">Шаг увеличения цены</label>
+        <div class="flex items-center gap-2">
+          <input
+            type="number"
+            step="0.01"
+            min="0"
+            v-model="form.price_step"
+            placeholder="0"
+            class="w-32 p-2 border rounded border-gray-300"
+          />
+          <span class="text-sm text-gray-600">MDL за каждую следующую вариацию</span>
+        </div>
+        <p class="text-xs text-gray-500 mt-1">
+          Если указан шаг, цены будут увеличиваться автоматически: первая вариация = базовая цена, вторая = базовая + шаг, третья
+          = базовая + шаг×2, и т.д.
+        </p>
+      </div>
+
       <!-- Секция вариаций -->
       <div v-if="form.create_variations" class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded">
         <h4 class="font-semibold mb-4">Настройка вариаций</h4>
@@ -156,9 +176,26 @@
             <label class="font-medium">
               {{ getAttributeName(attrId) }}
             </label>
-            <button type="button" @click="removeVariationAttribute(attrId)" class="text-red-600 hover:text-red-800 text-sm">
-              Удалить
-            </button>
+            <div class="flex items-center gap-2">
+              <!-- Кнопки выбрать все / снять все -->
+              <button
+                type="button"
+                @click="selectAllAttributeValues(attrId)"
+                class="px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700"
+              >
+                Все
+              </button>
+              <button
+                type="button"
+                @click="deselectAllAttributeValues(attrId)"
+                class="px-2 py-1 text-xs bg-gray-500 text-white rounded hover:bg-gray-600"
+              >
+                Снять
+              </button>
+              <button type="button" @click="removeVariationAttribute(attrId)" class="text-red-600 hover:text-red-800 text-sm">
+                Удалить
+              </button>
+            </div>
           </div>
 
           <div class="flex flex-wrap gap-2">
@@ -216,7 +253,7 @@
             </div>
           </div>
 
-          <div class="max-h-64 overflow-y-auto border rounded p-2 bg-white">
+          <div class="overflow-y-auto border rounded p-2 bg-white">
             <div v-for="combination in generatedCombinations" :key="combination.key" class="p-3 border rounded bg-gray-50">
               <label class="flex items-center mb-2">
                 <input type="checkbox" :value="combination.key" v-model="form.selected_combinations" class="mr-2" />
@@ -395,6 +432,7 @@
     attributes: [],
     // Поля для вариаций
     create_variations: false,
+    price_step: 0,
     variation_attributes: {},
     selected_combinations: [],
     prices: {},
@@ -475,14 +513,22 @@
     return URL.createObjectURL(file)
   }
 
-  // Методы для работы с комбинациями
+  // ЗАМЕНЯЕМ функцию selectAllCombinations
   const selectAllCombinations = () => {
     form.selected_combinations = generatedCombinations.value.map((c) => c.key)
-    // Устанавливаем базовую цену для всех
-    generatedCombinations.value.forEach((combo) => {
-      if (!form.prices[combo.key]) {
-        form.prices[combo.key] = form.price
-      }
+    calculatePricesWithStep()
+  }
+
+  // НОВАЯ функция для расчета цен с шагом
+  const calculatePricesWithStep = () => {
+    const step = parseFloat(form.price_step) || 0
+    const basePrice = parseFloat(form.price) || 0
+
+    generatedCombinations.value.forEach((combo, index) => {
+      // Первая вариация = базовая цена
+      // Каждая следующая = базовая + шаг * индекс
+      const calculatedPrice = basePrice + step * index
+      form.prices[combo.key] = calculatedPrice.toFixed(2)
     })
   }
 
@@ -490,7 +536,7 @@
     form.selected_combinations = []
   }
 
-  // Автовыбор всех комбинаций при их генерации
+  // ОБНОВЛЯЕМ watcher для автоматического пересчета при изменении
   watch(
     generatedCombinations,
     (newCombinations) => {
@@ -502,16 +548,20 @@
         // Добавляем новые комбинации к уже выбранным
         form.selected_combinations = [...existingKeys, ...newKeys.filter((key) => !existingKeys.includes(key))]
 
-        // Устанавливаем базовые цены для новых комбинаций
-        newCombinations.forEach((combo) => {
-          if (!form.prices[combo.key]) {
-            form.prices[combo.key] = form.price
-          }
-        })
+        // Пересчитываем цены с учетом шага
+        calculatePricesWithStep()
       }
     },
     { deep: true }
   )
+
+  // ДОБАВЛЯЕМ watcher для пересчета при изменении базовой цены или шага
+  watch([() => form.price, () => form.price_step], () => {
+    if (generatedCombinations.value.length > 0) {
+      calculatePricesWithStep()
+    }
+  })
+
   const addVariationAttribute = () => {
     if (selectedAttributeToAdd.value) {
       form.variation_attributes[selectedAttributeToAdd.value] = []
@@ -546,6 +596,20 @@
       }
     }
   )
+
+  // ДОБАВЛЯЕМ эти функции в script setup
+  const selectAllAttributeValues = (attrId) => {
+    // Получаем все ID значений для этого атрибута
+    const allValueIds = getAttributeValues(attrId).map((value) => value.id)
+
+    // Присваиваем все значения к этому атрибуту
+    form.variation_attributes[attrId] = [...allValueIds]
+  }
+
+  const deselectAllAttributeValues = (attrId) => {
+    // Очищаем все выбранные значения для этого атрибута
+    form.variation_attributes[attrId] = []
+  }
 
   const submit = () => {
     if (form.create_variations) {
