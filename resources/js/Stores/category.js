@@ -44,9 +44,11 @@ export const useCategoryStore = defineStore('category', () => {
       activeCategory.value = {
         id: parent.id,
         name: parent.translation?.name ?? 'Без названия',
+        logo: parent.logo,
         children: (parent.children || []).map((sub) => ({
           id: sub.id,
           name: sub.translation?.name ?? 'Без названия',
+          logo: sub.logo, // 🔹 ДОБАВЛЯЕМ ЛОГОТИП РЕБЕНКА
         })),
       }
       return
@@ -59,9 +61,11 @@ export const useCategoryStore = defineStore('category', () => {
         activeCategory.value = {
           id: sub.id,
           name: sub.translation?.name ?? 'Без названия',
+          logo: sub.logo, // 🔹 ДОБАВЛЯЕМ ЛОГОТИП
           children: (sub.children || []).map((s) => ({
             id: s.id,
             name: s.translation?.name ?? 'Без названия',
+            logo: s.logo, // 🔹 ДОБАВЛЯЕМ ЛОГОТИП
           })),
         }
         return

@@ -77,9 +77,11 @@
     return categoryStore.navCategories.map((category) => ({
       id: category.id,
       name: category.translation?.name ?? 'Без названия',
+      logo: category.logo,
       children: (category.children || []).map((sub) => ({
         id: sub.id,
         name: sub.translation?.name ?? 'Без названия',
+        logo: sub.logo,
       })),
     }))
   })

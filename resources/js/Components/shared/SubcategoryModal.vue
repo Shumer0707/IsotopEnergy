@@ -81,7 +81,11 @@
               class="flex flex-col items-center text-center hover:bg-gray-100 p-2 rounded"
               @click="handleOverlayClick"
             >
-              <img src="/images/placeholder.jpg" alt="Subcategory" class="w-16 h-16 object-contain bg-white rounded-md" />
+              <img
+                :src="sub.logo ? `/storage/${sub.logo}` : '/images/placeholder.jpg'"
+                :alt="sub.name"
+                class="w-16 h-16 object-contain bg-white rounded-md"
+              />
               <span class="text-sm mt-2">{{ sub.name }}</span>
             </Link>
           </div>
