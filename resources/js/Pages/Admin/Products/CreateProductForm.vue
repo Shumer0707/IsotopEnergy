@@ -340,19 +340,12 @@
           </div>
 
           <div class="w-full md:w-1/3 flex items-start gap-2">
-            <select
+            <SearchableSelect
               v-model="attr.value_id"
-              data-error
-              :class="[
-                'w-full p-2 border rounded',
-                form.errors[`attributes.${index}.value_id`] ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300',
-              ]"
-            >
-              <option disabled value="">Значение</option>
-              <option v-for="v in filteredValues(attr.attribute_id)" :key="v.id" :value="v.id">
-                {{ v.translated_value }}
-              </option>
-            </select>
+              :options="filteredValues(attr.attribute_id)"
+              :has-error="!!form.errors[`attributes.${index}.value_id`]"
+              placeholder="Выберите значение"
+            />
 
             <button
               type="button"
@@ -408,6 +401,7 @@
   import QuickAddValueModal from '@/Pages/Admin/AttributeValues/QuickAddValueModal.vue'
   import { ref, computed, watch } from 'vue'
   import { useForm } from '@inertiajs/vue3'
+  import SearchableSelect from '@/Components/shared/SearchableSelect.vue'
 
   const emit = defineEmits(['productAdded', 'cancel'])
 
