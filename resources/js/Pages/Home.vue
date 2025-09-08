@@ -16,7 +16,10 @@
       {{ t['h1-description'] }}
     </p>
     <div class="mt-6">
-      <a href="/about" class="bg-my_green hover:bg-my_green_op text-my_white px-6 py-3 rounded-lg font-semibold transition">
+      <a
+        :href="`/${$page.props.locale}/about`"
+        class="bg-my_green hover:bg-my_green_op text-my_white px-6 py-3 rounded-lg font-semibold transition"
+      >
         Подробнее о нас
       </a>
     </div>
