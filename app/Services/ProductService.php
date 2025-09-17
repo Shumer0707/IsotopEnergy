@@ -9,6 +9,8 @@ use App\Models\ProductAttribute;
 use App\Models\AttributeValue;
 use App\Models\Description;
 use App\Models\ProductAttributeValue;
+use App\Models\ProductVariant;
+use App\Models\ProductVariantAttribute;
 use Illuminate\Support\Facades\DB;
 
 class ProductService
@@ -21,38 +23,63 @@ class ProductService
       $productsQuery->where('category_id', $categoryId);
     }
 
-    // Применяем пагинацию перед загрузкой связанных данных
-    $products = $productsQuery->paginate(30); // 10 товаров на страницу
+    $products = $productsQuery->paginate(30);
 
-    // Загружаем дополнительные связанные данные для каждого товара на текущей странице
     $products->getCollection()->transform(function ($product) {
-      $product->attributeValues = $product->attributeValues()->get();
+      // Загружаем варианты с атрибутами
+      $product->variants = $product->variants()->with(['variantAttributes.attribute.translations', 'variantAttributes.attributeValue.translations'])->get();
       $product->images = $product->images()->get();
+
+      // Для совместимости с таблицей - цена дефолтного варианта
+      $defaultVariant = $product->variants->where('is_default', true)->first();
+      $product->price = $defaultVariant ? $defaultVariant->price : 0;
+
+      // ✅ ДОБАВЛЯЕМ: Подготавливаем варианты для формы редактирования
+      $product->variantsForEdit = $product->variants->map(function ($variant) {
+        return [
+          'id' => $variant->id,
+          'sku' => $variant->sku,
+          'price' => $variant->price,
+          'is_default' => $variant->is_default,
+          'attributes' => $variant->variantAttributes->map(function ($va) {
+            return [
+              'attribute_id' => $va->attribute_id,
+              'attribute_name' => $va->attribute->translatedName(),
+              'value_id' => $va->attribute_value_id,
+              'value_name' => $va->attributeValue->translatedValue(),
+            ];
+          }),
+        ];
+      });
+
       return $product;
     });
 
     return [
-      'products' => $products, // Laravel автоматически сериализует пагинированные данные для Inertia
+      'products' => $products,
       'categories' => Category::with('translation')->get(),
       'brands' => Brand::all(),
-      'attributes' => ProductAttribute::all(),
-      'values' => AttributeValue::all(),
+      'attributes' => ProductAttribute::with('translations')->get(),
+      'values' => AttributeValue::with('translations')->get(),
     ];
   }
 
   public function store(array $data): Product
   {
     return DB::transaction(function () use ($data) {
-      // 1. Создаём товар
+      // 1. Создаём основной товар (БЕЗ цены)
       $product = Product::create([
         'category_id' => $data['category_id'],
         'brand_id' => $data['brand_id'] ?? null,
-        'price' => $data['price'],
-        'discount_price' => $data['discount_price'] ?? null,
+        'base_sku' => $data['base_sku'] ?? null,
         'currency' => $data['currency'],
         'main_image' => null,
         'measurement' => $data['measurement'],
       ]);
+
+      if (empty($product->base_sku)) {
+        $product->update(['base_sku' => (string)$product->id]);
+      }
 
       // 2. Создаём описания
       foreach (['ru', 'ro', 'en'] as $lang) {
@@ -65,168 +92,113 @@ class ProductService
         ]);
       }
 
-      // 3. Привязываем атрибуты
-      foreach ($data['attributes'] ?? [] as $attr) {
-        ProductAttributeValue::create([
-          'product_id' => $product->id,
-          'attribute_id' => $attr['attribute_id'],
-          'attribute_value_id' => $attr['value_id'],
-        ]);
+      // 3. Обрабатываем изображения
+      if (!empty($data['images'])) {
+        $imageService = app(\App\Services\ImageService::class);
+        $imageService->upload($product, $data['images']);
+
+        // Устанавливаем первое изображение как главное
+        $firstImage = $product->images()->first();
+        if ($firstImage) {
+          $product->update(['main_image' => $firstImage->path]);
+        }
+      }
+
+      // 4. Создаём вариант(ы)
+      if (isset($data['create_variations']) && $data['create_variations']) {
+        // Создаём множественные варианты
+        $this->createMultipleVariants($product, $data);
+      } else {
+        // Создаём один простой вариант
+        $this->createSingleVariant($product, $data);
       }
 
       return $product;
     });
-  }
-
-  public function update(Product $product, array $data): Product
-  {
-    return DB::transaction(function () use ($product, $data) {
-      // 1. Обновляем сам товар
-      $product->update([
-        'category_id' => $data['category_id'],
-        'brand_id' => $data['brand_id'] ?? null,
-        'price' => $data['price'],
-        'discount_price' => $data['discount_price'] ?? null,
-        'currency' => $data['currency'],
-        'measurement' => $data['measurement'],
-      ]);
-
-      // 2. Обновляем описания
-      foreach (['ru', 'ro', 'en'] as $lang) {
-        $product->descriptions()->updateOrCreate(
-          ['language' => $lang],
-          [
-            'title' => trim($data['descriptions'][$lang]['title']),
-            'short_description' => trim($data['descriptions'][$lang]['short_description']),
-            'full_description' => trim($data['descriptions'][$lang]['full_description'] ?? ''),
-          ]
-        );
-      }
-
-      // 3. Обновляем атрибуты
-      $product->attributeValues()->delete();
-
-      foreach ($data['attributes'] ?? [] as $attr) {
-        ProductAttributeValue::create([
-          'product_id' => $product->id,
-          'attribute_id' => $attr['attribute_id'],
-          'attribute_value_id' => $attr['value_id'],
-        ]);
-      }
-
-      return $product;
-    });
-  }
-
-  public function destroy($product)
-  {
-    return $product->delete();
   }
 
   /**
-   * Создание вариаций товара
-   *
-   * @param array $baseData - данные базового товара
-   * @param array $variationConfig - конфиг вариаций
-   * @param array $variationImages - изображения для конкретных вариаций
-   * @param array $commonImages - общие изображения для всех вариаций
-   * @param bool $useCommonImages - использовать ли общие изображения
-   * @return array - массив созданных товаров
+   * Создание одного простого варианта (для обычных товаров)
    */
-  public function createVariations(array $baseData, array $variationConfig, array $variationImages = [], array $commonImages = [], bool $useCommonImages = false): array
+  private function createSingleVariant(Product $product, array $data): void
   {
-    return DB::transaction(function () use ($baseData, $variationConfig, $variationImages, $commonImages, $useCommonImages) {
-      $createdProducts = [];
+    // Создаём один вариант с базовой ценой
+    $variant = ProductVariant::create([
+      'product_id' => $product->id,
+      'sku' => $this->generateSingleVariantSku($product),
+      'price' => $data['price'],
+      'is_default' => true, // Единственный вариант автоматически дефолтный
+    ]);
 
-      // Получаем все комбинации атрибутов
-      $combinations = $this->generateAttributeCombinations($variationConfig['variation_attributes']);
+    // Привязываем обычные атрибуты к варианту
+    foreach ($data['attributes'] ?? [] as $attr) {
+      ProductVariantAttribute::create([
+        'variant_id' => $variant->id,
+        'attribute_id' => $attr['attribute_id'],
+        'attribute_value_id' => $attr['value_id'],
+      ]);
+    }
 
-      foreach ($combinations as $combination) {
-        // Пропускаем если админ не выбрал эту комбинацию
-        if (!in_array($combination['key'], $variationConfig['selected_combinations'])) {
-          continue;
-        }
+    // Обновляем SKU с учетом атрибутов
+    $variant->update(['sku' => $variant->generateSku()]);
+  }
 
-        // Создаем товар-вариацию
-        $productData = $baseData;
+  /**
+   * Создание множественных вариантов (для вариативных товаров)
+   */
+  private function createMultipleVariants(Product $product, array $data): void
+  {
+    $variationConfig = [
+      'variation_attributes' => $data['variation_attributes'],
+      'selected_combinations' => $data['selected_combinations'],
+      'prices' => $data['prices'],
+    ];
 
-        // Устанавливаем цену для этой вариации
-        $productData['price'] = $variationConfig['prices'][$combination['key']] ?? $baseData['price'];
+    // Получаем все комбинации атрибутов
+    $combinations = $this->generateAttributeCombinations($variationConfig['variation_attributes']);
+    $createdVariants = [];
 
-        // Создаем товар
-        $product = Product::create([
-          'category_id' => $productData['category_id'],
-          'brand_id' => $productData['brand_id'] ?? null,
-          'price' => $productData['price'],
-          'discount_price' => $productData['discount_price'] ?? null,
-          'currency' => $productData['currency'],
-          'main_image' => null,
-          'measurement' => $productData['measurement'],
-        ]);
-
-        // Создаем описания с модифицированным названием
-        foreach (['ru', 'ro', 'en'] as $lang) {
-          $title = $productData['descriptions'][$lang]['title'];
-          $variationTitle = $this->generateVariationTitle($title, $combination['attributes'], $lang);
-
-          Description::create([
-            'product_id' => $product->id,
-            'language' => $lang,
-            'title' => $variationTitle,
-            'short_description' => $productData['descriptions'][$lang]['short_description'],
-            'full_description' => $productData['descriptions'][$lang]['full_description'] ?? '',
-          ]);
-        }
-
-        // Привязываем атрибуты вариации
-        foreach ($combination['attributes'] as $attrId => $valueId) {
-          ProductAttributeValue::create([
-            'product_id' => $product->id,
-            'attribute_id' => $attrId,
-            'attribute_value_id' => $valueId,
-          ]);
-        }
-
-        // Привязываем остальные атрибуты (если есть)
-        foreach ($productData['attributes'] ?? [] as $attr) {
-          // Не дублируем атрибуты вариации
-          if (!array_key_exists($attr['attribute_id'], $combination['attributes'])) {
-            ProductAttributeValue::create([
-              'product_id' => $product->id,
-              'attribute_id' => $attr['attribute_id'],
-              'attribute_value_id' => $attr['value_id'],
-            ]);
-          }
-        }
-
-        $createdProducts[] = $product;
-
-        $imageService = app(\App\Services\ImageService::class);
-        $hasImages = false;
-
-        // Загружаем общие изображения если включена опция
-        if ($useCommonImages && !empty($commonImages)) {
-          $imageService->upload($product, $commonImages);
-          $hasImages = true;
-        }
-
-        // Загружаем индивидуальные изображения для этой вариации
-        if (isset($variationImages[$combination['key']]) && !empty($variationImages[$combination['key']])) {
-          $imageService->upload($product, $variationImages[$combination['key']]);
-          $hasImages = true;
-        }
-
-        // Устанавливаем первое изображение как главное если есть изображения
-        if ($hasImages) {
-          $firstImage = $product->images()->first();
-          if ($firstImage) {
-            $product->update(['main_image' => $firstImage->path]);
-          }
-        }
+    foreach ($combinations as $combination) {
+      // Пропускаем если админ не выбрал эту комбинацию
+      if (!in_array($combination['key'], $variationConfig['selected_combinations'])) {
+        continue;
       }
 
-      return $createdProducts;
-    });
+      // Создаем вариант
+      $variant = ProductVariant::create([
+        'product_id' => $product->id,
+        'sku' => 'temp_' . time() . '_' . rand(1000, 9999), // Временный SKU
+        'price' => $variationConfig['prices'][$combination['key']] ?? $data['price'],
+        'is_default' => false, // Пока все не дефолтные
+      ]);
+
+      // Привязываем атрибуты вариации
+      foreach ($combination['attributes'] as $attrId => $valueId) {
+        ProductVariantAttribute::create([
+          'variant_id' => $variant->id,
+          'attribute_id' => $attrId,
+          'attribute_value_id' => $valueId,
+        ]);
+      }
+
+      // Обновляем SKU с учетом атрибутов
+      $variant->update(['sku' => $variant->generateSku()]);
+      $createdVariants[] = $variant;
+    }
+
+    // Устанавливаем самый дешевый как дефолтный
+    if (!empty($createdVariants)) {
+      $cheapest = collect($createdVariants)->sortBy('price')->first();
+      $cheapest->update(['is_default' => true]);
+    }
+  }
+
+  /**
+   * Генерация SKU для простого варианта
+   */
+  private function generateSingleVariantSku(Product $product): string
+  {
+    return $product->base_sku ?? "product_{$product->id}";
   }
 
   /**
@@ -246,7 +218,7 @@ class ProductService
   /**
    * Рекурсивная генерация комбинаций
    */
-  private function generateCombinationsRecursive(array $attributes, array $attributeIds, array $current, array &$combinations, int $index = 0)
+  private function generateCombinationsRecursive(array $attributes, array $attributeIds, array $current, array &$combinations, int $index = 0): void
   {
     if ($index >= count($attributeIds)) {
       // Создаем ключ в том же формате что и во фронтенде: "1_5_2_8"
@@ -272,29 +244,41 @@ class ProductService
     }
   }
 
-  /**
-   * Генерация названия с атрибутами
-   */
-  private function generateVariationTitle(string $baseTitle, array $attributes, string $language): string
+  public function update(Product $product, array $data): Product
   {
-    // Получаем значения атрибутов для названия
-    $attributeValues = [];
+    return DB::transaction(function () use ($product, $data) {
+      // Обновляем сам товар
+      $product->update([
+        'category_id' => $data['category_id'],
+        'brand_id' => $data['brand_id'] ?? null,
+        'base_sku' => $data['base_sku'] ?? null,
+        'currency' => $data['currency'],
+        'measurement' => $data['measurement'],
+      ]);
 
-    foreach ($attributes as $attrId => $valueId) {
-      $value = \App\Models\AttributeValue::find($valueId);
-      if ($value) {
-        $translation = $value->translations()->where('language', $language)->first();
-        if ($translation) {
-          $attributeValues[] = $translation->value;
-        }
+      // Обновляем описания
+      foreach (['ru', 'ro', 'en'] as $lang) {
+        $product->descriptions()->updateOrCreate(
+          ['language' => $lang],
+          [
+            'title' => trim($data['descriptions'][$lang]['title']),
+            'short_description' => trim($data['descriptions'][$lang]['short_description']),
+            'full_description' => trim($data['descriptions'][$lang]['full_description'] ?? ''),
+          ]
+        );
       }
-    }
 
-    // Формируем название: "Базовое название (атрибут1, атрибут2)"
-    if (!empty($attributeValues)) {
-      return $baseTitle . ' (' . implode(', ', $attributeValues) . ')';
-    }
+      // TODO: Обновление вариантов - сложная логика, делаем позже
 
-    return $baseTitle;
+      return $product;
+    });
+  }
+
+  public function destroy($product)
+  {
+    return DB::transaction(function () use ($product) {
+      // Варианты удалятся каскадно благодаря внешним ключам
+      return $product->delete();
+    });
   }
 }

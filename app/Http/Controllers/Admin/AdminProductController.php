@@ -17,26 +17,26 @@ class AdminProductController extends Controller
 
     return Inertia::render('Admin/Products/IndexProducts', $service->getIndexData($categoryId));
   }
+
   public function store(StoreProductRequest $request, ProductService $service)
   {
-    // Проверяем, создаются ли вариации товара
-    if ($request->isCreatingVariations()) {
-      $createdProducts = $service->createVariations(
-        $request->getBaseProductData(),
-        $request->getVariationConfig(),
-        $request->file('variation_images', []), // Индивидуальные изображения
-        $request->file('common_images', []), // Общие изображения
-        $request->boolean('use_common_images', false) // Флаг использования общих
-      );
+    $productData = $request->getBaseProductData();
+    $productData['images'] = $request->getImages();
+    $productData['create_variations'] = $request->isCreatingVariations();
 
-      return redirect()->route('admin.products.index')
-        ->with('success', 'Создано вариаций товара: ' . count($createdProducts));
+    if ($request->isCreatingVariations()) {
+      $productData = array_merge($productData, $request->getVariationConfig());
     }
 
-    // Обычное создание одного товара
-    $service->store($request->validated());
+    $product = $service->store($productData);
 
-    return redirect()->route('admin.products.index')->with('success', 'Товар добавлен!');
+    if ($request->isCreatingVariations()) {
+      $variantsCount = $product->variants()->count();
+      $message = "Товар создан с {$variantsCount} вариантами!";
+    } else {
+      $message = 'Товар добавлен!';
+    }
+    return redirect()->route('admin.products.index')->with('success', $message);
   }
 
   public function update(UpdateProductRequest $request, Product $product, ProductService $service)

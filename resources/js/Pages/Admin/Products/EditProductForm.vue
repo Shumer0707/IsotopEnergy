@@ -77,105 +77,181 @@
         </div>
       </div>
 
-      <!-- Цена / Скидка -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+      <!-- Базовый SKU и измерение -->
+      <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label class="block">Цена</label>
+          <label class="block">Базовый артикул</label>
           <input
-            type="number"
-            step="0.01"
-            v-model="form.price"
+            type="text"
+            v-model="form.base_sku"
             data-error
             :class="[
               'w-full p-2 border rounded mb-1',
-              form.errors.price ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300',
+              form.errors.base_sku ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300',
             ]"
           />
-          <p v-if="form.errors.price" class="mt-1 text-sm text-red-600">{{ form.errors.price }}</p>
+          <p v-if="form.errors.base_sku" class="mt-1 text-sm text-red-600">{{ form.errors.base_sku }}</p>
+        </div>
+
+        <div>
+          <label class="block">Единицы измерения</label>
+          <select
+            v-model="form.measurement"
+            data-error
+            :class="[
+              'w-full p-2 border rounded mb-1',
+              form.errors.measurement ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300',
+            ]"
+          >
+            <option disabled value="">Выберите единицу измерения</option>
+            <option value="m²">m² (метр квадратный)</option>
+            <option value="m.p.">m.p. (метр погонный)</option>
+            <option value="kg">kg (килограмм)</option>
+            <option value="pcs">pcs (штука)</option>
+          </select>
+          <p v-if="form.errors.measurement" class="mt-1 text-sm text-red-600">{{ form.errors.measurement }}</p>
         </div>
       </div>
 
-      <!-- Измерение -->
-      <div class="mt-6">
-        <label class="block">Единицы измерения</label>
-        <input
-          v-model="form.measurement"
-          data-error
-          :class="[
-            'w-full p-2 border rounded mb-1 max-w-xs',
-            form.errors.measurement ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300',
-          ]"
-        />
-      </div>
-
-      <!-- Атрибуты -->
+      <!-- СЕКЦИЯ ВАРИАНТОВ ТОВАРА -->
       <div class="mt-8">
-        <h4 class="font-semibold mb-2">Атрибуты товара</h4>
-
-        <div
-          v-for="(attr, index) in form.attributes"
-          :key="index"
-          class="flex flex-col md:flex-row gap-2 items-start md:items-center mb-2"
-        >
-          <div class="w-full md:w-1/3">
-            <select
-              v-model="attr.attribute_id"
-              data-error
-              :class="[
-                'w-full p-2 border rounded',
-                form.errors[`attributes.${index}.attribute_id`] ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300',
-              ]"
-            >
-              <option disabled value="">Атрибут</option>
-              <option v-for="a in attributes" :key="a.id" :value="a.id">
-                {{ a.translated_name }}
-              </option>
-            </select>
-            <p v-if="form.errors[`attributes.${index}.attribute_id`]" class="mt-1 text-sm text-red-600">
-              {{ form.errors[`attributes.${index}.attribute_id`] }}
-            </p>
-          </div>
-
-          <!-- Значение + быстрый ввод -->
-          <div class="w-full md:w-1/3 flex items-start gap-2">
-            <select
-              v-model="attr.value_id"
-              data-error
-              :class="[
-                'w-full p-2 border rounded',
-                form.errors[`attributes.${index}.value_id`] ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300',
-              ]"
-            >
-              <option disabled value="">Значение</option>
-              <option v-for="v in filteredValues(attr.attribute_id)" :key="v.id" :value="v.id">
-                {{ v.translated_value }}
-              </option>
-            </select>
-
-            <button
-              type="button"
-              class="px-2 py-1 text-xs rounded bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50"
-              :disabled="!attr.attribute_id"
-              @click="openQuickAdd(index)"
-              title="Добавить новое значение"
-            >
-              ➕
-            </button>
-          </div>
-
-          <button
-            type="button"
-            @click="removeAttribute(index)"
-            class="text-red-600 hover:text-red-800 text-xl"
-            aria-label="Удалить атрибут"
-          >
-            ✖
+        <div class="flex items-center justify-between mb-4">
+          <h4 class="text-lg font-semibold">Варианты товара ({{ form.variants.length }})</h4>
+          <button type="button" @click="addVariant" class="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+            + Добавить вариант
           </button>
         </div>
 
-        <button type="button" @click="addAttribute" class="mt-2 px-3 py-1 bg-gray-300 rounded hover:bg-gray-400 text-sm">
-          ➕ Добавить атрибут
-        </button>
+        <!-- Список вариантов -->
+        <div v-if="form.variants.length > 0" class="space-y-4">
+          <div
+            v-for="(variant, index) in form.variants"
+            :key="variant.id || index"
+            class="border rounded-lg p-4 bg-white"
+            :class="{ 'ring-2 ring-blue-300': variant.is_default }"
+          >
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-medium text-gray-600">Вариант {{ index + 1 }}</span>
+                <span v-if="variant.is_default" class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">По умолчанию</span>
+                <span class="text-xs text-gray-500">SKU: {{ variant.sku }}</span>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <label class="text-xs">
+                  <input
+                    type="radio"
+                    :value="index"
+                    v-model="defaultVariantIndex"
+                    @change="setDefaultVariant(index)"
+                    class="mr-1"
+                  />
+                  По умолчанию
+                </label>
+                <button
+                  type="button"
+                  @click="removeVariant(index)"
+                  :disabled="form.variants.length <= 1"
+                  class="px-2 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
+                >
+                  Удалить
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Цена варианта -->
+              <div>
+                <label class="block text-sm font-medium mb-1">Цена</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  v-model="variant.price"
+                  data-error
+                  :class="[
+                    'w-full p-2 border rounded',
+                    form.errors[`variants.${index}.price`] ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300',
+                  ]"
+                />
+                <p v-if="form.errors[`variants.${index}.price`]" class="mt-1 text-sm text-red-600">
+                  {{ form.errors[`variants.${index}.price`] }}
+                </p>
+              </div>
+
+              <!-- Атрибуты варианта -->
+              <div>
+                <label class="block text-sm font-medium mb-1">Атрибуты</label>
+                <div v-if="variant.attributes && variant.attributes.length > 0" class="space-y-1">
+                  <div
+                    v-for="attr in variant.attributes"
+                    :key="attr.attribute_id + '_' + attr.value_id"
+                    class="flex items-center justify-between bg-gray-50 p-2 rounded text-sm"
+                  >
+                    <span>
+                      <strong>{{ attr.attribute_name }}:</strong>
+                      {{ attr.value_name }}
+                    </span>
+                    <button type="button" @click="removeVariantAttribute(index, attr)" class="text-red-600 hover:text-red-800">
+                      ×
+                    </button>
+                  </div>
+                </div>
+                <div v-else class="text-sm text-gray-500 italic">Атрибутов нет</div>
+
+                <!-- Кнопка добавления атрибута -->
+                <button
+                  type="button"
+                  @click="openAddVariantAttribute(index)"
+                  class="mt-2 px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
+                >
+                  + Добавить атрибут
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Если нет вариантов -->
+        <div v-else class="text-center py-8 text-gray-500">
+          <p>У товара нет вариантов</p>
+          <button type="button" @click="addVariant" class="mt-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+            Создать первый вариант
+          </button>
+        </div>
+      </div>
+
+      <!-- Отладочная секция для просмотра данных -->
+      <div class="mt-8 p-4 bg-gray-100 rounded">
+        <details>
+          <summary class="cursor-pointer font-medium">🔍 Отладочные данные</summary>
+          <div class="mt-2 text-xs">
+            <h5 class="font-medium mb-2">Исходные данные товара:</h5>
+            <pre class="bg-white p-2 rounded overflow-auto">{{
+              JSON.stringify(
+                {
+                  id: product.id,
+                  base_sku: product.base_sku,
+                  variants: product.variants,
+                  variantsForEdit: product.variantsForEdit,
+                },
+                null,
+                2
+              )
+            }}</pre>
+
+            <h5 class="font-medium mb-2 mt-4">Данные формы:</h5>
+            <pre class="bg-white p-2 rounded overflow-auto">{{
+              JSON.stringify(
+                {
+                  variants: form.variants,
+                  defaultVariantIndex: defaultVariantIndex,
+                },
+                null,
+                2
+              )
+            }}</pre>
+          </div>
+        </details>
       </div>
 
       <!-- Кнопки -->
@@ -188,7 +264,7 @@
             form.processing ? 'bg-yellow-400 cursor-not-allowed' : 'bg-yellow-600 hover:bg-yellow-700',
           ]"
         >
-          Обновить
+          Обновить товар
         </button>
         <button type="button" @click="$emit('cancel')" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
           Отмена
@@ -199,11 +275,22 @@
 
   <!-- Модалка быстрого добавления -->
   <QuickAddValueModal :isOpen="isQuickAddOpen" @close="isQuickAddOpen = false" @save="handleQuickAddSave" />
+
+  <!-- Модалка добавления атрибута к варианту -->
+  <AddVariantAttributeModal
+    :isOpen="isVariantAttributeModalOpen"
+    :attributes="attributes"
+    :values="values"
+    :existingAttributes="currentVariantAttributes"
+    @close="closeVariantAttributeModal"
+    @save="handleVariantAttributeSave"
+  />
 </template>
 
 <script setup>
   import axios from 'axios'
   import QuickAddValueModal from '@/Pages/Admin/AttributeValues/QuickAddValueModal.vue'
+  import AddVariantAttributeModal from './AddVariantAttributeModal.vue'
   import { computed, ref } from 'vue'
   import { useForm } from '@inertiajs/vue3'
 
@@ -219,23 +306,31 @@
 
   const childCategories = computed(() => props.categories.filter((cat) => cat.parent_id !== null))
 
+  // Находим индекс дефолтного варианта
+  const findDefaultVariantIndex = () => {
+    if (!props.product.variantsForEdit) return 0
+    const defaultIndex = props.product.variantsForEdit.findIndex((v) => v.is_default)
+    return defaultIndex >= 0 ? defaultIndex : 0
+  }
+
+  const defaultVariantIndex = ref(findDefaultVariantIndex())
+
   const form = useForm({
     id: props.product.id,
     category_id: props.product.category_id ?? '',
     brand_id: props.product.brand_id ?? '',
-    price: props.product.price ?? '',
-    discount_price: props.product.discount_price ?? '',
+    base_sku: props.product.base_sku ?? '',
     currency: props.product.currency ?? 'MDL',
-    measurement: props.product.measurement,
+    measurement: props.product.measurement ?? '',
     descriptions: {
       ru: { title: '', short_description: '', full_description: '' },
       ro: { title: '', short_description: '', full_description: '' },
       en: { title: '', short_description: '', full_description: '' },
     },
-    attributes: [],
+    variants: [], // Варианты товара
   })
 
-  // descriptions из пропсов
+  // Заполняем descriptions из пропсов
   if (Array.isArray(props.product.descriptions)) {
     for (const desc of props.product.descriptions) {
       const lang = desc.language
@@ -247,23 +342,73 @@
     }
   }
 
-  // attributes из пропсов
-  form.attributes =
-    props.product.attributeValues?.map((attr) => ({
-      attribute_id: attr.attribute_id,
-      value_id: attr.attribute_value_id,
-    })) ?? []
+  // Заполняем варианты из пропсов
+  if (props.product.variantsForEdit && Array.isArray(props.product.variantsForEdit)) {
+    form.variants = props.product.variantsForEdit.map((variant) => ({
+      id: variant.id,
+      sku: variant.sku,
+      price: variant.price,
+      is_default: variant.is_default,
+      attributes: variant.attributes || [],
+    }))
+  }
 
-  const addAttribute = () => form.attributes.push({ attribute_id: '', value_id: '' })
-  const removeAttribute = (index) => form.attributes.splice(index, 1)
+  // Методы для работы с вариантами
+  const addVariant = () => {
+    form.variants.push({
+      id: null, // null означает новый вариант
+      sku: 'Будет сгенерирован',
+      price: 0,
+      is_default: form.variants.length === 0, // Первый вариант автоматически дефолтный
+      attributes: [],
+    })
 
-  /** Локальный список значений (инициализируем из пропсов, чтобы можно было дополнять) */
-  const allValues = ref([...(props.values ?? [])])
-  const filteredValues = (attrId) => allValues.value.filter((v) => v.attribute_id === attrId)
+    if (form.variants.length === 1) {
+      defaultVariantIndex.value = 0
+    }
+  }
+
+  const removeVariant = (index) => {
+    if (form.variants.length <= 1) return
+
+    const wasDefault = form.variants[index].is_default
+    form.variants.splice(index, 1)
+
+    // Если удалили дефолтный вариант, делаем дефолтным первый
+    if (wasDefault && form.variants.length > 0) {
+      form.variants[0].is_default = true
+      defaultVariantIndex.value = 0
+    }
+  }
+
+  const setDefaultVariant = (index) => {
+    // Сбрасываем все дефолтные значения
+    form.variants.forEach((variant) => (variant.is_default = false))
+    // Устанавливаем новый дефолтный
+    form.variants[index].is_default = true
+    defaultVariantIndex.value = index
+  }
+
+  const addVariantAttribute = (variantIndex) => {
+    // TODO: Открыть модалку выбора атрибута и значения
+    alert('TODO: Добавление атрибута к варианту')
+  }
+
+  const removeVariantAttribute = (variantIndex, attrToRemove) => {
+    const variant = form.variants[variantIndex]
+    variant.attributes = variant.attributes.filter(
+      (attr) => !(attr.attribute_id === attrToRemove.attribute_id && attr.value_id === attrToRemove.value_id)
+    )
+  }
 
   /** Модалка быстрого добавления */
   const isQuickAddOpen = ref(false)
   const quickAddIndex = ref(null)
+
+  /** Модалка добавления атрибута к варианту */
+  const isVariantAttributeModalOpen = ref(false)
+  const currentVariantIndex = ref(null)
+  const currentVariantAttributes = ref([])
 
   const openQuickAdd = (index) => {
     quickAddIndex.value = index
@@ -272,33 +417,13 @@
 
   /** Сохранение нового значения через axios */
   const handleQuickAddSave = async ({ ru, ro, en }) => {
-    const row = quickAddIndex.value
-    const attrId = form.attributes[row]?.attribute_id
-    if (!attrId) {
-      alert('Сначала выберите атрибут.')
-      return
-    }
-
-    try {
-      const { data } = await axios.post('/admin/attribute-values/quick-store', {
-        attribute_id: attrId,
-        translations: { ru, ro, en },
-      })
-
-      // подмешиваем и сразу выбираем
-      allValues.value.push(data)
-      form.attributes[row].value_id = data.id
-      isQuickAddOpen.value = false
-    } catch (e) {
-      const msg =
-        e?.response?.data?.message ||
-        (e?.response?.data?.errors && Object.values(e.response.data.errors).flat().join('\n')) ||
-        'Не удалось создать значение.'
-      alert(msg)
-    }
+    // TODO: Логика для старых атрибутов если нужна
+    isQuickAddOpen.value = false
   }
 
   const submit = () => {
+    console.log('Отправка формы:', form.data())
+
     form.post(`/admin/products/update/${form.id}`, {
       onSuccess: () => emit('productUpdated'),
       onError: () => {

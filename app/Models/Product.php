@@ -13,13 +13,15 @@ class Product extends Model
   protected $fillable = [
     'category_id',
     'brand_id',
-    'price',
+    'base_sku',        // Базовый артикул для генерации SKU вариантов
     'measurement',
     'currency',
     'main_image'
   ];
 
-  protected $appends = ['discounted_price'];
+  // Убираем 'discounted_price' из appends, так как цены теперь в вариантах
+  // protected $appends = ['discounted_price'];
+
   // ✅ Описание на текущем языке
   public function description()
   {
@@ -33,6 +35,7 @@ class Product extends Model
   {
     return $this->hasMany(Description::class);
   }
+
   public function brand()
   {
     return $this->belongsTo(Brand::class);
@@ -43,6 +46,33 @@ class Product extends Model
     return $this->belongsTo(Category::class);
   }
 
+  // ✅ НОВЫЕ СВЯЗИ ДЛЯ ВАРИАНТОВ
+
+  // Все варианты товара
+  public function variants()
+  {
+    return $this->hasMany(ProductVariant::class);
+  }
+
+  // Основной (дефолтный) вариант
+  public function defaultVariant()
+  {
+    return $this->hasOne(ProductVariant::class)->where('is_default', true);
+  }
+
+  // Самый дешевый вариант
+  public function cheapestVariant()
+  {
+    return $this->hasOne(ProductVariant::class)->orderBy('price', 'asc');
+  }
+
+  // Самый дорогой вариант
+  public function expensiveVariant()
+  {
+    return $this->hasOne(ProductVariant::class)->orderBy('price', 'desc');
+  }
+
+  // ✅ СТАРЫЕ СВЯЗИ (пока оставляем для совместимости)
   public function attributes()
   {
     return $this->belongsToMany(ProductAttribute::class, 'product_attribute_values')
@@ -53,21 +83,56 @@ class Product extends Model
   {
     return $this->hasMany(Image::class);
   }
+
   public function attributeValues()
   {
     return $this->hasMany(ProductAttributeValue::class, 'product_id', 'id');
   }
 
+  // Связь с акциями (пока оставляем)
   public function promotion()
   {
     return $this->hasOne(Promotion::class);
   }
 
-  public function getDiscountedPriceAttribute()
-{
-    $discount = $this->promotion?->discountGroup?->discount_percent ?? 0;
-    $discounted = $this->price * (1 - $discount / 100);
+  // ✅ НОВЫЕ МЕТОДЫ ДЛЯ РАБОТЫ С ВАРИАНТАМИ
 
-    return number_format(floor($discounted), 2, '.', '');
-}
+  // Получить диапазон цен товара
+  public function getPriceRange()
+  {
+    $prices = $this->variants()->pluck('price');
+
+    if ($prices->isEmpty()) {
+      return null;
+    }
+
+    $min = $prices->min();
+    $max = $prices->max();
+
+    return $min == $max ?
+      number_format($min, 2) :
+      number_format($min, 2) . ' - ' . number_format($max, 2);
+  }
+
+  // Установить дефолтный вариант (самый дешевый)
+  public function setDefaultVariant()
+  {
+    // Сбрасываем все дефолтные варианты
+    $this->variants()->update(['is_default' => false]);
+
+    // Находим самый дешевый и делаем его дефолтным
+    $cheapest = $this->variants()->orderBy('price', 'asc')->first();
+
+    if ($cheapest) {
+      $cheapest->update(['is_default' => true]);
+    }
+
+    return $cheapest;
+  }
+
+  // Проверка - есть ли варианты у товара
+  public function hasVariants()
+  {
+    return $this->variants()->exists();
+  }
 }

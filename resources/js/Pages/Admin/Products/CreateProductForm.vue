@@ -70,20 +70,38 @@
         </div>
       </div>
 
-      <!-- Цена -->
-      <div class="mt-6">
-        <label class="block">Базовая цена</label>
-        <input
-          type="number"
-          step="0.01"
-          v-model="form.price"
-          data-error
-          :class="[
-            'w-full p-2 border rounded mb-1 max-w-xs',
-            form.errors.price ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300',
-          ]"
-        />
-        <p v-if="form.errors.price" class="mt-1 text-sm text-red-600">{{ form.errors.price }}</p>
+      <!-- Цена и артикул -->
+      <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block">Базовая цена</label>
+          <input
+            type="number"
+            step="0.01"
+            v-model="form.price"
+            data-error
+            :class="[
+              'w-full p-2 border rounded mb-1',
+              form.errors.price ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300',
+            ]"
+          />
+          <p v-if="form.errors.price" class="mt-1 text-sm text-red-600">{{ form.errors.price }}</p>
+        </div>
+
+        <div>
+          <label class="block">Базовый артикул</label>
+          <input
+            type="text"
+            v-model="form.base_sku"
+            data-error
+            placeholder="12345"
+            :class="[
+              'w-full p-2 border rounded mb-1',
+              form.errors.base_sku ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300',
+            ]"
+          />
+          <p v-if="form.errors.base_sku" class="mt-1 text-sm text-red-600">{{ form.errors.base_sku }}</p>
+          <p class="text-xs text-gray-500 mt-1">Для генерации артикулов вариантов (необязательно)</p>
+        </div>
       </div>
 
       <!-- Измерение -->
@@ -106,13 +124,36 @@
         <p v-if="form.errors.measurement" class="mt-1 text-sm text-red-600">{{ form.errors.measurement }}</p>
       </div>
 
+      <!-- Изображения товара -->
+      <div class="mt-6">
+        <label class="block mb-2">Изображения товара</label>
+        <input type="file" multiple accept="image/*" @change="handleImages" class="mb-3" />
+        <p class="text-xs text-gray-500 mb-2">Первое изображение станет главным</p>
+
+        <!-- Предпросмотр изображений -->
+        <div v-if="form.images && form.images.length > 0" class="flex gap-2 flex-wrap">
+          <div v-for="(file, index) in form.images" :key="index" class="relative w-20 h-20 border rounded overflow-hidden">
+            <img :src="getImagePreview(file)" alt="Preview" class="w-full h-full object-cover" />
+            <button
+              type="button"
+              @click="removeImage(index)"
+              class="absolute top-0 right-0 bg-red-600 text-white text-xs w-5 h-5 flex items-center justify-center"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Чекбокс создания вариаций -->
       <div class="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded">
         <label class="flex items-center">
           <input type="checkbox" v-model="form.create_variations" class="mr-2" />
           <span class="font-medium">Создать вариации товара</span>
         </label>
-        <p class="text-sm text-gray-600 mt-1">Создать несколько товаров с разными характеристиками (размер, плотность и т.д.)</p>
+        <p class="text-sm text-gray-600 mt-1">
+          Создать несколько вариантов с разными характеристиками (размер, плотность и т.д.)
+        </p>
       </div>
 
       <!-- НОВОЕ ПОЛЕ: Шаг увеличения цены -->
@@ -138,37 +179,6 @@
       <!-- Секция вариаций -->
       <div v-if="form.create_variations" class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded">
         <h4 class="font-semibold mb-4">Настройка вариаций</h4>
-
-        <!-- Общие фото для всех вариаций -->
-        <div class="mb-6 p-3 bg-white rounded border">
-          <label class="flex items-center mb-2">
-            <input type="checkbox" v-model="form.use_common_images" class="mr-2" />
-            <span class="font-medium">Использовать общие фото для всех вариаций</span>
-          </label>
-          <p class="text-sm text-gray-600 mb-3">Одни и те же изображения будут добавлены ко всем создаваемым товарам</p>
-
-          <div v-if="form.use_common_images">
-            <input type="file" multiple accept="image/*" @change="handleCommonImages" class="mb-2" />
-
-            <!-- Предпросмотр общих фото -->
-            <div v-if="form.common_images && form.common_images.length > 0" class="flex gap-2 flex-wrap">
-              <div
-                v-for="(file, index) in form.common_images"
-                :key="index"
-                class="relative w-16 h-16 border rounded overflow-hidden"
-              >
-                <img :src="getImagePreview(file)" alt="Preview" class="w-full h-full object-cover" />
-                <button
-                  type="button"
-                  @click="removeCommonImage(index)"
-                  class="absolute top-0 right-0 bg-red-600 text-white text-xs w-4 h-4 flex items-center justify-center"
-                >
-                  ×
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
 
         <!-- Выбор атрибутов для вариаций -->
         <div v-for="(selectedValues, attrId) in form.variation_attributes" :key="attrId" class="mb-4">
@@ -254,7 +264,7 @@
           </div>
 
           <div class="overflow-y-auto border rounded p-2 bg-white">
-            <div v-for="combination in generatedCombinations" :key="combination.key" class="p-3 border rounded bg-gray-50">
+            <div v-for="combination in generatedCombinations" :key="combination.key" class="p-3 border rounded bg-gray-50 mb-2">
               <label class="flex items-center mb-2">
                 <input type="checkbox" :value="combination.key" v-model="form.selected_combinations" class="mr-2" />
                 <span class="text-sm font-medium">{{ combination.displayName }}</span>
@@ -271,39 +281,6 @@
                     placeholder="Цена"
                     class="w-24 p-1 text-sm border rounded"
                   />
-                </div>
-
-                <!-- Загрузка изображений для вариации -->
-                <div v-if="form.selected_combinations.includes(combination.key)">
-                  <label class="text-xs text-gray-600">Фото:</label>
-                  <input
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    @change="handleVariationImages(combination.key, $event)"
-                    class="text-xs w-32"
-                  />
-
-                  <!-- Предпросмотр выбранных фото -->
-                  <div
-                    v-if="form.variation_images[combination.key] && form.variation_images[combination.key].length > 0"
-                    class="flex gap-1 mt-1"
-                  >
-                    <div
-                      v-for="(file, index) in form.variation_images[combination.key]"
-                      :key="index"
-                      class="relative w-12 h-12 border rounded overflow-hidden"
-                    >
-                      <img :src="getImagePreview(file)" alt="Preview" class="w-full h-full object-cover" />
-                      <button
-                        type="button"
-                        @click="removeVariationImage(combination.key, index)"
-                        class="absolute top-0 right-0 bg-red-600 text-white text-xs w-4 h-4 flex items-center justify-center"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
@@ -416,8 +393,10 @@
     category_id: '',
     brand_id: '',
     price: '',
+    base_sku: '',
     currency: 'MDL',
     measurement: '',
+    images: [], // Изображения товара
     descriptions: {
       ru: { title: '', short_description: '' },
       ro: { title: '', short_description: '' },
@@ -430,9 +409,6 @@
     variation_attributes: {},
     selected_combinations: [],
     prices: {},
-    variation_images: {}, // Храним файлы для каждой вариации
-    use_common_images: false, // Использовать общие фото
-    common_images: [], // Общие фото для всех вариаций
   })
 
   const childCategories = computed(() => props.categories.filter((cat) => cat.parent_id !== null))
@@ -478,29 +454,14 @@
     return combinations
   })
 
-  // Методы для работы с общими изображениями
-  const handleCommonImages = (event) => {
+  // Методы для работы с изображениями
+  const handleImages = (event) => {
     const files = Array.from(event.target.files)
-    form.common_images.push(...files)
+    form.images.push(...files)
   }
 
-  const removeCommonImage = (index) => {
-    form.common_images.splice(index, 1)
-  }
-
-  // Методы для работы с изображениями вариаций
-  const handleVariationImages = (combinationKey, event) => {
-    const files = Array.from(event.target.files)
-    if (!form.variation_images[combinationKey]) {
-      form.variation_images[combinationKey] = []
-    }
-    form.variation_images[combinationKey].push(...files)
-  }
-
-  const removeVariationImage = (combinationKey, index) => {
-    if (form.variation_images[combinationKey]) {
-      form.variation_images[combinationKey].splice(index, 1)
-    }
+  const removeImage = (index) => {
+    form.images.splice(index, 1)
   }
 
   const getImagePreview = (file) => {
@@ -517,6 +478,9 @@
   const calculatePricesWithStep = () => {
     const step = parseFloat(form.price_step) || 0
     const basePrice = parseFloat(form.price) || 0
+
+    // ✅ ОЧИЩАЕМ СТАРЫЕ ЦЕНЫ
+    form.prices = {}
 
     generatedCombinations.value.forEach((combo, index) => {
       // Первая вариация = базовая цена
@@ -560,6 +524,7 @@
     if (selectedAttributeToAdd.value) {
       form.variation_attributes[selectedAttributeToAdd.value] = []
       selectedAttributeToAdd.value = ''
+      form.prices = {}
     }
   }
 
@@ -583,15 +548,10 @@
         form.variation_attributes = {}
         form.selected_combinations = []
         form.prices = {}
-        form.variation_images = {}
-        form.use_common_images = false
-        form.common_images = []
-        form.measurement = {}
       }
     }
   )
 
-  // ДОБАВЛЯЕМ эти функции в script setup
   const selectAllAttributeValues = (attrId) => {
     // Получаем все ID значений для этого атрибута
     const allValueIds = getAttributeValues(attrId).map((value) => value.id)
@@ -607,6 +567,11 @@
 
   const submit = () => {
     if (form.create_variations) {
+      // Проверим что у нас есть данные для отправки
+      if (form.selected_combinations.length === 0) {
+        alert('Выберите хотя бы одну комбинацию!')
+        return
+      }
       // Для вариаций отправляем через FormData
       const formData = new FormData()
 
@@ -614,9 +579,15 @@
       formData.append('category_id', form.category_id)
       formData.append('brand_id', form.brand_id || '')
       formData.append('price', form.price)
+      formData.append('base_sku', form.base_sku || '')
       formData.append('currency', form.currency)
       formData.append('create_variations', 'true')
       formData.append('measurement', form.measurement)
+
+      // Добавляем изображения
+      form.images.forEach((file, index) => {
+        formData.append(`images[${index}]`, file)
+      })
 
       // Добавляем описания
       Object.keys(form.descriptions).forEach((lang) => {
@@ -641,16 +612,6 @@
         formData.append(`prices[${combo}]`, form.prices[combo])
       })
 
-      // Добавляем изображения вариаций
-      Object.keys(form.variation_images).forEach((combinationKey) => {
-        const images = form.variation_images[combinationKey]
-        if (images && images.length > 0) {
-          images.forEach((file) => {
-            formData.append(`variation_images[${combinationKey}][]`, file)
-          })
-        }
-      })
-
       form.post('/admin/products/store', {
         data: formData,
         forceFormData: true,
@@ -671,7 +632,36 @@
       })
     } else {
       // Обычная отправка для простых товаров
+      const formData = new FormData()
+
+      // Добавляем основные поля
+      formData.append('category_id', form.category_id)
+      formData.append('brand_id', form.brand_id || '')
+      formData.append('price', form.price)
+      formData.append('base_sku', form.base_sku || '')
+      formData.append('currency', form.currency)
+      formData.append('measurement', form.measurement)
+
+      // Добавляем изображения
+      form.images.forEach((file, index) => {
+        formData.append(`images[${index}]`, file)
+      })
+
+      // Добавляем описания
+      Object.keys(form.descriptions).forEach((lang) => {
+        formData.append(`descriptions[${lang}][title]`, form.descriptions[lang].title)
+        formData.append(`descriptions[${lang}][short_description]`, form.descriptions[lang].short_description)
+      })
+
+      // Добавляем обычные атрибуты
+      form.attributes.forEach((attr, index) => {
+        formData.append(`attributes[${index}][attribute_id]`, attr.attribute_id)
+        formData.append(`attributes[${index}][value_id]`, attr.value_id)
+      })
+
       form.post('/admin/products/store', {
+        data: formData,
+        forceFormData: true,
         onSuccess: () => {
           form.reset()
           emit('productAdded')
@@ -681,7 +671,7 @@
             const el =
               document.querySelector('[data-error].ring-red-500, [data-error].border-red-500') ||
               document.querySelector('.text-red-600')
-            el?.scrollIntoView({ behavior: 'smart', block: 'center' })
+            el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
             el?.focus?.()
           })
         },
