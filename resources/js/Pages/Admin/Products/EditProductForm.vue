@@ -68,8 +68,7 @@
             {{ form.errors[`descriptions.${lang}.short_description`] }}
           </p>
 
-          <!-- Полное описание (опционально) -->
-          <label class="block mt-2">Полное описание (опционально)</label>
+          <label class="block mt-2">Полное описание</label>
           <textarea
             v-model="form.descriptions[lang].full_description"
             class="w-full p-2 border rounded border-gray-300"
@@ -113,7 +112,7 @@
         </div>
       </div>
 
-      <!-- СЕКЦИЯ ВАРИАНТОВ ТОВАРА -->
+      <!-- Варианты товара -->
       <div class="mt-8">
         <div class="flex items-center justify-between mb-4">
           <h4 class="text-lg font-semibold">Варианты товара ({{ form.variants.length }})</h4>
@@ -130,6 +129,7 @@
             class="border rounded-lg p-4 bg-white"
             :class="{ 'ring-2 ring-blue-300': variant.is_default }"
           >
+            <!-- Заголовок варианта -->
             <div class="flex items-center justify-between mb-3">
               <div class="flex items-center gap-2">
                 <span class="text-sm font-medium text-gray-600">Вариант {{ index + 1 }}</span>
@@ -159,6 +159,7 @@
               </div>
             </div>
 
+            <!-- Цена и атрибуты -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <!-- Цена варианта -->
               <div>
@@ -181,7 +182,9 @@
               <!-- Атрибуты варианта -->
               <div>
                 <label class="block text-sm font-medium mb-1">Атрибуты</label>
-                <div v-if="variant.attributes && variant.attributes.length > 0" class="space-y-1">
+
+                <!-- Список существующих атрибутов -->
+                <div v-if="variant.attributes && variant.attributes.length > 0" class="space-y-1 mb-2">
                   <div
                     v-for="attr in variant.attributes"
                     :key="attr.attribute_id + '_' + attr.value_id"
@@ -196,13 +199,14 @@
                     </button>
                   </div>
                 </div>
-                <div v-else class="text-sm text-gray-500 italic">Атрибутов нет</div>
+
+                <div v-else class="text-sm text-gray-500 italic mb-2">Атрибутов нет</div>
 
                 <!-- Кнопка добавления атрибута -->
                 <button
                   type="button"
                   @click="openAddVariantAttribute(index)"
-                  class="mt-2 px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
+                  class="px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
                 >
                   + Добавить атрибут
                 </button>
@@ -218,40 +222,6 @@
             Создать первый вариант
           </button>
         </div>
-      </div>
-
-      <!-- Отладочная секция для просмотра данных -->
-      <div class="mt-8 p-4 bg-gray-100 rounded">
-        <details>
-          <summary class="cursor-pointer font-medium">🔍 Отладочные данные</summary>
-          <div class="mt-2 text-xs">
-            <h5 class="font-medium mb-2">Исходные данные товара:</h5>
-            <pre class="bg-white p-2 rounded overflow-auto">{{
-              JSON.stringify(
-                {
-                  id: product.id,
-                  base_sku: product.base_sku,
-                  variants: product.variants,
-                  variantsForEdit: product.variantsForEdit,
-                },
-                null,
-                2
-              )
-            }}</pre>
-
-            <h5 class="font-medium mb-2 mt-4">Данные формы:</h5>
-            <pre class="bg-white p-2 rounded overflow-auto">{{
-              JSON.stringify(
-                {
-                  variants: form.variants,
-                  defaultVariantIndex: defaultVariantIndex,
-                },
-                null,
-                2
-              )
-            }}</pre>
-          </div>
-        </details>
       </div>
 
       <!-- Кнопки -->
@@ -273,9 +243,6 @@
     </form>
   </div>
 
-  <!-- Модалка быстрого добавления -->
-  <QuickAddValueModal :isOpen="isQuickAddOpen" @close="isQuickAddOpen = false" @save="handleQuickAddSave" />
-
   <!-- Модалка добавления атрибута к варианту -->
   <AddVariantAttributeModal
     :isOpen="isVariantAttributeModalOpen"
@@ -288,8 +255,6 @@
 </template>
 
 <script setup>
-  import axios from 'axios'
-  import QuickAddValueModal from '@/Pages/Admin/AttributeValues/QuickAddValueModal.vue'
   import AddVariantAttributeModal from './AddVariantAttributeModal.vue'
   import { computed, ref } from 'vue'
   import { useForm } from '@inertiajs/vue3'
@@ -315,6 +280,7 @@
 
   const defaultVariantIndex = ref(findDefaultVariantIndex())
 
+  // Инициализация формы
   const form = useForm({
     id: props.product.id,
     category_id: props.product.category_id ?? '',
@@ -327,17 +293,19 @@
       ro: { title: '', short_description: '', full_description: '' },
       en: { title: '', short_description: '', full_description: '' },
     },
-    variants: [], // Варианты товара
+    variants: [],
   })
 
   // Заполняем descriptions из пропсов
   if (Array.isArray(props.product.descriptions)) {
     for (const desc of props.product.descriptions) {
       const lang = desc.language
-      form.descriptions[lang] = {
-        title: desc.title ?? '',
-        short_description: desc.short_description ?? '',
-        full_description: desc.full_description ?? '',
+      if (form.descriptions[lang]) {
+        form.descriptions[lang] = {
+          title: desc.title ?? '',
+          short_description: desc.short_description ?? '',
+          full_description: desc.full_description ?? '',
+        }
       }
     }
   }
@@ -389,11 +357,6 @@
     defaultVariantIndex.value = index
   }
 
-  const addVariantAttribute = (variantIndex) => {
-    // TODO: Открыть модалку выбора атрибута и значения
-    alert('TODO: Добавление атрибута к варианту')
-  }
-
   const removeVariantAttribute = (variantIndex, attrToRemove) => {
     const variant = form.variants[variantIndex]
     variant.attributes = variant.attributes.filter(
@@ -401,33 +364,50 @@
     )
   }
 
-  /** Модалка быстрого добавления */
-  const isQuickAddOpen = ref(false)
-  const quickAddIndex = ref(null)
-
-  /** Модалка добавления атрибута к варианту */
+  // Модалка добавления атрибута к варианту
   const isVariantAttributeModalOpen = ref(false)
   const currentVariantIndex = ref(null)
   const currentVariantAttributes = ref([])
 
-  const openQuickAdd = (index) => {
-    quickAddIndex.value = index
-    isQuickAddOpen.value = true
+  const openAddVariantAttribute = (index) => {
+    currentVariantIndex.value = index
+    // Передаем существующие атрибуты этого варианта
+    currentVariantAttributes.value = form.variants[index].attributes || []
+    isVariantAttributeModalOpen.value = true
   }
 
-  /** Сохранение нового значения через axios */
-  const handleQuickAddSave = async ({ ru, ro, en }) => {
-    // TODO: Логика для старых атрибутов если нужна
-    isQuickAddOpen.value = false
+  const closeVariantAttributeModal = () => {
+    currentVariantIndex.value = null
+    currentVariantAttributes.value = []
+    isVariantAttributeModalOpen.value = false
   }
 
+  const handleVariantAttributeSave = (attributeData) => {
+    const variantIndex = currentVariantIndex.value
+
+    if (variantIndex !== null && form.variants[variantIndex]) {
+      // Проверяем что у варианта есть массив атрибутов
+      if (!form.variants[variantIndex].attributes) {
+        form.variants[variantIndex].attributes = []
+      }
+
+      // Добавляем новый атрибут
+      form.variants[variantIndex].attributes.push({
+        attribute_id: attributeData.attribute_id,
+        attribute_name: attributeData.attribute_name,
+        value_id: attributeData.value_id,
+        value_name: attributeData.value_name,
+      })
+    }
+
+    closeVariantAttributeModal()
+  }
+
+  // Отправка формы
   const submit = () => {
-    console.log('Отправка формы:', form.data())
-
     form.post(`/admin/products/update/${form.id}`, {
       onSuccess: () => emit('productUpdated'),
       onError: () => {
-        // скролл к первому полю с ошибкой
         queueMicrotask(() => {
           const el =
             document.querySelector('[data-error].ring-red-500, [data-error].border-red-500') ||

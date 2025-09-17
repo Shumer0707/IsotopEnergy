@@ -41,7 +41,13 @@ class AdminProductController extends Controller
 
   public function update(UpdateProductRequest $request, Product $product, ProductService $service)
   {
-    $service->update($product, $request->validated());
+    $baseData = $request->getBaseProductData();
+    $variantsData = $request->getVariantsData();
+
+    // Объединяем данные
+    $productData = array_merge($baseData, ['variants' => $variantsData]);
+
+    $service->update($product, $productData);
 
     return redirect()->route('admin.products.index')->with('success', 'Товар обновлён!');
   }

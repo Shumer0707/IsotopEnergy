@@ -247,31 +247,138 @@ class ProductService
   public function update(Product $product, array $data): Product
   {
     return DB::transaction(function () use ($product, $data) {
-      // Обновляем сам товар
+      // 1. Обновляем основные данные товара
+      $baseData = collect($data)->except(['variants'])->toArray();
+
       $product->update([
-        'category_id' => $data['category_id'],
-        'brand_id' => $data['brand_id'] ?? null,
-        'base_sku' => $data['base_sku'] ?? null,
-        'currency' => $data['currency'],
-        'measurement' => $data['measurement'],
+        'category_id' => $baseData['category_id'],
+        'brand_id' => $baseData['brand_id'] ?? null,
+        'base_sku' => $baseData['base_sku'] ?? null,
+        'currency' => $baseData['currency'],
+        'measurement' => $baseData['measurement'],
       ]);
 
-      // Обновляем описания
+      // 2. Обновляем описания
       foreach (['ru', 'ro', 'en'] as $lang) {
         $product->descriptions()->updateOrCreate(
           ['language' => $lang],
           [
-            'title' => trim($data['descriptions'][$lang]['title']),
-            'short_description' => trim($data['descriptions'][$lang]['short_description']),
-            'full_description' => trim($data['descriptions'][$lang]['full_description'] ?? ''),
+            'title' => trim($baseData['descriptions'][$lang]['title']),
+            'short_description' => trim($baseData['descriptions'][$lang]['short_description']),
+            'full_description' => trim($baseData['descriptions'][$lang]['full_description'] ?? ''),
           ]
         );
       }
 
-      // TODO: Обновление вариантов - сложная логика, делаем позже
+      // 3. Обновляем варианты товара
+      $this->updateProductVariants($product, $data['variants'] ?? []);
 
-      return $product;
+      return $product->fresh();
     });
+  }
+
+  /**
+   * Обновление вариантов товара
+   */
+  private function updateProductVariants(Product $product, array $variantsData): void
+  {
+    // Получаем существующие варианты
+    $existingVariants = $product->variants()->with('variantAttributes')->get()->keyBy('id');
+    $processedVariantIds = [];
+
+    foreach ($variantsData as $variantData) {
+      $variantId = $variantData['id'] ?? null;
+
+      if ($variantId && $existingVariants->has($variantId)) {
+        // Обновляем существующий вариант
+        $variant = $existingVariants->get($variantId);
+        $this->updateExistingVariant($variant, $variantData);
+        $processedVariantIds[] = $variantId;
+      } else {
+        // Создаем новый вариант
+        $newVariant = $this->createNewVariant($product, $variantData);
+        $processedVariantIds[] = $newVariant->id;
+      }
+    }
+
+    // Удаляем варианты которых нет в новых данных
+    $variantsToDelete = $existingVariants->keys()->diff($processedVariantIds);
+    if ($variantsToDelete->isNotEmpty()) {
+      ProductVariant::whereIn('id', $variantsToDelete)->delete();
+    }
+
+    // Проверяем что остался хотя бы один дефолтный вариант
+    $this->ensureDefaultVariant($product);
+  }
+
+  /**
+   * Обновление существующего варианта
+   */
+  private function updateExistingVariant(ProductVariant $variant, array $variantData): void
+  {
+    // Обновляем основные данные варианта
+    $variant->update([
+      'price' => $variantData['price'],
+      'is_default' => $variantData['is_default'] ?? false,
+    ]);
+
+    // Обновляем атрибуты варианта
+    $this->updateVariantAttributes($variant, $variantData['attributes'] ?? []);
+  }
+
+  /**
+   * Создание нового варианта
+   */
+  private function createNewVariant(Product $product, array $variantData): ProductVariant
+  {
+    // Создаем вариант с временным SKU
+    $variant = ProductVariant::create([
+      'product_id' => $product->id,
+      'sku' => 'temp_' . time() . '_' . rand(1000, 9999),
+      'price' => $variantData['price'],
+      'is_default' => $variantData['is_default'] ?? false,
+    ]);
+
+    // Добавляем атрибуты к варианту
+    $this->updateVariantAttributes($variant, $variantData['attributes'] ?? []);
+
+    // Обновляем SKU с учетом атрибутов
+    $variant->update(['sku' => $variant->generateSku()]);
+
+    return $variant;
+  }
+
+  /**
+   * Обновление атрибутов варианта
+   */
+  private function updateVariantAttributes(ProductVariant $variant, array $attributesData): void
+  {
+    // Удаляем все старые атрибуты варианта
+    $variant->variantAttributes()->delete();
+
+    // Добавляем новые атрибуты
+    foreach ($attributesData as $attrData) {
+      ProductVariantAttribute::create([
+        'variant_id' => $variant->id,
+        'attribute_id' => $attrData['attribute_id'],
+        'attribute_value_id' => $attrData['value_id'],
+      ]);
+    }
+  }
+
+  /**
+   * Проверка что есть дефолтный вариант, если нет - делаем первый дефолтным
+   */
+  private function ensureDefaultVariant(Product $product): void
+  {
+    $hasDefault = $product->variants()->where('is_default', true)->exists();
+
+    if (!$hasDefault) {
+      $firstVariant = $product->variants()->orderBy('id')->first();
+      if ($firstVariant) {
+        $firstVariant->update(['is_default' => true]);
+      }
+    }
   }
 
   public function destroy($product)
