@@ -12,37 +12,74 @@ class ProductFilterService
 {
   public function filter(Category $category, array $filters = [], ?string $sort = null)
   {
+    // ✅ ГЛАВНОЕ ИЗМЕНЕНИЕ: Теперь начинаем с товаров, но фильтруем по вариантам
     $query = $category->products()->with([
       'brand',
       'images',
       'description',
       'promotion.discountGroup',
-      'attributeValues.value.translation',
+
+      // ✅ НОВЫЕ СВЯЗИ: Загружаем варианты и их атрибуты
+      'variants' => function ($q) {
+        $q->orderBy('price', 'asc'); // Сначала дешевые варианты
+      },
+      'variants.variantAttributes.attribute.translations',
+      'variants.variantAttributes.attributeValue.translations',
+
+      // ✅ Загружаем дефолтный вариант отдельно (для отображения цены)
+      'defaultVariant',
+      'cheapestVariant',
     ]);
 
-    // Бренды
+    // ✅ Бренды (без изменений)
     if (!empty($filters['brands'])) {
       $query->whereIn('brand_id', $filters['brands']);
     }
 
-    // Атрибуты: AND по атрибутам, OR по значениям
+    // ✅ НОВАЯ ЛОГИКА: Фильтрация по атрибутам вариантов
     if (!empty($filters['attrs']) && is_array($filters['attrs'])) {
       foreach ($filters['attrs'] as $attrId => $valueIds) {
         if (empty($valueIds)) continue;
-        $query->whereHas('attributeValues', function ($q) use ($attrId, $valueIds) {
+
+        // Фильтруем товары, у которых ЕСТЬ варианты с нужными атрибутами
+        $query->whereHas('variants.variantAttributes', function ($q) use ($attrId, $valueIds) {
           $q->where('attribute_id', (int)$attrId)
             ->whereIn('attribute_value_id', array_map('intval', (array)$valueIds));
         });
       }
     }
 
-    // Цена
-    if (isset($filters['price_from'])) $query->where('price', '>=', (int)$filters['price_from']);
-    if (isset($filters['price_to']))   $query->where('price', '<=', (int)$filters['price_to']);
+    // ✅ НОВАЯ ЛОГИКА: Фильтрация по цене - ищем среди вариантов
+    if (isset($filters['price_from']) || isset($filters['price_to'])) {
+      $query->whereHas('variants', function ($q) use ($filters) {
+        if (isset($filters['price_from'])) {
+          $q->where('price', '>=', (int)$filters['price_from']);
+        }
+        if (isset($filters['price_to'])) {
+          $q->where('price', '<=', (int)$filters['price_to']);
+        }
+      });
+    }
 
-    // Сортировка
-    if ($sort === 'cheap')      $query->orderBy('price', 'asc');
-    elseif ($sort === 'expensive') $query->orderBy('price', 'desc');
+    // ✅ НОВАЯ ЛОГИКА: Сортировка по цене - через варианты
+    if ($sort === 'cheap') {
+      // Сортируем по цене самого дешевого варианта
+      $query->join('product_variants as pv_sort', function ($join) {
+        $join->on('products.id', '=', 'pv_sort.product_id')
+          ->where('pv_sort.is_default', true);
+      })->orderBy('pv_sort.price', 'asc')
+        ->select('products.*'); // Важно! Выбираем только поля products
+
+    } elseif ($sort === 'expensive') {
+      // Сортируем по цене самого дорогого варианта
+      $query->leftJoin(
+        DB::raw('(SELECT product_id, MAX(price) as max_price FROM product_variants GROUP BY product_id) as pv_max'),
+        'products.id',
+        '=',
+        'pv_max.product_id'
+      )->orderBy('pv_max.max_price', 'desc')
+        ->select('products.*');
+    }
 
     return $query;
   }
@@ -51,14 +88,16 @@ class ProductFilterService
   {
     $locale = $locale ?: app()->getLocale();
 
-    // Если нужно учитывать подкатегории, собери их id и подставь в whereIn
+    // Если нужно учитывать подкатегории
     $categoryIds = [$category->id];
 
-    $base = DB::table('product_attribute_values as pav')
-      ->join('products', 'products.id', '=', 'pav.product_id')
+    // ✅ НОВАЯ ЛОГИКА: Ищем атрибуты среди вариантов товаров, а не самих товаров
+    $base = DB::table('product_variant_attributes as pva')
+      ->join('product_variants as pv', 'pv.id', '=', 'pva.variant_id')
+      ->join('products', 'products.id', '=', 'pv.product_id')
       ->whereIn('products.category_id', $categoryIds)
-      ->select('pav.attribute_id', 'pav.attribute_value_id', DB::raw('COUNT(*) as cnt'))
-      ->groupBy('pav.attribute_id', 'pav.attribute_value_id')
+      ->select('pva.attribute_id', 'pva.attribute_value_id', DB::raw('COUNT(DISTINCT products.id) as cnt'))
+      ->groupBy('pva.attribute_id', 'pva.attribute_value_id')
       ->get();
 
     if ($base->isEmpty()) return [];
@@ -66,12 +105,14 @@ class ProductFilterService
     $attrIds  = $base->pluck('attribute_id')->unique();
     $valueIds = $base->pluck('attribute_value_id')->unique();
 
+    // Загружаем переводы атрибутов
     $attributes = ProductAttribute::with([
-      'translation' => fn($q) => $q->where('language', $locale),
+      'translations' => fn($q) => $q->where('language', $locale),
     ])->whereIn('id', $attrIds)->get()->keyBy('id');
 
+    // Загружаем переводы значений
     $values = AttributeValue::with([
-      'translation' => fn($q) => $q->where('language', $locale),
+      'translations' => fn($q) => $q->where('language', $locale),
     ])->whereIn('id', $valueIds)->get()->keyBy('id');
 
     $byAttr = [];
@@ -83,7 +124,8 @@ class ProductFilterService
       if (!isset($byAttr[$a->id])) {
         $byAttr[$a->id] = [
           'id'     => $a->id,
-          'name'   => $a->translation->name ?? '—',
+          // ✅ ИСПРАВЛЕНИЕ: Используем метод translatedName() из модели
+          'name'   => $a->translatedName() ?? '—',
           'type'   => 'enum',
           'values' => [],
         ];
@@ -91,11 +133,13 @@ class ProductFilterService
 
       $byAttr[$a->id]['values'][] = [
         'id'    => $v->id,
-        'label' => $v->translation->value ?? '—',
+        // ✅ ИСПРАВЛЕНИЕ: Используем метод translatedValue() из модели
+        'label' => $v->translatedValue() ?? '—',
         'count' => (int) $row->cnt,
       ];
     }
 
+    // Сортируем значения по алфавиту
     foreach ($byAttr as &$attr) {
       usort($attr['values'], fn($x, $y) => strnatcasecmp($x['label'], $y['label']));
     }

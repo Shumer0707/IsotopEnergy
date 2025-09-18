@@ -14,14 +14,27 @@ class ProductController extends Controller
       'brand',
       'category.parent',
       'images',
-      'attributeValues.attribute.translations',
-      'attributeValues.value.translations',
+
+      // ✅ Основные варианты с атрибутами
+      'variants' => function ($query) {
+        $query->with([
+          'variantAttributes.attribute.translations',
+          'variantAttributes.attributeValue.translations'
+        ])->orderBy('price', 'asc');
+      },
+
+      // ✅ Специальные варианты
+      'defaultVariant.variantAttributes.attribute.translations',
+      'defaultVariant.variantAttributes.attributeValue.translations',
+      'cheapestVariant',
+
+      'promotion.discountGroup',
     ]);
 
     return Inertia::render('Product', [
       'product' => $product,
-      'category' => $product->category, // подкатегория
-      'parentCategory' => $product->category?->parent, // родитель
+      'category' => $product->category,
+      'parentCategory' => $product->category?->parent,
     ]);
   }
 }

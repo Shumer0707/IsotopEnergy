@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+  import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
   import QuantityControl from '@/Components/common/QuantityControl.vue'
   import FavoriteButton from '@/Components/common/FavoriteButton.vue'
@@ -19,10 +19,48 @@
   const cart = useCartStore()
   const isMobile = ref(false)
   const swiper = ref(null)
+
+  // ✅ Выбранный вариант товара
+  const selectedVariant = ref(null)
+
+  // ✅ Инициализация выбранного варианта
+  const initSelectedVariant = () => {
+    if (!props.product) return
+
+    let defaultVariant = null
+
+    // Пробуем найти дефолтный вариант разными способами
+    if (props.product.default_variant) {
+      defaultVariant = props.product.default_variant
+    } else if (props.product.cheapest_variant) {
+      defaultVariant = props.product.cheapest_variant
+    } else if (props.product.variants && props.product.variants.length > 0) {
+      // Ищем вариант с is_default = true
+      defaultVariant = props.product.variants.find((v) => v.is_default) || props.product.variants[0]
+    }
+
+    if (defaultVariant) {
+      selectedVariant.value = defaultVariant
+    }
+  }
+
+  // ✅ Наблюдатель за изменением product
+  watch(
+    () => props.product,
+    (newProduct) => {
+      if (newProduct) {
+        nextTick(() => {
+          initSelectedVariant()
+        })
+      }
+    },
+    { immediate: true, deep: true }
+  )
+
   const activeImage = ref(
-    props.product.main_image
+    props.product?.main_image
       ? `/storage/${props.product.main_image}`
-      : props.product.images.length
+      : props.product?.images?.length
       ? `/storage/${props.product.images[0].path}`
       : '/images/placeholder.jpg'
   )
@@ -31,26 +69,159 @@
     activeImage.value = `/storage/${imgPath}`
   }
 
-  const attributes = computed(() => {
-    return (
-      props.product.attribute_values?.map((pivot) => {
-        return {
-          name: pivot.attribute?.translated_name ?? '—',
-          value: pivot.value?.translated_value ?? '—',
+  // ✅ Группировка вариантов по атрибутам
+  const variantOptions = computed(() => {
+    if (!props.product?.variants || props.product.variants.length === 0) {
+      return {}
+    }
+
+    const options = {}
+
+    props.product.variants.forEach((variant) => {
+      if (!variant.variant_attributes || variant.variant_attributes.length === 0) {
+        return
+      }
+
+      variant.variant_attributes.forEach((va) => {
+        const attributeId = va.attribute_id
+        const attributeName = va.attribute?.translated_name || `Атрибут ${attributeId}`
+        const valueId = va.attribute_value_id
+        const valueName = va.attribute_value?.translated_value || `Значение ${valueId}`
+
+        if (!options[attributeId]) {
+          options[attributeId] = {
+            name: attributeName,
+            values: [],
+          }
         }
-      }) ?? []
+
+        // Проверяем есть ли уже такое значение
+        const existingValue = options[attributeId].values.find((v) => v.id === valueId)
+
+        if (!existingValue) {
+          options[attributeId].values.push({
+            id: valueId,
+            label: valueName,
+            variants: [variant],
+          })
+        } else {
+          // Добавляем вариант к существующему значению
+          if (!existingValue.variants.find((v) => v.id === variant.id)) {
+            existingValue.variants.push(variant)
+          }
+        }
+      })
+    })
+
+    return options
+  })
+
+  // ✅ Выбор варианта по атрибуту
+  const selectVariantByAttribute = (attributeId, valueId) => {
+    // Если нет текущего варианта, берем первый подходящий
+    if (!selectedVariant.value) {
+      const matchingVariant = props.product.variants.find((variant) =>
+        variant.variant_attributes?.some((va) => va.attribute_id === attributeId && va.attribute_value_id === valueId)
+      )
+
+      if (matchingVariant) {
+        selectedVariant.value = matchingVariant
+      }
+      return
+    }
+
+    // Если есть текущий вариант, нужно найти вариант который:
+    // 1. Содержит выбранный атрибут+значение
+    // 2. Максимально сохраняет другие выбранные атрибуты
+
+    const currentAttributes = {}
+    selectedVariant.value.variant_attributes?.forEach((va) => {
+      currentAttributes[va.attribute_id] = va.attribute_value_id
+    })
+
+    // Обновляем выбранный атрибут
+    currentAttributes[attributeId] = valueId
+
+    // Ищем точное совпадение
+    let bestMatch = props.product.variants.find((variant) => {
+      const variantAttrs = {}
+      variant.variant_attributes?.forEach((va) => {
+        variantAttrs[va.attribute_id] = va.attribute_value_id
+      })
+
+      // Проверяем все атрибуты
+      return Object.keys(currentAttributes).every((attrId) => variantAttrs[attrId] === currentAttributes[attrId])
+    })
+
+    // Если точного совпадения нет, ищем хотя бы с выбранным атрибутом
+    if (!bestMatch) {
+      bestMatch = props.product.variants.find((variant) =>
+        variant.variant_attributes?.some((va) => va.attribute_id === attributeId && va.attribute_value_id === valueId)
+      )
+    }
+
+    if (bestMatch) {
+      selectedVariant.value = bestMatch
+    }
+  }
+
+  // ✅ Проверка выбранного значения
+  const isAttributeValueSelected = (attributeId, valueId) => {
+    if (!selectedVariant.value) return false
+
+    return selectedVariant.value.variant_attributes?.some(
+      (va) => va.attribute_id === attributeId && va.attribute_value_id === valueId
     )
+  }
+
+  // ✅ Цена выбранного варианта
+  const currentPrice = computed(() => {
+    if (!selectedVariant.value) return 0
+    return parseFloat(selectedVariant.value.price)
   })
 
-  // Вычисляем количество слайдов для показа
+  // ✅ Цена со скидкой
+  const discountedPrice = computed(() => {
+    if (props.product?.promotion?.discount_group?.discount_percent) {
+      const discount = props.product.promotion.discount_group.discount_percent
+      return currentPrice.value * (1 - discount / 100)
+    }
+    return currentPrice.value
+  })
+
+  // ✅ Формирование красивой строки атрибутов выбранного варианта
+  const selectedVariantDisplayText = computed(() => {
+    if (!selectedVariant.value?.variant_attributes || selectedVariant.value.variant_attributes.length === 0) {
+      return ''
+    }
+
+    const attributeStrings = selectedVariant.value.variant_attributes.map((va) => {
+      const attrName = va.attribute?.translated_name || 'Атрибут'
+      const valueName = va.attribute_value?.translated_value || 'Значение'
+      return `${attrName}: ${valueName}`
+    })
+
+    return attributeStrings.join(', ')
+  })
+
+  // ✅ Атрибуты выбранного варианта для отображения в характеристиках
+  const selectedVariantAttributes = computed(() => {
+    if (!selectedVariant.value?.variant_attributes) return []
+
+    return selectedVariant.value.variant_attributes.map((va) => ({
+      name: va.attribute?.translated_name || '—',
+      value: va.attribute_value?.translated_value || '—',
+    }))
+  })
+
+  // Остальная логика без изменений...
   const slidesPerView = computed(() => {
-    const imageCount = props.product.images?.length || 0
-    return Math.min(imageCount, 4) // Максимум 4, но не больше чем есть изображений
+    const imageCount = props.product?.images?.length || 0
+    return Math.min(imageCount, 4)
   })
 
-  // Показывать ли навигацию (только если изображений больше чем помещается)
   const showNavigation = computed(() => {
-    const imageCount = props.product.images?.length || 0
+    const imageCount = props.product?.images?.length || 0
     return imageCount > (isMobile.value ? 4 : 4)
   })
 
@@ -70,12 +241,12 @@
 
 <template>
   <ProductHeadSeo :product="product" />
+
   <div class="max-w-7xl mx-auto px-4">
     <div class="flex flex-col md:flex-row gap-8 bg-white rounded-xl shadow p-6">
-      <!-- 🔹 Галерея -->
+      <!-- 🔹 Галерея (без изменений) -->
       <div class="flex flex-col sm:flex-row gap-4 md:w-1/2">
-        <div v-if="product.images && product.images.length > 0" :class="['relative', isMobile ? 'w-full h-24' : 'w-20']">
-          <!-- Кнопка вверх (показываем только если есть навигация) -->
+        <div v-if="product?.images && product.images.length > 0" :class="['relative', isMobile ? 'w-full h-24' : 'w-20']">
           <button
             v-if="!isMobile && showNavigation"
             @click="swiper?.slidePrev()"
@@ -84,7 +255,6 @@
             <font-awesome-icon icon="chevron-up" />
           </button>
 
-          <!-- Swiper -->
           <Swiper
             :modules="[Mousewheel]"
             :direction="isMobile ? 'horizontal' : 'vertical'"
@@ -113,7 +283,6 @@
             </SwiperSlide>
           </Swiper>
 
-          <!-- Кнопка вниз (показываем только если есть навигация) -->
           <button
             v-if="!isMobile && showNavigation"
             @click="swiper?.slideNext()"
@@ -123,18 +292,15 @@
           </button>
         </div>
 
-        <!-- Fallback если нет изображений -->
         <div v-else :class="['relative', isMobile ? 'w-full h-24' : 'w-20']">
           <div class="w-20 h-20 rounded overflow-hidden shadow-sm p-1 border">
             <img src="/images/placeholder.jpg" alt="No image" class="w-full h-full object-contain" />
           </div>
         </div>
 
-        <!-- Основное изображение -->
         <div class="relative flex-1 flex justify-center items-center bg-gray-50 rounded p-4">
-          <!-- 🔻 Скидка -->
           <div
-            v-if="product.promotion?.discount_group"
+            v-if="product?.promotion?.discount_group"
             class="absolute top-2 left-2 bg-gray-200 text-xs font-bold px-3 py-1 rounded z-10"
           >
             {{ t['product_discount'] }} -{{ product.promotion.discount_group.discount_percent }}%
@@ -142,8 +308,8 @@
 
           <img
             :src="activeImage"
-            :alt="product.description?.title || 'product image'"
-            class="max-w-full max-h-[400px] object-contain"
+            :alt="product?.description?.title || 'product image'"
+            class="w-full h-full object-cover rounded"
           />
         </div>
       </div>
@@ -154,50 +320,85 @@
           <!-- Название и бренд -->
           <div>
             <h1 class="text-2xl font-bold leading-snug">
-              {{ product.description?.title ?? 'Без названия' }}
+              {{ product?.description?.title ?? 'Без названия' }}
             </h1>
 
             <div class="text-sm text-gray-500 mt-1">
-              {{ t['product_art'] }} {{ product.id }}
-              <br />
-              {{ t['product_availability'] }}
-              <span class="text-my_grin font-semibold">{{ t['product_stock'] }}</span>
+              {{ t['product_art'] }} {{ selectedVariant?.sku || product?.base_sku || product?.id }}
             </div>
           </div>
 
-          <!-- Цена и скидка -->
+          <!-- ✅ БЛОК ВЫБОРА ВАРИАНТОВ -->
+          <div v-if="Object.keys(variantOptions).length > 0" class="space-y-4 border rounded-lg p-4 bg-gray-50">
+            <h3 class="text-sm font-semibold text-gray-700">Выберите характеристики:</h3>
+
+            <div v-for="(option, attributeId) in variantOptions" :key="attributeId" class="space-y-2">
+              <label class="text-sm text-gray-600 font-medium">{{ option.name }}:</label>
+
+              <div class="flex flex-wrap gap-2">
+                <button
+                  v-for="value in option.values"
+                  :key="value.id"
+                  @click="selectVariantByAttribute(Number(attributeId), value.id)"
+                  :class="[
+                    'px-3 py-2 text-sm border rounded-lg transition-colors',
+                    isAttributeValueSelected(Number(attributeId), value.id)
+                      ? 'bg-blue-500 text-white border-blue-500 shadow-md'
+                      : 'bg-white text-gray-700 border-gray-300 hover:border-blue-300 hover:bg-blue-50',
+                  ]"
+                >
+                  {{ value.label }}
+                </button>
+              </div>
+            </div>
+
+            <!-- ✅ Информация о выбранном варианте -->
+            <div v-if="selectedVariant && selectedVariantDisplayText" class="text-sm text-gray-600 pt-2 border-t border-gray-200">
+              <span class="font-medium">Выбран:</span>
+              {{ selectedVariantDisplayText }} ({{ selectedVariant.price }} {{ product?.currency || 'MDL' }})
+            </div>
+          </div>
+
+          <!-- ✅ ЦЕНА из выбранного варианта -->
           <div class="space-y-1">
             <div
-              v-if="product.promotion?.discount_group"
+              v-if="product?.promotion?.discount_group"
               class="inline-block bg-my_grin_op text-my_red text-xs font-bold px-2 py-1 rounded"
             >
               {{ t['product_discount'] }} -{{ product.promotion.discount_group.discount_percent }}%
             </div>
-            <div v-if="product.promotion?.discount_group" class="text-sm text-my_red line-through">
-              {{ product.price }} {{ product.currency }}
+            <div v-if="product?.promotion?.discount_group" class="text-sm text-my_red line-through">
+              {{ currentPrice.toFixed(2) }} {{ product?.currency || 'mdl' }}
             </div>
             <div class="text-2xl font-bold text-black">
-              {{ product.discounted_price }} {{ product.currency }} {{ product.measurement }}
+              {{ discountedPrice.toFixed(2) }} {{ product?.currency || 'mdl' }} {{ product?.measurement || '' }}
             </div>
           </div>
 
-          <!-- Кнопки действия + QuantityControl -->
+          <!-- ✅ КНОПКИ с проверкой варианта -->
           <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 mt-2">
-            <!-- Счётчик -->
-            <QuantityControl :product-id="product.id" />
-            <!-- Кнопки -->
+            <QuantityControl :product-id="product?.id" />
+
             <div class="flex gap-4">
               <button
-                v-if="!cart.items[product.id]"
-                @click="cart.toggle(product.id)"
+                v-if="selectedVariant && !cart.items[selectedVariant.id]"
+                @click="cart.toggle(selectedVariant.id)"
                 class="bg-my_green hover:bg-my_green_op text-white text-sm px-6 py-2 rounded-xl"
               >
                 {{ t['product_add'] }}
               </button>
-              <FavoriteButton :product-id="product.id" :product="product" size-class="text-2xl" />
+              <button
+                v-else-if="!selectedVariant"
+                disabled
+                class="bg-gray-300 text-gray-500 text-sm px-6 py-2 rounded-xl cursor-not-allowed"
+              >
+                Выберите вариант
+              </button>
+              <FavoriteButton :product-id="product?.id" :product="product" size-class="text-2xl" />
             </div>
           </div>
-          <!-- Иконки преимуществ -->
+
+          <!-- Иконки преимуществ (без изменений) -->
           <div class="flex gap-4 text-sm text-gray-600 pt-4 border-t mt-4">
             <div class="flex flex-col items-center gap-1 text-center">
               <span class="text-2xl">🔒</span>
@@ -230,7 +431,7 @@
     </div>
 
     <div class="grid md:grid-cols-2 gap-6 mt-10">
-      <!-- Характеристики -->
+      <!-- ✅ ХАРАКТЕРИСТИКИ выбранного варианта -->
       <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200">
         <div class="flex items-center gap-3 mb-6">
           <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
@@ -239,9 +440,9 @@
           <h2 class="text-xl font-semibold text-gray-800">{{ t['product_characteristics'] }}</h2>
         </div>
 
-        <div v-if="attributes.length > 0" class="space-y-3">
+        <div v-if="selectedVariantAttributes.length > 0" class="space-y-3">
           <div
-            v-for="(attribute, index) in attributes"
+            v-for="(attribute, index) in selectedVariantAttributes"
             :key="index"
             class="flex justify-between items-center py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors duration-150"
             :class="index % 2 === 0 ? 'bg-gray-25' : 'bg-white'"
@@ -253,11 +454,13 @@
 
         <div v-else class="text-center py-8">
           <div class="text-gray-400 mb-2">📝</div>
-          <p class="text-gray-500 text-sm">Характеристики не указаны</p>
+          <p class="text-gray-500 text-sm">
+            {{ selectedVariant ? 'Характеристики не указаны' : 'Выберите вариант товара' }}
+          </p>
         </div>
       </div>
 
-      <!-- Описание -->
+      <!-- Описание (без изменений) -->
       <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200">
         <div class="flex items-center gap-3 mb-6">
           <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
@@ -266,7 +469,7 @@
           <h2 class="text-xl font-semibold text-gray-800">{{ t['product_description'] }}</h2>
         </div>
 
-        <div v-if="product.description?.short_description" class="prose prose-sm max-w-none">
+        <div v-if="product?.description?.short_description" class="prose prose-sm max-w-none">
           <p class="text-gray-700 leading-relaxed whitespace-pre-line text-sm">
             {{ product.description.short_description }}
           </p>

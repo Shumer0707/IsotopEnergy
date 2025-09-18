@@ -4,14 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\ProductVariant;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use App\Services\Product\ProductFilterService;
 
 class CategoryController extends Controller
 {
-  // App/Http/Controllers/CategoryController.php
-
   public function show(Request $request, string $locale, Category $category, ProductFilterService $filterService)
   {
     $category->load([
@@ -23,8 +22,11 @@ class CategoryController extends Controller
 
     $brands = Brand::select('id', 'name')->get();
 
-    // max_price первым
-    $max_price = (int) ceil((($category->products()->max('price') ?? 10000) / 1000)) * 1000;
+    $max_price = (int) ceil((
+      ProductVariant::whereHas('product', function ($query) use ($category) {
+        $query->where('category_id', $category->id);
+      })->max('price') ?? 10000
+    ) / 1000) * 1000;
 
     // фильтры из JSON
     $raw = $request->input('filters', '');
@@ -64,7 +66,41 @@ class CategoryController extends Controller
       'price_to'   => $to,
     ];
 
+    // ✅ ИЗМЕНЕНИЕ: Получаем результат фильтрации и добавляем нужные связи
     $productsQuery = $filterService->filter($category, $normFilters, $sort);
+
+    // ✅ ДОБАВЛЯЕМ: Загружаем все нужные связи для корректного отображения карточек
+    $products = $productsQuery->with([
+      'description',
+      'brand',
+      'images',
+
+      // Варианты с атрибутами и переводами
+      'variants' => function ($query) {
+        $query->with([
+          'variantAttributes.attribute.translations',
+          'variantAttributes.attributeValue.translations'
+        ])->orderBy('price', 'asc');
+      },
+
+      // Дефолтный вариант с атрибутами
+      'defaultVariant' => function ($query) {
+        $query->with([
+          'variantAttributes.attribute.translations',
+          'variantAttributes.attributeValue.translations'
+        ]);
+      },
+
+      // Самый дешевый вариант
+      'cheapestVariant' => function ($query) {
+        $query->with([
+          'variantAttributes.attribute.translations',
+          'variantAttributes.attributeValue.translations'
+        ]);
+      },
+
+      'promotion.discountGroup',
+    ])->paginate(20)->withQueryString();
 
     // доступные фильтры для рендера UI
     $available = $filterService->availableFilters($category);
@@ -72,12 +108,12 @@ class CategoryController extends Controller
     return Inertia::render('Products/ProductsByCategory', [
       'category'          => $category,
       'parentCategory'    => $category->parent,
-      'products'          => $productsQuery->paginate(20)->withQueryString(),
+      'products'          => $products, // ✅ ИЗМЕНЕНИЕ: Теперь передаем уже загруженные данные
       'brands'            => $brands,
       'max_price'         => $max_price,
       'filters'           => $normFilters,
       'sort'              => $sort,
-      'available_filters' => $available, // ← добавили
+      'available_filters' => $available,
     ]);
   }
 }
