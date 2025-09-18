@@ -38,6 +38,7 @@
     'Telenești',
     'Șoldănești',
   ]
+
   // 🧍‍ Контакты
   const firstName = ref('')
   const lastName = ref('')
@@ -60,19 +61,20 @@
   const loading = ref(false)
   const error = ref(null)
 
-  // 💰 Итоги
-  const totalQuantity = computed(() => Object.values(cart.items).reduce((sum, qty) => sum + qty, 0))
+  // ✅ ИСПРАВЛЯЕМ: Используем геттеры из cart store
+  const totalQuantity = computed(() => cart.totalQuantity)
+  const totalWithoutDiscount = computed(() => cart.totalWithoutDiscount)
+  const totalWithDiscount = computed(() => cart.totalWithDiscount)
+  const totalDiscount = computed(() => cart.totalDiscount)
 
-  const totalWithoutDiscount = computed(() => cart.products.reduce((sum, p) => sum + p.price * cart.items[p.id], 0))
+  // ✅ НОВАЯ ФУНКЦИЯ: Форматирование атрибутов варианта
+  const formatVariantAttributes = (variant) => {
+    if (!variant.attributes || variant.attributes.length === 0) {
+      return ''
+    }
 
-  const totalWithDiscount = computed(() =>
-    cart.products.reduce((sum, p) => {
-      const price = parseFloat(p.discounted_price ?? p.price)
-      return sum + price * cart.items[p.id]
-    }, 0)
-  )
-
-  const totalDiscount = computed(() => totalWithoutDiscount.value - totalWithDiscount.value)
+    return variant.attributes.map((attr) => `${attr.name}: ${attr.value}`).join(', ')
+  }
 
   // 🚀 Отправка
   const submitOrder = async () => {
@@ -85,6 +87,7 @@
     error.value = null
 
     try {
+      // ✅ ИЗМЕНЕНИЕ: Отправляем cart.items (variant_id: quantity) вместо старой структуры
       await axios.post('/order', {
         first_name: firstName.value,
         last_name: lastName.value,
@@ -103,7 +106,7 @@
               }
             : null,
         payment_method: paymentMethod.value,
-        cart: cart.items,
+        cart: cart.items, // Теперь это { [variantId]: quantity }
       })
 
       cart.clear()
@@ -111,6 +114,7 @@
       alert('✅ Заказ успешно отправлен!')
     } catch (err) {
       error.value = 'Ошибка при отправке заказа'
+      console.error('Order submission error:', err)
     } finally {
       loading.value = false
     }
@@ -150,9 +154,11 @@
       <button class="absolute top-2 right-3 text-gray-400 hover:text-black text-2xl" @click="emit('close')">×</button>
 
       <h2 class="text-2xl font-bold mb-6 text-center">{{ t['order_title'] }}</h2>
-      <div class="text-sm"><p>(* - {{ t['order_mandatory'] }})</p></div>
+      <div class="text-sm">
+        <p>(* - {{ t['order_mandatory'] }})</p>
+      </div>
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Левая часть -->
+        <!-- Левая часть - форма заказа (без изменений) -->
         <div class="lg:col-span-2 space-y-4">
           <!-- Контактные данные -->
           <div class="bg-gray-100 border border-gray-200 rounded-lg overflow-hidden">
@@ -161,22 +167,22 @@
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 px-4 py-3">
               <div>
-                <input v-model="lastName" type="text" :placeholder=t.order_surname class="w-full border rounded p-2 text-sm" />
+                <input v-model="lastName" type="text" :placeholder="t.order_surname" class="w-full border rounded p-2 text-sm" />
                 <p v-if="errors.lastName" class="text-xs text-red-500 mt-1">{{ errors.lastName }}</p>
               </div>
 
               <div>
-                <input v-model="firstName" type="text" :placeholder=t.order_name class="w-full border rounded p-2 text-sm" />
+                <input v-model="firstName" type="text" :placeholder="t.order_name" class="w-full border rounded p-2 text-sm" />
                 <p v-if="errors.firstName" class="text-xs text-red-500 mt-1">{{ errors.firstName }}</p>
               </div>
 
               <div>
-                <input v-model="phone" type="text" :placeholder=t.order_phone class="w-full border rounded p-2 text-sm" />
+                <input v-model="phone" type="text" :placeholder="t.order_phone" class="w-full border rounded p-2 text-sm" />
                 <p v-if="errors.phone" class="text-xs text-red-500 mt-1">{{ errors.phone }}</p>
               </div>
 
               <div>
-                <input v-model="email" type="email" :placeholder=t.order_mail class="w-full border rounded p-2 text-sm" />
+                <input v-model="email" type="email" :placeholder="t.order_mail" class="w-full border rounded p-2 text-sm" />
               </div>
             </div>
           </div>
@@ -205,7 +211,7 @@
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 px-4 py-3">
               <div>
-                <input v-model="country" type="text" :placeholder=t.order_country class="w-full border rounded p-2 text-sm" />
+                <input v-model="country" type="text" :placeholder="t.order_country" class="w-full border rounded p-2 text-sm" />
                 <p v-if="errors.country" class="text-xs text-red-500 mt-1">{{ errors.country }}</p>
               </div>
 
@@ -218,17 +224,12 @@
               </div>
 
               <div>
-                <input v-model="city" type="text" :placeholder=t.order_settlement class="w-full border rounded p-2 text-sm" />
+                <input v-model="city" type="text" :placeholder="t.order_settlement" class="w-full border rounded p-2 text-sm" />
                 <p v-if="errors.city" class="text-xs text-red-500 mt-1">{{ errors.city }}</p>
               </div>
 
               <div class="sm:col-span-2">
-                <input
-                  v-model="address"
-                  type="text"
-                  :placeholder=t.order_address
-                  class="w-full border rounded p-2 text-sm"
-                />
+                <input v-model="address" type="text" :placeholder="t.order_address" class="w-full border rounded p-2 text-sm" />
                 <p v-if="errors.address" class="text-xs text-red-500 mt-1">{{ errors.address }}</p>
               </div>
             </div>
@@ -261,33 +262,58 @@
               <h3 class="text-sm font-semibold text-gray-700">{{ t['order_information'] }}</h3>
             </div>
             <div class="px-4 py-3">
-              <textarea
-                v-model="comment"
-                rows="3"
-                :placeholder=t.order_comment
-                class="w-full border rounded p-2 text-sm"
-              />
+              <textarea v-model="comment" rows="3" :placeholder="t.order_comment" class="w-full border rounded p-2 text-sm" />
             </div>
           </div>
         </div>
 
-        <!-- 🔸 Правая часть -->
+        <!-- ✅ ОБНОВЛЕННАЯ правая часть - список вариантов -->
         <div class="bg-gray-100 p-4 rounded-lg space-y-4">
           <h3 class="text-lg font-semibold border-b pb-2">{{ t['cart_details'] }}</h3>
 
-          <div v-for="product in cart.products" :key="product.id" class="flex items-start gap-4 text-sm">
+          <!-- Список вариантов вместо товаров -->
+          <div
+            v-for="variant in cart.variants"
+            :key="variant.id"
+            class="flex items-start gap-3 text-sm border-b border-gray-200 pb-3 last:border-b-0"
+          >
             <img
-              :src="product.main_image ? `/storage/${product.main_image}` : '/images/placeholder.jpg'"
-              class="w-14 h-14 object-cover rounded bg-white border"
+              :src="variant.product.main_image ? `/storage/${variant.product.main_image}` : '/images/placeholder.jpg'"
+              class="w-12 h-12 object-cover rounded bg-white border shrink-0"
             />
-            <div class="flex-1">
-              <p class="font-medium truncate">{{ product.description?.title ?? 'Без названия' }}</p>
-              <p class="text-gray-500 text-xs">
-                {{ cart.items[product.id] }} × {{ product.discounted_price ?? product.price }} {{ product.currency ?? 'mdl' }}
+            <div class="flex-1 min-w-0">
+              <p class="font-medium truncate" :title="variant.product.title">
+                {{ variant.product.title || 'Без названия' }}
               </p>
+
+              <!-- Показываем атрибуты варианта -->
+              <p v-if="formatVariantAttributes(variant)" class="text-xs text-gray-600 mt-1 truncate">
+                {{ formatVariantAttributes(variant) }}
+              </p>
+
+              <!-- Артикул варианта -->
+              <p class="text-xs text-gray-500 mt-1">{{ variant.sku }}</p>
+
+              <!-- Количество и цена -->
+              <div class="flex justify-between items-center mt-2">
+                <span class="text-xs text-gray-600">{{ cart.getVariantQuantity(variant.id) }} шт</span>
+                <div class="text-right">
+                  <div
+                    v-if="variant.discounted_price && variant.discounted_price !== variant.price"
+                    class="text-xs line-through text-gray-400"
+                  >
+                    {{ variant.price }} {{ variant.product.currency }}
+                  </div>
+                  <div class="text-sm font-medium">
+                    {{ ((variant.discounted_price || variant.price) * cart.getVariantQuantity(variant.id)).toFixed(2) }}
+                    {{ variant.product.currency }}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
+          <!-- Итоги заказа -->
           <div class="border-t pt-4 space-y-2 text-sm">
             <div class="flex justify-between">
               <span>{{ t['cart_all_items'] }}</span>
@@ -295,22 +321,22 @@
             </div>
             <div class="flex justify-between">
               <span>{{ t['cart_not_discount'] }}</span>
-              <span>{{ totalWithoutDiscount.toFixed(2) }} mdl</span>
+              <span>{{ totalWithoutDiscount.toFixed(2) }} MDL</span>
             </div>
             <div class="flex justify-between text-my_red">
               <span>{{ t['cart_discount'] }}</span>
-              <span>-{{ totalDiscount.toFixed(2) }} mdl</span>
+              <span>-{{ totalDiscount.toFixed(2) }} MDL</span>
             </div>
-            <div class="flex justify-between font-bold text-base pt-1">
+            <div class="flex justify-between font-bold text-base pt-1 border-t">
               <span>{{ t['cart_all_price'] }}</span>
-              <span>{{ totalWithDiscount.toFixed(2) }} mdl</span>
+              <span>{{ totalWithDiscount.toFixed(2) }} MDL</span>
             </div>
           </div>
 
           <button
             @click="submitOrder"
-            :disabled="loading"
-            class="w-full bg-my_green hover:bg-my_green_op text-white py-2 rounded mt-4 transition-colors"
+            :disabled="loading || cart.variants.length === 0"
+            class="w-full bg-my_green hover:bg-my_green_op text-white py-2 rounded mt-4 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
             {{ loading ? 'Отправка...' : t.order_send }}
           </button>

@@ -58,12 +58,12 @@ Route::get('/search-products', ProductSearchController::class);
 
 // Корзина (XHR)
 Route::prefix('cart')->as('cart.')->group(function () {
-  Route::post('/data', [CartController::class, 'index'])->name('data');
+  Route::get('/get', [CartController::class, 'get'])->name('get');
   Route::post('/add', [CartController::class, 'add'])->name('add');
   Route::post('/update', [CartController::class, 'update'])->name('update');
-  Route::delete('/remove/{productId}', [CartController::class, 'remove'])->name('remove');
+  Route::post('/data', [CartController::class, 'index'])->name('data');
+  Route::delete('/remove/{variantId}', [CartController::class, 'remove'])->name('remove');
   Route::delete('/clear', [CartController::class, 'clear'])->name('clear');
-  Route::get('/get', [CartController::class, 'get'])->name('get');
 });
 
 // Избранное (XHR)
@@ -75,7 +75,7 @@ Route::prefix('favorites')->as('favorites.')->group(function () {
 });
 
 // Заказы/контакты (XHR)
-Route::post('/order', [OrderController::class, 'submit']);
+Route::post('/order', [OrderController::class, 'submit'])->name('order.submit');
 Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:5,1');
 
 // Аутентификация (страницы без локали — ок, это не SEO-контент)
