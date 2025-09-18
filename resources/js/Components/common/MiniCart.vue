@@ -43,14 +43,27 @@
     })
   })
 
-  watch(() => layout.headerBottom, updateOffset) // на всякий случай
+  watch(() => layout.headerBottom, updateOffset)
 
-  const totalWithDiscount = computed(() =>
-    cart.products.reduce((sum, p) => {
-      const price = parseFloat(p.discounted_price ?? p.price)
-      return sum + price * cart.items[p.id]
-    }, 0)
-  )
+  // ✅ ИСПРАВЛЯЕМ: Теперь используем геттеры из cart store
+  const totalWithDiscount = computed(() => cart.totalWithDiscount)
+  const totalQuantity = computed(() => cart.totalQuantity)
+
+  // ✅ НОВАЯ ФУНКЦИЯ: Форматирование атрибутов для краткого отображения
+  const formatVariantAttributesShort = (variant) => {
+    if (!variant.attributes || variant.attributes.length === 0) {
+      return ''
+    }
+
+    // Берем только первые 2 атрибута для экономии места
+    const shortAttributes = variant.attributes
+      .slice(0, 2)
+      .map((attr) => `${attr.value}`)
+      .join(', ')
+
+    const moreCount = variant.attributes.length - 2
+    return shortAttributes + (moreCount > 0 ? `... +${moreCount}` : '')
+  }
 
   const goToCart = () => {
     cartMiniUi.closeMiniCart()
@@ -60,8 +73,6 @@
   const toggleMiniCart = () => {
     cartMiniUi.toggleMiniCart()
   }
-
-  const totalQuantity = computed(() => Object.values(cart.items).reduce((sum, qty) => sum + qty, 0))
 </script>
 
 <template>
@@ -82,12 +93,6 @@
 
     <Teleport to="body">
       <!-- Затемнение -->
-      <!-- <div
-        class="fixed inset-0 bg-black/30 z-30 transition-opacity duration-300"
-        :class="cartMiniUi.isMiniCartOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'"
-        @click="cartMiniUi.closeMiniCart"
-      /> -->
-      <!-- Затемнение -->
       <OverlayLayer v-model:show="cartMiniUi.isMiniCartOpen" />
 
       <!-- Модалка -->
@@ -97,7 +102,7 @@
         :style="{
           top: `${layout.headerBottom}px`,
           right: `${layout.cartButtonRightOffset}px`,
-          width: '300px',
+          width: '320px',
         }"
       >
         <div
@@ -112,34 +117,65 @@
             </button>
           </div>
 
-          <!-- Товары -->
+          <!-- ✅ ОБНОВЛЕННЫЙ БЛОК: Варианты товаров -->
           <div class="overflow-y-auto px-3 py-2 space-y-3 flex-1">
-            <div v-if="cart.products.length === 0" class="text-center">Пусто</div>
+            <div v-if="cart.variants.length === 0" class="text-center text-gray-500 py-4">Корзина пуста</div>
             <div v-else>
-              <div v-for="product in cart.products" :key="product.id" class="flex items-center gap-2 border-t pt-2">
+              <div
+                v-for="variant in cart.variants"
+                :key="variant.id"
+                class="flex items-start gap-2 border-t pt-2 first:border-t-0 first:pt-0"
+              >
+                <!-- Изображение товара -->
                 <img
-                  :src="product.main_image ? `/storage/${product.main_image}` : '/images/placeholder.jpg'"
-                  alt=""
-                  class="w-12 h-12 object-cover rounded bg-gray-100"
+                  :src="variant.product.main_image ? `/storage/${variant.product.main_image}` : '/images/placeholder.jpg'"
+                  :alt="variant.product.title"
+                  class="w-12 h-12 object-cover rounded bg-gray-100 shrink-0"
                 />
-                <div class="flex-1">
-                  <p class="text-xs">
-                    {{ product.description?.title ?? '❌ нет title' }} x {{ cart.items[product.id] }} —
-                    {{ (product.discounted_price ?? product.price) * cart.items[product.id] }} mdl
+
+                <!-- Информация о варианте -->
+                <div class="flex-1 min-w-0">
+                  <!-- Название товара -->
+                  <p class="text-xs font-medium leading-tight mb-1 truncate" :title="variant.product.title">
+                    {{ variant.product.title || 'Без названия' }}
                   </p>
+
+                  <!-- Атрибуты варианта (сокращенно) -->
+                  <p v-if="formatVariantAttributesShort(variant)" class="text-xs text-gray-500 mb-1 truncate">
+                    {{ formatVariantAttributesShort(variant) }}
+                  </p>
+
+                  <!-- Количество и цена -->
+                  <div class="flex justify-between items-center text-xs">
+                    <span class="text-gray-600">{{ cart.getVariantQuantity(variant.id) }} шт</span>
+                    <div class="text-right">
+                      <!-- Цена со скидкой если есть -->
+                      <div
+                        v-if="variant.discounted_price && variant.discounted_price !== variant.price"
+                        class="line-through text-gray-400 text-xs"
+                      >
+                        {{ variant.price }} {{ variant.product.currency }}
+                      </div>
+                      <div class="font-medium">
+                        {{ ((variant.discounted_price || variant.price) * cart.getVariantQuantity(variant.id)).toFixed(2) }}
+                        {{ variant.product.currency }}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Итого -->
-          <div class="p-3 border-t">
-            <div class="flex justify-between font-semibold mb-2">
-              <span>Итого:</span>
-              <span>{{ totalWithDiscount.toFixed(2) }} mdl</span>
+          <div class="p-3 border-t bg-gray-50">
+            <div class="flex justify-between font-semibold mb-3 text-sm">
+              <span>Итого ({{ totalQuantity }} шт):</span>
+              <span>{{ totalWithDiscount.toFixed(2) }} MDL</span>
             </div>
             <button
-              class="w-full bg-my_green border border-main text-black py-1.5 rounded text-sm font-semibold hover:bg-my_green_op"
+              :disabled="cart.variants.length === 0"
+              class="w-full bg-my_green border border-main text-black py-2 rounded text-sm font-semibold hover:bg-my_green_op disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
               @click="goToCart"
             >
               Перейти в корзину

@@ -377,23 +377,29 @@
 
           <!-- ✅ КНОПКИ с проверкой варианта -->
           <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 mt-2">
-            <QuantityControl :product-id="product?.id" />
+            <QuantityControl :variant-id="selectedVariant?.id" />
 
             <div class="flex gap-4">
               <button
-                v-if="selectedVariant && !cart.items[selectedVariant.id]"
-                @click="cart.toggle(selectedVariant.id)"
+                v-if="selectedVariant && !cart.hasVariant(selectedVariant.id)"
+                @click="cart.add(selectedVariant.id)"
                 class="bg-my_green hover:bg-my_green_op text-white text-sm px-6 py-2 rounded-xl"
               >
                 {{ t['product_add'] }}
               </button>
+
               <button
-                v-else-if="!selectedVariant"
-                disabled
-                class="bg-gray-300 text-gray-500 text-sm px-6 py-2 rounded-xl cursor-not-allowed"
+                v-else-if="selectedVariant && cart.hasVariant(selectedVariant.id)"
+                @click="cart.remove(selectedVariant.id)"
+                class="bg-red-500 hover:bg-red-600 text-white text-sm px-6 py-2 rounded-xl"
               >
+                Убрать из корзины
+              </button>
+
+              <button v-else disabled class="bg-gray-300 text-gray-500 text-sm px-6 py-2 rounded-xl cursor-not-allowed">
                 Выберите вариант
               </button>
+
               <FavoriteButton :product-id="product?.id" :product="product" size-class="text-2xl" />
             </div>
           </div>
