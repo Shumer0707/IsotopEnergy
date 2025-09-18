@@ -27,7 +27,38 @@ class FavoriteController extends Controller
   {
     $favorites = session()->get('favorites', []);
 
-    $products = Product::with(['description', 'brand', 'images', 'promotion'])
+    // ✅ ОБНОВЛЯЕМ: Загружаем все связи как в каталоге
+    $products = Product::with([
+      'description',
+      'brand',
+      'images',
+
+      // Варианты с атрибутами и переводами
+      'variants' => function ($query) {
+        $query->with([
+          'variantAttributes.attribute.translations',
+          'variantAttributes.attributeValue.translations'
+        ])->orderBy('price', 'asc');
+      },
+
+      // Дефолтный вариант
+      'defaultVariant' => function ($query) {
+        $query->with([
+          'variantAttributes.attribute.translations',
+          'variantAttributes.attributeValue.translations'
+        ]);
+      },
+
+      // Самый дешевый вариант
+      'cheapestVariant' => function ($query) {
+        $query->with([
+          'variantAttributes.attribute.translations',
+          'variantAttributes.attributeValue.translations'
+        ]);
+      },
+
+      'promotion.discountGroup',
+    ])
       ->whereIn('id', $favorites)
       ->get();
 

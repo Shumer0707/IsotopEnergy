@@ -23,24 +23,23 @@
     <!-- 🔹 Заголовок -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
       <h1 class="text-2xl font-bold">{{ t['favorite_title'] }}</h1>
-      <button @click="favorites.clear()" class="text-sm text-red-600 hover:underline whitespace-nowrap">
+      <button
+        v-if="products.length > 0"
+        @click="favorites.clear()"
+        class="text-sm text-red-600 hover:underline whitespace-nowrap"
+      >
         {{ t['favorite_delete_all'] }}
       </button>
     </div>
 
     <!-- 🔹 Пусто -->
-    <div v-if="products.length === 0" class="text-gray-500">{{ t['favorite_not'] }}</div>
+    <div v-if="products.length === 0" class="text-gray-500 text-center py-8">
+      {{ t['favorite_not'] }}
+    </div>
 
     <!-- 🔹 Сетка карточек -->
     <div v-else class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-      <ProductCard
-        v-for="product in products"
-        :key="product.id"
-        :product="product"
-        :onClick="openProduct"
-        :onAddToCart="cart.add"
-        :inFavorites="true"
-      />
+      <ProductCard v-for="product in products" :key="product.id" :product="product" :onClick="openProduct" :inFavorites="true" />
     </div>
   </div>
 </template>

@@ -30,8 +30,25 @@ class LayoutController extends Controller
 
   public function promoProducts()
   {
-    $products = Product::with(['description', 'brand', 'promotion.discountGroup'])
-      ->whereHas('promotion', fn($q) => $q->where('active', true))
+    $products = Product::with([
+      'description',
+      'brand',
+      'promotion.discountGroup',
+      'variants',
+      'defaultVariant',
+      'cheapestVariant',
+      'defaultVariant.variantAttributes.attribute.translations',
+      'defaultVariant.variantAttributes.attributeValue.translations',
+      'cheapestVariant.variantAttributes.attribute.translations',
+      'cheapestVariant.variantAttributes.attributeValue.translations'
+    ])
+      ->whereHas('promotion', function ($q) {
+        $q->where('active', true)
+          ->where(function ($subQ) {
+            $subQ->whereNull('ends_at')
+              ->orWhere('ends_at', '>=', now());
+          });
+      })
       ->paginate(8);
 
     return response()->json($products);
