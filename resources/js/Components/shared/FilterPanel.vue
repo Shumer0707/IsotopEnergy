@@ -2,6 +2,9 @@
   import { useProductFilterStore } from '@/Stores/productFilter'
   import { computed, ref, watch } from 'vue'
   import PriceFilter from '@/Components/shared/PriceFilter.vue'
+  import { useTranslations } from '@/composables/useTranslations'
+
+  const t = useTranslations()
 
   const props = defineProps({
     brands: Array,
@@ -51,7 +54,7 @@
 
 <template>
   <aside class="mb-6 w-full sm:w-64 bg-white border rounded-lg p-4 shadow">
-    <h2 class="font-semibold mb-3">Бренды</h2>
+    <!-- <h2 class="font-semibold mb-3">Бренды</h2> -->
     <!-- <div v-for="brand in brands" :key="brand.id" class="flex items-center space-x-2 mb-1">
       <input
         type="checkbox"
@@ -63,12 +66,12 @@
       <label class="text-sm text-gray-700">{{ brand.name }}</label>
     </div> -->
 
-    <h2 class="font-semibold mt-4 mb-2">Цена</h2>
+    <h2 class="font-semibold mt-4 mb-2">{{ t['product_price'] }}</h2>
     <PriceFilter />
 
     <!-- ХАРАКТЕРИСТИКИ (атрибуты) -->
     <template v-if="filterStore.availableFilters.length">
-      <h2 class="font-semibold mt-4 mb-2">Характеристики</h2>
+      <h2 class="font-semibold mt-4 mb-2">{{ t['product_characteristics'] }}</h2>
 
       <div v-for="attr in filterStore.availableFilters" :key="attr.id" class="mb-3 border rounded-lg">
         <!-- Заголовок атрибута -->
@@ -90,7 +93,7 @@
               @click.stop="clearAttribute(Number(attr.id))"
               title="Очистить выбранные"
             >
-              Очистить
+              {{ t['product_clear'] }}
             </button>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -132,7 +135,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
-        Сбросить фильтры
+        {{ t['product_drop'] }}
       </button>
     </div>
   </aside>

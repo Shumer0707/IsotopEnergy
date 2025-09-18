@@ -1,6 +1,9 @@
 <script setup>
   import { computed } from 'vue'
   import { useCartStore } from '@/Stores/cart'
+  import { useTranslations } from '@/composables/useTranslations'
+
+  const t = useTranslations()
 
   const props = defineProps({
     // Теперь работаем с variant-id вместо product-id
@@ -54,11 +57,11 @@
 
 <template>
   <!-- Если вариант не выбран - показываем заглушку -->
-  <div v-if="!variantId" class="text-sm text-gray-400">Выберите вариант</div>
+  <div v-if="!variantId" class="text-sm text-gray-400">{{ t['product_select'] }}</div>
 
   <!-- Если вариант не в корзине - показываем только количество -->
   <div v-else-if="!inCart" :class="['flex items-center', small ? 'text-sm' : '']">
-    <span class="text-gray-600 mr-2">Количество:</span>
+    <span class="text-gray-600 mr-2">{{ t['product_quantity'] }}</span>
     <span class="bg-gray-100 px-3 py-1 rounded">1</span>
   </div>
 

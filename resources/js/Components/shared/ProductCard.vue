@@ -191,17 +191,17 @@
 
           <!-- Количество вариантов -->
           <div v-if="product.variants && product.variants.length > 1" class="text-xs text-gray-500 mt-1">
-            {{ product.variants.length }} вариантов
+            {{ product.variants.length }} {{ t['product_variants'] }}
           </div>
         </div>
 
         <!-- Кнопки -->
         <div class="flex justify-between items-center">
           <button
-            class="flex-1 bg-blue-500 hover:bg-blue-600 text-white text-sm py-2 px-4 rounded-lg transition-colors mr-2"
+            class="flex-1 bg-my_green hover:bg-my_green_op text-white text-sm py-2 px-4 rounded-lg transition-colors mr-2"
             @click.stop="goToProduct"
           >
-            Подробнее
+            {{ t['product_more'] }}
           </button>
 
           <div @click.stop="">

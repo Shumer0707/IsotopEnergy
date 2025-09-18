@@ -330,7 +330,7 @@
 
           <!-- ✅ БЛОК ВЫБОРА ВАРИАНТОВ -->
           <div v-if="Object.keys(variantOptions).length > 0" class="space-y-4 border rounded-lg p-4 bg-gray-50">
-            <h3 class="text-sm font-semibold text-gray-700">Выберите характеристики:</h3>
+            <h3 class="text-sm font-semibold text-gray-700">{{ t['product_choose'] }}</h3>
 
             <div v-for="(option, attributeId) in variantOptions" :key="attributeId" class="space-y-2">
               <label class="text-sm text-gray-600 font-medium">{{ option.name }}:</label>
@@ -343,8 +343,8 @@
                   :class="[
                     'px-3 py-2 text-sm border rounded-lg transition-colors',
                     isAttributeValueSelected(Number(attributeId), value.id)
-                      ? 'bg-blue-500 text-white border-blue-500 shadow-md'
-                      : 'bg-white text-gray-700 border-gray-300 hover:border-blue-300 hover:bg-blue-50',
+                      ? 'bg-my_green text-white border-my_green shadow-md'
+                      : 'bg-white text-gray-700 border-gray-300 hover:border-my_green hover:bg-blue-50',
                   ]"
                 >
                   {{ value.label }}
@@ -354,7 +354,7 @@
 
             <!-- ✅ Информация о выбранном варианте -->
             <div v-if="selectedVariant && selectedVariantDisplayText" class="text-sm text-gray-600 pt-2 border-t border-gray-200">
-              <span class="font-medium">Выбран:</span>
+              <span class="font-medium">{{ t['product_selected'] }}</span>
               {{ selectedVariantDisplayText }} ({{ selectedVariant.price }} {{ product?.currency || 'MDL' }})
             </div>
           </div>
@@ -393,11 +393,11 @@
                 @click="cart.remove(selectedVariant.id)"
                 class="bg-red-500 hover:bg-red-600 text-white text-sm px-6 py-2 rounded-xl"
               >
-                Убрать из корзины
+                {{ t['product_remove'] }}
               </button>
 
               <button v-else disabled class="bg-gray-300 text-gray-500 text-sm px-6 py-2 rounded-xl cursor-not-allowed">
-                Выберите вариант
+                {{ t['product_select'] }}
               </button>
 
               <FavoriteButton :product-id="product?.id" :product="product" size-class="text-2xl" />
@@ -483,7 +483,7 @@
 
         <div v-else class="text-center py-8">
           <div class="text-gray-400 mb-2">📄</div>
-          <p class="text-gray-500 text-sm">Описание отсутствует</p>
+          <p class="text-gray-500 text-sm">{{ t['product_available'] }}</p>
         </div>
       </div>
     </div>
