@@ -31,7 +31,7 @@
   )
 
   // ввод руками — применяем на blur/Enter с клампом и шагом
-  const STEP = 100
+  const STEP = 10
   const clamp = (v, lo, hi) => Math.min(Math.max(v, lo), hi)
   const roundToStep = (v) => Math.round(v / STEP) * STEP
 
@@ -64,7 +64,7 @@
       v-model="priceRange"
       :min="0"
       :max="filterStore.filters.max_price"
-      :step="100"
+      :step="10"
       :lazy="true"
       :tooltips="true"
       class="mb-4"
