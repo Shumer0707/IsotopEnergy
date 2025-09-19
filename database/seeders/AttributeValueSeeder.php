@@ -11,26 +11,34 @@ class AttributeValueSeeder extends Seeder
 {
     public function run()
     {
+        // Значения для термопанелей и декора
         $values = [
-            'Мощность' => ['500 Вт', '1000 Вт'],
-            'Цвет' => ['Красный', 'Синий'],
-            'Длина' => ['1 м', '2 м'],
-            'Ширина' => ['50 см', '100 см'],
-            'Вес' => ['1 кг', '5 кг'],
+            'Толщина' => ['30 мм', '40 мм', '50 мм', '60 мм', '70 мм', '80 мм', '90 мм', '100 мм'],
+            'Плотность' => ['60 eps', '80 eps', '100 eps'],
+            'Ширина' => $this->generateSizeRange(20, 500, 5), // от 20 до 500 с шагом 5
+            'Высота' => $this->generateSizeRange(20, 500, 5), // от 20 до 500 с шагом 5
+            'Длина' => ['1200 мм', '2000 мм'],
         ];
 
         foreach ($values as $attrNameRu => $valSet) {
+            // Ищем атрибут по русскому названию
             $attribute = ProductAttribute::whereHas('translations', function ($query) use ($attrNameRu) {
                 $query->where('language', 'ru')->where('name', $attrNameRu);
             })->first();
 
-            if (!$attribute) continue;
+            // Если атрибут не найден, пропускаем
+            if (!$attribute) {
+                echo "Атрибут '{$attrNameRu}' не найден\n";
+                continue;
+            }
 
             foreach ($valSet as $valRu) {
+                // Создаем запись значения
                 $value = AttributeValue::create([
                     'attribute_id' => $attribute->id,
                 ]);
 
+                // Добавляем переводы для всех языков
                 AttributeValueTranslation::insert([
                     [
                         'attribute_value_id' => $value->id,
@@ -52,36 +60,78 @@ class AttributeValueSeeder extends Seeder
         }
     }
 
+    /**
+     * Генерирует массив размеров от min до max с шагом step
+     */
+    private function generateSizeRange($min, $max, $step)
+    {
+        $sizes = [];
+        for ($i = $min; $i <= $max; $i += $step) {
+            $sizes[] = $i . ' мм';
+        }
+        return $sizes;
+    }
+
+    /**
+     * Переводы на румынский
+     */
     private function translateToRo($val)
     {
-        return match ($val) {
-            '500 Вт' => '500 W',
-            '1000 Вт' => '1000 W',
-            'Красный' => 'Roșu',
-            'Синий' => 'Albastru',
-            '1 м' => '1 m',
-            '2 м' => '2 m',
-            '50 см' => '50 cm',
-            '100 см' => '100 cm',
-            '1 кг' => '1 kg',
-            '5 кг' => '5 kg',
+        return match (true) {
+            // Толщина - конкретные значения
+            $val === '30 мм' => '30 mm',
+            $val === '40 мм' => '40 mm',
+            $val === '50 мм' => '50 mm',
+            $val === '60 мм' => '60 mm',
+            $val === '70 мм' => '70 mm',
+            $val === '80 мм' => '80 mm',
+            $val === '90 мм' => '90 mm',
+            $val === '100 мм' => '100 mm',
+
+            // Плотность
+            $val === '60 eps' => '60 eps',
+            $val === '80 eps' => '80 eps',
+            $val === '100 eps' => '100 eps',
+
+            // Длина
+            $val === '1200 мм' => '1200 mm',
+            $val === '2000 мм' => '2000 mm',
+
+            // Для ширины и высоты - автоматическая замена мм на mm
+            str_ends_with($val, ' мм') => str_replace(' мм', ' mm', $val),
+
             default => $val,
         };
     }
 
+    /**
+     * Переводы на английский
+     */
     private function translateToEn($val)
     {
-        return match ($val) {
-            '500 Вт' => '500 W',
-            '1000 Вт' => '1000 W',
-            'Красный' => 'Red',
-            'Синий' => 'Blue',
-            '1 м' => '1 m',
-            '2 м' => '2 m',
-            '50 см' => '50 cm',
-            '100 см' => '100 cm',
-            '1 кг' => '1 kg',
-            '5 кг' => '5 kg',
+        return match (true) {
+            // Толщина - конкретные значения
+            $val === '30 мм' => '30 mm',
+            $val === '40 мм' => '40 mm',
+            $val === '50 мм' => '50 mm',
+            $val === '60 мм' => '60 mm',
+            $val === '70 мм' => '70 mm',
+            $val === '80 мм' => '80 mm',
+            $val === '90 мм' => '90 mm',
+            $val === '100 мм' => '100 mm',
+
+            // Плотность
+            $val === '60 eps' => '60 eps',
+            $val === '80 eps' => '80 eps',
+            $val === '100 eps' => '100 eps',
+
+            // Длина
+            $val === '1200 мм' => '1200 mm',
+            $val === '2000 мм' => '2000 mm',
+
+            // Для ширины и высоты - автоматическая замена мм на mm
+            str_ends_with($val, ' мм') => str_replace(' мм', ' mm', $val),
+
             default => $val,
         };
     }
