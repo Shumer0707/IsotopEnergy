@@ -11,6 +11,9 @@ import {
   faChevronDown,
   faGlobe,
   faMagnifyingGlass,
+  faXmark,
+  faChevronLeft,
+  faChevronRight,
 } from '@fortawesome/free-solid-svg-icons'
 import { faHeart as farHeart } from '@fortawesome/free-regular-svg-icons'
 import { faFacebook, faInstagram, faTiktok } from '@fortawesome/free-brands-svg-icons'
@@ -28,5 +31,8 @@ library.add(
   faMagnifyingGlass,
   faFacebook,
   faInstagram,
-  faTiktok
+  faTiktok,
+  faXmark,
+  faChevronLeft,
+  faChevronRight,
 )

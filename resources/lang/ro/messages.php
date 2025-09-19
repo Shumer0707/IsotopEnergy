@@ -214,9 +214,12 @@ return [
   'product_choose' => 'Alegeți caracteristicile:',
   'product_selected' => 'Selectat:',
   'product_remove' => 'Scoate din coș',
-    'product_quantity' => 'Număr:',
+  'product_quantity' => 'Număr:',
   'product_select' => 'Alegeți varianta',
   'product_available' => 'Descrierea lipsește',
+  'product_img_click' => 'Click pentru zoom',
+
+  'product_modal_zoom' => 'Rotița mouse-ului sau dublu clic pentru zoom',
 
   //404
   '404_title' => 'Ne pare rău, pagina nu a fost găsită',

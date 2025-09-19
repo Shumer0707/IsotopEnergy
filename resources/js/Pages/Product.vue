@@ -3,13 +3,14 @@
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
   import QuantityControl from '@/Components/common/QuantityControl.vue'
   import FavoriteButton from '@/Components/common/FavoriteButton.vue'
+  import ImageModal from '@/Components/common/ImageModal.vue'
   import { useCartStore } from '@/Stores/cart'
   import { Swiper, SwiperSlide } from 'swiper/vue'
   import { Navigation, Mousewheel } from 'swiper'
   import 'swiper/css'
   import 'swiper/css/navigation'
-  import { useTranslations } from '@/composables/useTranslations'
   import ProductHeadSeo from '@/Components/seo/pages/ProductHeadSeo.vue'
+  import { useTranslations } from '@/composables/useTranslations'
 
   const t = useTranslations()
   const props = defineProps({
@@ -20,22 +21,24 @@
   const isMobile = ref(false)
   const swiper = ref(null)
 
-  // ✅ Выбранный вариант товара
+  // Выбранный вариант товара
   const selectedVariant = ref(null)
 
-  // ✅ Инициализация выбранного варианта
+  // Модальное окно для изображений
+  const isModalOpen = ref(false)
+  const currentModalImageIndex = ref(0)
+
+  // Инициализация выбранного варианта
   const initSelectedVariant = () => {
     if (!props.product) return
 
     let defaultVariant = null
 
-    // Пробуем найти дефолтный вариант разными способами
     if (props.product.default_variant) {
       defaultVariant = props.product.default_variant
     } else if (props.product.cheapest_variant) {
       defaultVariant = props.product.cheapest_variant
     } else if (props.product.variants && props.product.variants.length > 0) {
-      // Ищем вариант с is_default = true
       defaultVariant = props.product.variants.find((v) => v.is_default) || props.product.variants[0]
     }
 
@@ -44,7 +47,7 @@
     }
   }
 
-  // ✅ Наблюдатель за изменением product
+  // Наблюдатель за изменением product
   watch(
     () => props.product,
     (newProduct) => {
@@ -65,11 +68,38 @@
       : '/images/placeholder.jpg'
   )
 
-  const setImage = (imgPath) => {
+  // Простая смена картинки (только для миниатюр)
+  const setActiveImage = (imgPath) => {
     activeImage.value = `/storage/${imgPath}`
   }
 
-  // ✅ Группировка вариантов по атрибутам
+  // Открытие модалки с конкретным индексом
+  const openModal = (imageIndex) => {
+    console.log('openModal вызван с индексом:', imageIndex)
+    currentModalImageIndex.value = imageIndex
+    isModalOpen.value = true
+  }
+
+  // Открытие модалки для текущей активной картинки
+  const openModalForCurrentImage = () => {
+    const currentImagePath = activeImage.value.replace('/storage/', '')
+    const currentIndex = props.product.images?.findIndex((img) => img.path === currentImagePath) || 0
+    console.log('Открываем модалку для главной картинки, индекс:', currentIndex)
+    openModal(currentIndex)
+  }
+
+  const closeModal = () => {
+    isModalOpen.value = false
+  }
+
+  const onModalImageChange = (index) => {
+    if (props.product.images && props.product.images[index]) {
+      // Обновляем активное изображение без открытия модалки
+      activeImage.value = `/storage/${props.product.images[index].path}`
+    }
+  }
+
+  // Группировка вариантов по атрибутам
   const variantOptions = computed(() => {
     if (!props.product?.variants || props.product.variants.length === 0) {
       return {}
@@ -95,7 +125,6 @@
           }
         }
 
-        // Проверяем есть ли уже такое значение
         const existingValue = options[attributeId].values.find((v) => v.id === valueId)
 
         if (!existingValue) {
@@ -105,7 +134,6 @@
             variants: [variant],
           })
         } else {
-          // Добавляем вариант к существующему значению
           if (!existingValue.variants.find((v) => v.id === variant.id)) {
             existingValue.variants.push(variant)
           }
@@ -116,9 +144,8 @@
     return options
   })
 
-  // ✅ Выбор варианта по атрибуту
+  // Выбор варианта по атрибуту
   const selectVariantByAttribute = (attributeId, valueId) => {
-    // Если нет текущего варианта, берем первый подходящий
     if (!selectedVariant.value) {
       const matchingVariant = props.product.variants.find((variant) =>
         variant.variant_attributes?.some((va) => va.attribute_id === attributeId && va.attribute_value_id === valueId)
@@ -130,30 +157,22 @@
       return
     }
 
-    // Если есть текущий вариант, нужно найти вариант который:
-    // 1. Содержит выбранный атрибут+значение
-    // 2. Максимально сохраняет другие выбранные атрибуты
-
     const currentAttributes = {}
     selectedVariant.value.variant_attributes?.forEach((va) => {
       currentAttributes[va.attribute_id] = va.attribute_value_id
     })
 
-    // Обновляем выбранный атрибут
     currentAttributes[attributeId] = valueId
 
-    // Ищем точное совпадение
     let bestMatch = props.product.variants.find((variant) => {
       const variantAttrs = {}
       variant.variant_attributes?.forEach((va) => {
         variantAttrs[va.attribute_id] = va.attribute_value_id
       })
 
-      // Проверяем все атрибуты
       return Object.keys(currentAttributes).every((attrId) => variantAttrs[attrId] === currentAttributes[attrId])
     })
 
-    // Если точного совпадения нет, ищем хотя бы с выбранным атрибутом
     if (!bestMatch) {
       bestMatch = props.product.variants.find((variant) =>
         variant.variant_attributes?.some((va) => va.attribute_id === attributeId && va.attribute_value_id === valueId)
@@ -165,7 +184,7 @@
     }
   }
 
-  // ✅ Проверка выбранного значения
+  // Проверка выбранного значения
   const isAttributeValueSelected = (attributeId, valueId) => {
     if (!selectedVariant.value) return false
 
@@ -174,13 +193,13 @@
     )
   }
 
-  // ✅ Цена выбранного варианта
+  // Цена выбранного варианта
   const currentPrice = computed(() => {
     if (!selectedVariant.value) return 0
     return parseFloat(selectedVariant.value.price)
   })
 
-  // ✅ Цена со скидкой
+  // Цена со скидкой
   const discountedPrice = computed(() => {
     if (props.product?.promotion?.discount_group?.discount_percent) {
       const discount = props.product.promotion.discount_group.discount_percent
@@ -189,7 +208,7 @@
     return currentPrice.value
   })
 
-  // ✅ Формирование красивой строки атрибутов выбранного варианта
+  // Формирование красивой строки атрибутов выбранного варианта
   const selectedVariantDisplayText = computed(() => {
     if (!selectedVariant.value?.variant_attributes || selectedVariant.value.variant_attributes.length === 0) {
       return ''
@@ -204,7 +223,7 @@
     return attributeStrings.join(', ')
   })
 
-  // ✅ Атрибуты выбранного варианта для отображения в характеристиках
+  // Атрибуты выбранного варианта для отображения в характеристиках
   const selectedVariantAttributes = computed(() => {
     if (!selectedVariant.value?.variant_attributes) return []
 
@@ -214,7 +233,7 @@
     }))
   })
 
-  // Остальная логика без изменений...
+  // Остальная логика для слайдера
   const slidesPerView = computed(() => {
     const imageCount = props.product?.images?.length || 0
     return Math.min(imageCount, 4)
@@ -244,7 +263,7 @@
 
   <div class="max-w-7xl mx-auto px-4">
     <div class="flex flex-col md:flex-row gap-8 bg-white rounded-xl shadow p-6">
-      <!-- 🔹 Галерея (без изменений) -->
+      <!-- Галерея -->
       <div class="flex flex-col sm:flex-row gap-4 md:w-1/2">
         <div v-if="product?.images && product.images.length > 0" :class="['relative', isMobile ? 'w-full h-24' : 'w-20']">
           <button
@@ -269,8 +288,13 @@
               !showNavigation ? 'swiper-no-swiping' : '',
             ]"
           >
-            <SwiperSlide v-for="(img, index) in product.images" :key="index" @click="setImage(img.path)">
-              <div :class="['w-20 h-20 rounded overflow-hidden cursor-pointer shadow-sm transition p-1']">
+            <!-- ИСПРАВЛЕНО: только один обработчик на SwiperSlide -->
+            <SwiperSlide v-for="(img, index) in product.images" :key="index">
+              <div
+                :class="['w-20 h-20 rounded overflow-hidden cursor-pointer shadow-sm transition p-1']"
+                @click="setActiveImage(img.path)"
+                @dblclick="openModal(index)"
+              >
                 <img
                   :src="`/storage/${img.path}`"
                   :alt="`${product.description?.title} — foto ${index + 1}`"
@@ -306,15 +330,22 @@
             {{ t['product_discount'] }} -{{ product.promotion.discount_group.discount_percent }}%
           </div>
 
+          <!-- ИСПРАВЛЕНО: используем новый метод для главной картинки -->
           <img
             :src="activeImage"
             :alt="product?.description?.title || 'product image'"
-            class="w-full h-full object-cover rounded"
+            class="w-full h-full object-cover rounded cursor-pointer hover:opacity-90 transition-opacity"
+            @click="openModalForCurrentImage"
           />
+
+          <!-- Подсказка для пользователя -->
+          <div class="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded opacity-75">
+            {{ t['product_img_click'] }}
+          </div>
         </div>
       </div>
 
-      <!-- 🔸 Информация о товаре -->
+      <!-- Информация о товаре -->
       <div class="flex flex-col gap-4 md:w-1/2 justify-center md:justify-start self-center">
         <div class="flex flex-col gap-4">
           <!-- Название и бренд -->
@@ -328,7 +359,7 @@
             </div>
           </div>
 
-          <!-- ✅ БЛОК ВЫБОРА ВАРИАНТОВ -->
+          <!-- БЛОК ВЫБОРА ВАРИАНТОВ -->
           <div v-if="Object.keys(variantOptions).length > 0" class="space-y-4 border rounded-lg p-4 bg-gray-50">
             <h3 class="text-sm font-semibold text-gray-700">{{ t['product_choose'] }}</h3>
 
@@ -352,14 +383,14 @@
               </div>
             </div>
 
-            <!-- ✅ Информация о выбранном варианте -->
+            <!-- Информация о выбранном варианте -->
             <div v-if="selectedVariant && selectedVariantDisplayText" class="text-sm text-gray-600 pt-2 border-t border-gray-200">
               <span class="font-medium">{{ t['product_selected'] }}</span>
               {{ selectedVariantDisplayText }} ({{ selectedVariant.price }} {{ product?.currency || 'MDL' }})
             </div>
           </div>
 
-          <!-- ✅ ЦЕНА из выбранного варианта -->
+          <!-- ЦЕНА из выбранного варианта -->
           <div class="space-y-1">
             <div
               v-if="product?.promotion?.discount_group"
@@ -375,7 +406,7 @@
             </div>
           </div>
 
-          <!-- ✅ КНОПКИ с проверкой варианта -->
+          <!-- КНОПКИ с проверкой варианта -->
           <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 mt-2">
             <QuantityControl :variant-id="selectedVariant?.id" />
 
@@ -404,7 +435,7 @@
             </div>
           </div>
 
-          <!-- Иконки преимуществ (без изменений) -->
+          <!-- Иконки преимуществ -->
           <div class="flex gap-4 text-sm text-gray-600 pt-4 border-t mt-4">
             <div class="flex flex-col items-center gap-1 text-center">
               <span class="text-2xl">🔒</span>
@@ -437,7 +468,7 @@
     </div>
 
     <div class="grid md:grid-cols-2 gap-6 mt-10">
-      <!-- ✅ ХАРАКТЕРИСТИКИ выбранного варианта -->
+      <!-- ХАРАКТЕРИСТИКИ выбранного варианта -->
       <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200">
         <div class="flex items-center gap-3 mb-6">
           <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
@@ -466,7 +497,7 @@
         </div>
       </div>
 
-      <!-- Описание (без изменений) -->
+      <!-- Описание -->
       <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200">
         <div class="flex items-center gap-3 mb-6">
           <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
@@ -488,4 +519,14 @@
       </div>
     </div>
   </div>
+
+  <!-- Модальное окно для изображений -->
+  <ImageModal
+    :is-open="isModalOpen"
+    :images="product?.images || []"
+    :initial-image-index="currentModalImageIndex"
+    :product-title="product?.description?.title || 'Товар'"
+    @close="closeModal"
+    @image-change="onModalImageChange"
+  />
 </template>
