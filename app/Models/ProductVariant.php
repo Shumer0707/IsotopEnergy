@@ -70,18 +70,9 @@ class ProductVariant extends Model
     $baseSku = $this->product->base_sku ?? $this->product->id;
 
     $attributeParts = $this->variantAttributes()
-      ->with(['attribute.translations', 'attributeValue.translations'])
       ->get()
       ->map(function ($item) {
-        // Берем первые буквы названия атрибута + значение
-        $attrName = $item->attribute->translatedName();
-        $valueName = $item->attributeValue->translatedValue();
-
-        // Очищаем от спецсимволов и делаем короче
-        $attrShort = preg_replace('/[^a-zA-Zа-яА-Я0-9]/u', '', $attrName);
-        $valueShort = preg_replace('/[^a-zA-Zа-яА-Я0-9]/u', '', $valueName);
-
-        return strtolower($attrShort . '_' . $valueShort);
+        return $item->attribute_value_id; // Просто ID значения атрибута
       })
       ->implode('-');
 
