@@ -82,17 +82,7 @@
         <!-- Соцсети -->
         <div class="pt-2 border-t border-gray-200">
           <p class="font-semibold mb-2">{{ t['contact_soc'] }}</p>
-          <div class="flex gap-4 text-xl text-gray-600">
-            <a href="https://www.tiktok.com" target="_blank" rel="noopener noreferrer" class="hover:text-black">
-              <font-awesome-icon :icon="['fab', 'tiktok']" />
-            </a>
-            <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" class="hover:text-black">
-              <font-awesome-icon :icon="['fab', 'instagram']" />
-            </a>
-            <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" class="hover:text-black">
-              <font-awesome-icon :icon="['fab', 'facebook']" />
-            </a>
-          </div>
+          <SocialLinks />
         </div>
       </div>
 
@@ -141,6 +131,7 @@
   import { ref, computed } from 'vue'
   import ContactForm from '@/Components/shared/ContactForm.vue'
   import { useTranslations } from '@/composables/useTranslations'
+  import SocialLinks from '@/Components/common/SocialLinks.vue'
   import ContactsHeadSeo from '@/Components/seo/pages/ContactsHeadSeo.vue'
 
   const t = useTranslations()
