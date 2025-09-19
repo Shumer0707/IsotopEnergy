@@ -362,6 +362,12 @@
         >
           {{ form.create_variations ? 'Создать вариации' : 'Сохранить товар' }}
         </button>
+
+        <!-- Новая кнопка очистки шаблона -->
+        <button type="button" @click="clearTemplate" class="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600">
+          Очистить шаблон
+        </button>
+
         <button type="button" @click="$emit('cancel')" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
           Отмена
         </button>
@@ -376,9 +382,13 @@
 <script setup>
   import axios from 'axios'
   import QuickAddValueModal from '@/Pages/Admin/AttributeValues/QuickAddValueModal.vue'
-  import { ref, computed, watch } from 'vue'
+  import { ref, computed, watch, onMounted } from 'vue'
   import { useForm } from '@inertiajs/vue3'
   import SearchableSelect from '@/Components/shared/SearchableSelect.vue'
+
+  onMounted(() => {
+    loadFormTemplate()
+  })
 
   const emit = defineEmits(['productAdded', 'cancel'])
 
@@ -616,6 +626,7 @@
         data: formData,
         forceFormData: true,
         onSuccess: () => {
+          saveFormTemplate()
           form.reset()
           emit('productAdded')
         },
@@ -719,5 +730,54 @@
         'Не удалось создать значение.'
       alert(msg)
     }
+  }
+  const saveFormTemplate = () => {
+    const template = {
+      category_id: form.category_id,
+      brand_id: form.brand_id,
+      price: form.price,
+      measurement: form.measurement,
+      descriptions: { ...form.descriptions },
+      create_variations: form.create_variations,
+      price_step: form.price_step,
+      variation_attributes: { ...form.variation_attributes },
+      selected_combinations: [...form.selected_combinations],
+      prices: { ...form.prices },
+      attributes: [...form.attributes],
+    }
+
+    sessionStorage.setItem('product_template', JSON.stringify(template))
+    console.log('Шаблон сохранен:', template)
+  }
+
+  const loadFormTemplate = () => {
+    const saved = sessionStorage.getItem('product_template')
+    if (saved) {
+      try {
+        const template = JSON.parse(saved)
+
+        // Заполняем форму сохраненными данными
+        form.category_id = template.category_id || ''
+        form.brand_id = template.brand_id || ''
+        form.price = template.price || ''
+        form.measurement = template.measurement || ''
+        form.descriptions = { ...template.descriptions }
+        form.create_variations = template.create_variations || false
+        form.price_step = template.price_step || 0
+        form.variation_attributes = { ...template.variation_attributes }
+        form.selected_combinations = [...(template.selected_combinations || [])]
+        form.prices = { ...template.prices }
+        form.attributes = [...(template.attributes || [])]
+
+        console.log('Шаблон загружен:', template)
+      } catch (e) {
+        console.error('Ошибка загрузки шаблона:', e)
+      }
+    }
+  }
+
+  const clearTemplate = () => {
+    sessionStorage.removeItem('product_template')
+    console.log('Шаблон очищен')
   }
 </script>
