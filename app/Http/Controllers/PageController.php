@@ -9,6 +9,10 @@ class PageController extends Controller
 {
   public function home(Request $request, $locale = 'ru')
   {
+    if ($request->is('/') && !$request->route('locale')) {
+        return redirect('/ru');
+    }
+
     // Устанавливаем локаль
     app()->setLocale($locale);
 

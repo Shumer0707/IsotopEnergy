@@ -24,7 +24,10 @@ Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'inde
   ->withoutMiddleware(\App\Http\Middleware\HandleInertiaRequests::class);
 
 // 🔹 Редирект с корня на дефолтный язык
-Route::get('/', fn() => redirect('/ru'));
+// Route::get('/', fn() => redirect('/ru'));
+Route::get('/', [PageController::class, 'home'])
+  ->defaults('locale', 'ru')
+  ->name('home.default');
 
 // 🔹 ПУБЛИЧНЫЕ СТРАНИЦЫ (SEO) под {locale}
 Route::group([
