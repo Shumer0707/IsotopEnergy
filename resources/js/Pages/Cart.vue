@@ -106,7 +106,7 @@
           <!-- 💰 Цена -->
           <div class="hidden lg:flex items-center justify-end lg:col-span-2">
             <div class="text-sm text-right leading-snug">
-              <p v-if="variant.price !== variant.discounted_price" class="line-through text-gray-400">
+              <p v-if="variant.price > variant.discounted_price" class="line-through text-gray-400">
                 {{ variant.price }} {{ variant.product.currency }}
               </p>
               <p class="font-semibold">{{ variant.discounted_price || variant.price }} {{ variant.product.currency }}</p>

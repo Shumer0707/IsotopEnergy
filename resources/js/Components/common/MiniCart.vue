@@ -151,7 +151,7 @@
                     <div class="text-right">
                       <!-- Цена со скидкой если есть -->
                       <div
-                        v-if="variant.discounted_price && variant.discounted_price !== variant.price"
+                        v-if="variant.discounted_price && variant.discounted_price < variant.price"
                         class="line-through text-gray-400 text-xs"
                       >
                         {{ variant.price }} {{ variant.product.currency }}
