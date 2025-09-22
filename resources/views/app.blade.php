@@ -37,6 +37,8 @@
         href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Raleway:wght@600;700&display=swap&subset=latin,cyrillic-ext"
         rel="stylesheet">
 
+    <meta name="google-site-verification" content="4K6Xd5ZgxKMDtW_o70iKg1HfJhTh0yTp4ZrH1zw1ERY" />
+
     @routes
     @vite(['resources/js/app.js', "resources/js/Pages/{$page['component']}.vue"])
     @inertiaHead
