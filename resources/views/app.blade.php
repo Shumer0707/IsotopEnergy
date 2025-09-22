@@ -2,29 +2,30 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- SEO теги (динамические из контроллера или fallback) -->
-    <title inertia>{{ $page['props']['seo']['title'] ?? 'IsotopEnergy — Термопанели и архитектурный декор в Молдове' }}
-    </title>
-    <meta head-key="description" name="description"
-        content="{{ $page['props']['seo']['description'] ?? 'Производство термопанелей для утепления домов и архитектурного декора. Доставка по Молдове.' }}">
+    <!-- SEO теги (серверные для соцсетей) -->
+    <title>{{ $seoData['title'] ?? 'IsotopEnergy — Термопанели и архитектурный декор в Молдове' }}</title>
 
-    <!-- Open Graph -->
-    <meta head-key="og:title" property="og:title"
-        content="{{ $page['props']['seo']['og_title'] ?? ($page['props']['seo']['title'] ?? 'IsotopEnergy') }}">
-    <meta head-key="og:description" property="og:description"
-        content="{{ $page['props']['seo']['og_description'] ?? ($page['props']['seo']['description'] ?? 'Термопанели в Молдове') }}">
-    <meta head-key="og:type" property="og:type" content="website">
-    <meta head-key="og:url" property="og:url" content="{{ $page['props']['seo']['canonical'] ?? request()->url() }}">
-    <meta head-key="og:locale" property="og:locale"
-        content="{{ $page['props']['locale'] === 'ro' ? 'ro_RO' : 'ru_RU' }}">
+    <meta name="description"
+        content="{{ $seoData['description'] ?? 'Производство термопанелей для утепления домов и архитектурного декора. Доставка по Молдове.' }}">
+
+    <!-- Open Graph для соцсетей -->
+    <meta property="og:title" content="{{ $seoData['og_title'] ?? ($seoData['title'] ?? 'IsotopEnergy') }}">
+
+    <meta property="og:description"
+        content="{{ $seoData['og_description'] ?? ($seoData['description'] ?? 'Термопанели в Молдове') }}">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ $seoData['canonical'] ?? request()->url() }}">
+    <meta property="og:locale" content="{{ ($locale ?? 'ru') === 'ro' ? 'ro_RO' : 'ru_RU' }}">
+
     <!-- Open Graph изображение -->
-    <meta head-key="og:image" property="og:image" content="{{ asset('/images/og-image.jpg') }}">
-    <meta head-key="og:image:width" property="og:image:width" content="1200">
-    <meta head-key="og:image:height" property="og:image:height" content="630">
-    <meta head-key="og:image:type" property="og:image:type" content="image/jpeg">
+    <meta property="og:image" content="{{ asset('/images/og-image.jpg') }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:type" content="image/jpeg">
 
     <!-- Canonical -->
-    <link head-key="canonical" rel="canonical" href="{{ $page['props']['seo']['canonical'] ?? request()->url() }}">
+    <link rel="canonical" href="{{ $seoData['canonical'] ?? request()->url() }}">
 
     <!-- Остальное без изменений -->
     <link rel="icon" type="image/svg+xml" href="/favicon-2.svg">
