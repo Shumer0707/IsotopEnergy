@@ -25,9 +25,9 @@ Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'inde
 
 // 🔹 Редирект с корня на дефолтный язык
 // Route::get('/', fn() => redirect('/ru'));
-Route::get('/', [PageController::class, 'home'])
-  ->defaults('locale', 'ru')
-  ->name('home.default');
+Route::get('/', function () {
+  return app(PageController::class)->home(request(), 'ru');
+});
 
 // 🔹 ПУБЛИЧНЫЕ СТРАНИЦЫ (SEO) под {locale}
 Route::group([
