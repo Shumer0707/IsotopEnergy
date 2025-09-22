@@ -21,6 +21,9 @@ class PageController extends Controller
       'og_description' => __('messages.home_meta_description'),
     ];
 
+    view()->share('seoData', $seoData);
+    view()->share('locale', $locale);
+
     return Inertia::render('Home', [
       'locale' => $locale,
       'seo' => $seoData,
@@ -38,6 +41,9 @@ class PageController extends Controller
       'og_title' => __('messages.about_meta_title'),
       'og_description' => __('messages.about_meta_description'),
     ];
+
+    view()->share('seoData', $seoData);
+    view()->share('locale', $locale);
 
     return Inertia::render('About', [
       'locale' => $locale,
@@ -57,6 +63,9 @@ class PageController extends Controller
       'og_description' => __('messages.contacts_meta_description'),
     ];
 
+    view()->share('seoData', $seoData);
+    view()->share('locale', $locale);
+
     return Inertia::render('Contacts', [
       'locale' => $locale,
       'seo' => $seoData,
@@ -72,6 +81,9 @@ class PageController extends Controller
       'description' => 'Корзина покупок - IsotopEnergy термопанели',
       'canonical' => $request->url(),
     ];
+
+    view()->share('seoData', $seoData);
+    view()->share('locale', $locale);
 
     return Inertia::render('Cart', [
       'locale' => $locale,

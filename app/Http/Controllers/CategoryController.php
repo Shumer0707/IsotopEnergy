@@ -105,6 +105,18 @@ class CategoryController extends Controller
     // доступные фильтры для рендера UI
     $available = $filterService->availableFilters($category);
 
+    // для seo
+    app()->setLocale($locale);
+
+    $seoData = [
+      'title' => __('messages.cart_title') . ' - IsotopEnergy',
+      'description' => 'Корзина покупок - IsotopEnergy термопанели',
+      'canonical' => $request->url(),
+    ];
+
+    view()->share('seoData', $seoData);
+    view()->share('locale', $locale);
+
     return Inertia::render('Products/ProductsByCategory', [
       'category'          => $category,
       'parentCategory'    => $category->parent,

@@ -4,10 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Inertia\Inertia;
+use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-  public function show(string $locale, Product $product)
+  public function show(string $locale, Product $product, Request $request,)
   {
     $product->load([
       'description',
@@ -30,6 +31,18 @@ class ProductController extends Controller
 
       'promotion.discountGroup',
     ]);
+
+    // для seo
+    app()->setLocale($locale);
+
+    $seoData = [
+      'title' => __('messages.cart_title') . ' - IsotopEnergy',
+      'description' => 'Корзина покупок - IsotopEnergy термопанели',
+      'canonical' => $request->url(),
+    ];
+
+    view()->share('seoData', $seoData);
+    view()->share('locale', $locale);
 
     return Inertia::render('Product', [
       'product' => $product,
