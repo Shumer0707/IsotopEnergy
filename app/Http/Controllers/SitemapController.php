@@ -15,9 +15,35 @@ class SitemapController extends Controller
       return $this->buildUrls($request);
     });
 
-    return response()
-      ->view('sitemap', ['urls' => $urls])
-      ->header('Content-Type', 'application/xml; charset=UTF-8');
+    $this->outputXML($urls);
+  }
+
+  private function outputXML(array $urls): void
+  {
+    header('Content-Type: application/xml; charset=UTF-8');
+
+    echo '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL;
+    echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">' . PHP_EOL;
+
+    foreach ($urls as $u) {
+      echo '  <url>' . PHP_EOL;
+      echo '    <loc>' . htmlspecialchars($u['loc']) . '</loc>' . PHP_EOL;
+      echo '    <xhtml:link rel="alternate" hreflang="ru" href="' . htmlspecialchars($u['alt']['ru']) . '"/>' . PHP_EOL;
+      echo '    <xhtml:link rel="alternate" hreflang="ro" href="' . htmlspecialchars($u['alt']['ro']) . '"/>' . PHP_EOL;
+      echo '    <xhtml:link rel="alternate" hreflang="x-default" href="' . htmlspecialchars($u['alt']['x']) . '"/>' . PHP_EOL;
+
+      if (isset($u['lastmod'])) {
+        echo '    <lastmod>' . $u['lastmod'] . '</lastmod>' . PHP_EOL;
+      }
+      if (isset($u['priority'])) {
+        echo '    <priority>' . $u['priority'] . '</priority>' . PHP_EOL;
+      }
+
+      echo '  </url>' . PHP_EOL;
+    }
+
+    echo '</urlset>';
+    exit;
   }
 
   private function buildUrls(Request $request): array
