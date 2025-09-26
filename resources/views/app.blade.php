@@ -28,7 +28,7 @@
     <link rel="canonical" href="{{ $seoData['canonical'] ?? request()->url() }}">
 
     <!-- Остальное без изменений -->
-    <link rel="icon" type="image/svg+xml" href="/favicon-2.svg">
+    <link rel="icon" type="image/svg+xml" href="storage/logo/logo.png">
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />

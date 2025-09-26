@@ -25,7 +25,7 @@
     >
       <!-- Левая часть -->
       <div class="flex flex-row-reverse sm:flex-row items-center justify-between sm:justify-center gap-4 sm:gap-6">
-        <Link href="/" class="hover:underline">
+        <Link :href="`/${$page.props.locale}`" class="hover:underline">
           <span class="block">
             <img :src="`/storage/logo/logo.png`" alt="Logo" class="h-9 w-auto sm:h-auto sm:min-w-[140px] lg:sm:min-w-[180px]" />
           </span>
